@@ -12,4 +12,17 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PackageId>Blockly.Net</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Dr. Jochen Manns</Authors>
+    <Company>ZERA GmbH</Company>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>
