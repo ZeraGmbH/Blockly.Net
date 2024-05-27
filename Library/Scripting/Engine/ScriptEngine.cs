@@ -263,44 +263,6 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         => StartChild<TResult>(request, _active, options, 0);
 
     /// <summary>
-    /// Start a child script.
-    /// </summary>
-    /// <typeparam name="TResult">Type of the result data.</typeparam>
-    /// <param name="request">Script configuration.</param>
-    /// <param name="parent">Parent script.</param>
-    /// <param name="options">Detailed configuration of the new script.</param>
-    /// <param name="depth">Nestring depth of the child.</param>
-    /// <returns>Task on the result.</returns>
-    private async Task<TResult> StartChild<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
-    {
-        /* Create execution context. */
-        var site = new ScriptSite(this, parent, depth + 1);
-
-        using (_lock.Wait())
-        {
-            /* Create a new progress entry for this child. */
-            while (depth >= _allProgress.Count) _allProgress.Add([]);
-
-            _allProgress[depth].Add(site);
-        }
-
-        try
-        {
-            /* Start the script. */
-            site.Start(request, options);
-
-            /* Execute the script and report the result - or exception. */
-            return (TResult)(await site.WaitForResult())!;
-        }
-        finally
-        {
-            using (_lock.Wait())
-                if (depth < _allProgress.Count)
-                    _allProgress[depth].Remove(site);
-        }
-    }
-
-    /// <summary>
     /// Finish using this instance.
     /// </summary>
     public void Dispose()
