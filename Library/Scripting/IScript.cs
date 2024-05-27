@@ -10,5 +10,5 @@ public interface IScript
     /// <summary>
     /// Can be used to check for early termination.
     /// </summary>
-    Func<bool>? ShouldStopNow { get; set; }
+    StartScriptOptions? Options { get; }
 }

@@ -114,11 +114,8 @@ public partial class ScriptEngine
             try
             {
                 /* Create the script instance from the configuration model. */
-                if (Activator.CreateInstance(request.GetScriptType(), request, this) is not Script script)
+                if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not Script script)
                     throw new ArgumentException("bad script for '{Name}' request.", request.Name);
-
-                /* Process options. */
-                script.ShouldStopNow = options?.ShouldStopNow;
 
                 /* Start the background execution of the script. */
                 ThreadPool.QueueUserWorkItem(RunScript, script);

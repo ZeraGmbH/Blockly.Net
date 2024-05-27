@@ -71,11 +71,8 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         try
         {
             /* Try to create the script instance. */
-            if (Activator.CreateInstance(request.GetScriptType(), request, this) is not Script script)
+            if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not Script script)
                 throw new ArgumentException("bad script for '{Name}' request.", request.Name);
-
-            /* Process options. */
-            script.ShouldStopNow = options?.ShouldStopNow;
 
             using (_lock.Wait())
             {

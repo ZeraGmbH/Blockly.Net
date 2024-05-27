@@ -55,7 +55,7 @@ public abstract class Block : IFragment
         context.Cancellation.ThrowIfCancellationRequested();
 
         /* Check for early stop. */
-        if (context.Engine.CurrentScript?.ShouldStopNow?.Invoke() == true)
+        if (context.Engine.CurrentScript?.Options?.ShouldStopNow?.Invoke() == true)
             throw new ScriptStoppedEarlyException();
 
         /* Run the next block if we are not forcefully exiting a loop. */
