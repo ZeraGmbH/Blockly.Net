@@ -73,12 +73,12 @@ public abstract class TestEnvironment
     /// <summary>
     /// Mock for the broadcast receiver.
     /// </summary>
-    protected class Sink : IScriptEngineContext
+    protected class Sink : IScriptEngineNotifySink
     {
-        public Action<string, object?>? OnEvent;
+        public Action<ScriptEngineNotifyMethods, object?>? OnEvent;
 
         /// <inheritdoc/>
-        public Task Broadcast(string method, object? arg1)
+        public Task Send(ScriptEngineNotifyMethods method, object? arg1)
         {
             OnEvent?.Invoke(method, arg1);
 
@@ -197,6 +197,9 @@ public abstract class TestEnvironment
 
         /* Setup dependency injection. */
         var services = new ServiceCollection();
+
+        /* Enable logging. */
+        services.AddLogging();
 
         /* Mocked script definition storage. */
         services.AddSingleton<IScriptDefinitionStorage, Storage>();

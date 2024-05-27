@@ -1,7 +1,14 @@
+using Microsoft.Extensions.Logging;
+
 namespace BlocklyNet.Scripting.Engine;
 
 public interface IScriptSite
 {
+    /// <summary>
+    /// Report the current logging helper of the script engine.
+    /// </summary>
+    ILogger Logger { get; }
+
     /// <summary>
     /// Dependency injection manager.
     /// </summary>

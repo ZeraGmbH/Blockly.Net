@@ -170,7 +170,7 @@ public class ParallelTests : TestEnvironment
         base.OnSetup(services);
 
         /* Register the broadcast sink. */
-        services.AddSingleton<IScriptEngineContext, Sink>();
+        services.AddSingleton<IScriptEngineNotifySink, Sink>();
     }
 
     /// <summary>
@@ -183,7 +183,7 @@ public class ParallelTests : TestEnvironment
         var done = new TaskCompletionSource();
 
         /* Configure the broadcast sink. */
-        ((Sink)GetService<IScriptEngineContext>()).OnEvent = (method, arg) => { if (method == "ScriptDone") done.SetResult(); };
+        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) => { if (method == ScriptEngineNotifyMethods.Done) done.SetResult(); };
 
         AddScript("SINGLE", single, [new() { Name = "delay", Type = "number", Required = true }]);
 

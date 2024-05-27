@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -50,6 +51,9 @@ public partial class ScriptEngine
 
         /// <inheritdoc/>
         public IServiceProvider ServiceProvider => _engine.ServiceProvider;
+
+        /// <inheritdoc/>
+        public ILogger Logger => _engine.Logger;
 
         /// <inheritdoc/>
         public CancellationToken Cancellation => _engine.Cancellation;

@@ -38,4 +38,10 @@ public interface IScriptEngine
     /// Report the script parsing engine to use.
     /// </summary>
     IScriptParser Parser { get; }
+
+    /// <summary>
+    /// Send current status to a newly connected client to let it keep up.
+    /// </summary>
+    /// <param name="client">The new client.</param>
+    void Reconnect(IScriptEngineNotifySink client);
 }

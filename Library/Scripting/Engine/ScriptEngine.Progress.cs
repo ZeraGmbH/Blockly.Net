@@ -50,7 +50,7 @@ public partial class ScriptEngine
             _lastProgress = nextProgress;
 
             context?
-                .Broadcast("ScriptProgress", _lastProgress)
+                .Send(ScriptEngineNotifyMethods.Progress, _lastProgress)
                 .ContinueWith(t => { }, TaskContinuationOptions.NotOnRanToCompletion);
         }
     }

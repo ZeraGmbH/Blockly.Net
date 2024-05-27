@@ -187,7 +187,7 @@ public class ProgressTests : TestEnvironment
         base.OnSetup(services);
 
         /* Register the broadcast sink. */
-        services.AddSingleton<IScriptEngineContext, Sink>();
+        services.AddSingleton<IScriptEngineNotifySink, Sink>();
     }
 
     /// <summary>
@@ -202,20 +202,20 @@ public class ProgressTests : TestEnvironment
         /* Configure the broadcast sink. */
         var progress = 0;
 
-        ((Sink)GetService<IScriptEngineContext>()).OnEvent = (method, arg) =>
+        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) =>
         {
             switch (progress++)
             {
                 case 0:
                     /* The script has been started. */
-                    Assert.That(method, Is.EqualTo("ScriptStarted"));
+                    Assert.That(method, Is.EqualTo(ScriptEngineNotifyMethods.Started));
                     Assert.That(arg, Is.TypeOf<ScriptInformation>());
                     break;
                 case 1:
                 case 2:
                 case 3:
                     /* The SetProgress block has been executed. */
-                    Assert.That(method, Is.EqualTo("ScriptProgress"));
+                    Assert.That(method, Is.EqualTo(ScriptEngineNotifyMethods.Progress));
                     Assert.That(arg, Is.TypeOf<ScriptProgress>());
                     Assert.That(((ScriptProgress)arg!).AllProgress[0].Progress, Is.EqualTo(progress == 2 ? 0 : progress == 3 ? 0.33d : 1));
                     break;
@@ -223,12 +223,12 @@ public class ProgressTests : TestEnvironment
                     /* blockly finished the script. */
                     done.SetResult();
 
-                    Assert.That(method, Is.EqualTo("ScriptDone"));
+                    Assert.That(method, Is.EqualTo(ScriptEngineNotifyMethods.Done));
                     Assert.That(arg, Is.TypeOf<ScriptDone>());
                     break;
                 case 5:
                     /* The result of the script has been requested. */
-                    Assert.That(method, Is.EqualTo("ScriptFinished"));
+                    Assert.That(method, Is.EqualTo(ScriptEngineNotifyMethods.Finished));
                     Assert.That(arg, Is.TypeOf<ScriptFinished>());
                     break;
                 default:

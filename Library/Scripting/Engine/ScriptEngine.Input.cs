@@ -59,7 +59,7 @@ public partial class ScriptEngine
                 var inputRequest = new UserInputRequest { JobId = _active.JobId, Key = key, ValueType = type };
 
                 context?
-                    .Broadcast("InputRequest", _inputRequest = inputRequest)
+                    .Send(ScriptEngineNotifyMethods.InputRequest, _inputRequest = inputRequest)
                     .ContinueWith(t => { }, TaskContinuationOptions.NotOnRanToCompletion);
             }
 

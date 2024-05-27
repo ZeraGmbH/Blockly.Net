@@ -1,6 +1,7 @@
 using System.Reflection;
 using BlocklyNet.Scripting.Parsing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -10,9 +11,13 @@ namespace BlocklyNet.Scripting.Engine;
 /// </summary>
 /// <param name="context">Execution context of the engine.</param>
 /// <param name="_rootProvider">Dependency injection manager.</param>
+/// <param name="logger">Logging helper.</param>
 /// <param name="parser">Script parser to use.</param>
-public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser parser, IScriptEngineContext? context = null) : IScriptEngine, IScriptSite, IDisposable
+public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser parser, ILogger<ScriptEngine> logger, IScriptEngineNotifySink? context = null) : IScriptEngine, IScriptSite, IDisposable
 {
+    /// <inheritdoc/>
+    public ILogger Logger => logger;
+
     /// <summary>
     /// Synchronize modifying the result.
     /// </summary>
@@ -92,7 +97,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             ThreadPool.QueueUserWorkItem(RunScript);
 
             /* Inform all. */
-            context?.Broadcast("ScriptStarted", new ScriptInformation
+            context?.Send(ScriptEngineNotifyMethods.Started, new ScriptInformation
             {
                 JobId = script.JobId,
                 ModelType = request.ModelType,
@@ -162,13 +167,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             var requestName = request.Name;
 
             var task = error == null
-                ? context?.Broadcast("ScriptDone", new ScriptDone
+                ? context?.Send(ScriptEngineNotifyMethods.Done, new ScriptDone
                 {
                     JobId = script.JobId,
                     ModelType = request.ModelType,
                     Name = requestName,
                 })
-                : context?.Broadcast("ScriptError", new ScriptError
+                : context?.Send(ScriptEngineNotifyMethods.Error, new ScriptError
                 {
                     ErrorMessage = error.Message,
                     JobId = script.JobId,
@@ -212,7 +217,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             _active = null;
 
             /* Inform all. */
-            context?.Broadcast("ScriptFinished", new ScriptFinished
+            context?.Send(ScriptEngineNotifyMethods.Finished, new ScriptFinished
             {
                 JobId = script.JobId,
                 ModelType = script.GetRequest().ModelType,
@@ -277,5 +282,38 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     {
         /* Release system resources. */
         _lock.Dispose();
+    }
+
+    /// <inheritdoc/>
+    public void Reconnect(IScriptEngineNotifySink client)
+    {
+        using (_lock.Wait())
+        {
+            /* Nothing to report. */
+            if (_active == null) return;
+
+            /* Has been started. */
+            client
+                .Send(ScriptEngineNotifyMethods.Current, new ScriptInformation { JobId = _active.JobId, ModelType = _active.GetRequest().ModelType, Name = _active.GetRequest().Name })
+                .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+
+            /* Has some last progress. */
+            if (_lastProgress != null)
+                client
+                    .Send(ScriptEngineNotifyMethods.Progress, _lastProgress)
+                    .ContinueWith(t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+
+            /* Is waiting for input. */
+            if (_inputRequest != null)
+                client
+                    .Send(ScriptEngineNotifyMethods.InputRequest, _inputRequest)
+                    .ContinueWith(t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", _inputRequest.JobId, t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+
+            /* Script is completed. */
+            if (_done)
+                client
+                    .Send(ScriptEngineNotifyMethods.Done, new ScriptDone { Name = _active.GetRequest().Name, JobId = _active.JobId, ModelType = _active.GetRequest().ModelType })
+                    .ContinueWith(t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+        }
     }
 }
