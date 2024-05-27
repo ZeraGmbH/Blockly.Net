@@ -11,7 +11,7 @@ public partial class ScriptEngine
     /// <param name="engine">The main script engine.</param>
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nestring depth of the script, at least 1.</param>
-    private class ScriptSite(ScriptEngine engine, IScript? parent, int depth) : IScriptSite
+    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth) : IScriptSite
     {
         /// <summary>
         /// Last progress information of this child script.
@@ -21,7 +21,7 @@ public partial class ScriptEngine
         /// <summary>
         /// The script starting this script.
         /// </summary>
-        private readonly IScript? _parent = parent;
+        protected readonly IScript? Parent = parent;
 
         /// <summary>
         /// Synchronize access to the result.
@@ -176,6 +176,15 @@ public partial class ScriptEngine
     }
 
     /// <summary>
+    /// Create a new script site to allow proper customization of the engine.
+    /// </summary>
+    /// <param name="engine">Engine to use.</param>
+    /// <param name="parent">Parent script.</param>
+    /// <param name="depth">Nesting depth.</param>
+    /// <returns>The new site.</returns>
+    protected virtual ScriptSite CreateSite(IScript? parent, int depth) => new(this, parent, depth);
+
+    /// <summary>
     /// Start a child script.
     /// </summary>
     /// <typeparam name="TResult">Type of the result data.</typeparam>
@@ -187,7 +196,7 @@ public partial class ScriptEngine
     private async Task<TResult> StartChild<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
     {
         /* Create execution context. */
-        var site = new ScriptSite(this, parent, depth + 1);
+        var site = CreateSite(parent, depth + 1);
 
         using (_lock.Wait())
         {
