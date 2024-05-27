@@ -3,7 +3,6 @@ using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Engine;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace BlocklyNet.Scripting.Generic;
 
@@ -68,7 +67,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine) : Scr
                 if (!models.Models.TryGetValue(param.Type, out var modelInfo)) continue;
 
                 /* Do convert if we get raw json. */
-                presets[param.Name] = JsonConvert.DeserializeObject(json.ToString(), modelInfo.Type);
+                presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), modelInfo.Type, JsonUtils.JsonSettings);
             }
         }
 

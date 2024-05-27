@@ -1,8 +1,9 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using BlocklyNet.Core.Model;
-using Newtonsoft.Json;
 
 namespace BlocklyNet.Extensions.Builder;
 
@@ -127,7 +128,7 @@ public class ModelBlock<T> : Block where T : class, new()
         _props = typeof(T)
             .GetProperties()
             .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models))
-            .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() == null)
+            .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null)
             .ToArray();
 
         /* Generate the JSON descriptions of the model. */
@@ -278,8 +279,8 @@ public class ModelBlock<T> : Block where T : class, new()
             if (blocklyData == null) continue;
 
             /* Too make sure that the data fits run it to a serialize/deserialze sequence - currently performance should not be a problem. */
-            var dataAsJson = JsonConvert.SerializeObject(blocklyData);
-            var typedData = JsonConvert.DeserializeObject(dataAsJson, prop.PropertyType);
+            var dataAsJson = JsonSerializer.Serialize(blocklyData, JsonUtils.JsonSettings);
+            var typedData = JsonSerializer.Deserialize(dataAsJson, prop.PropertyType, JsonUtils.JsonSettings);
 
             /* Store the adapted value in the model. */
             prop.SetValue(model, typedData);
