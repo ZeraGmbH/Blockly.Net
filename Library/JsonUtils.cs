@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+namespace BlocklyNet;
+
 public static class JsonUtils
 {
     /// <summary>

@@ -1,5 +1,6 @@
 using System.Reflection;
 using BlocklyNet.Scripting.Parsing;
+using BlocklyNet.User;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -93,7 +94,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
                 _lastProgress = null;
                 _lastProgressValue = null;
 
+                /* Do additional cleanup */
+                OnPrepareStart();
+
                 _activeScope = _rootProvider.CreateScope();
+
+                /* If the notion of a user is enabled attach the user to the script execution threads. */
+                ServiceProvider.GetService<ICurrentUser>()?.FromToken(userToken);
 
                 Logger.LogTrace("Script '{Name}' started as {JobId}.", request.Name, script.JobId);
 
@@ -122,6 +129,11 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         }
     }
 
+    /// <summary>
+    /// Allow customization to prepare for a script execution.
+    /// </summary>
+    protected virtual void OnPrepareStart() { }
+
     /// <inheritdoc/>
     public void Cancel(string jobId)
     {
@@ -138,8 +150,17 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             /* Abort pending input. */
             if (_inputResponse != null && _inputRequest != null)
                 SetUserInput(new() { JobId = jobId, Key = _inputRequest.Key }, false);
+
+            /* Do custom cleanup. */
+            OnCancel(jobId);
         }
     }
+
+    /// <summary>
+    /// Cleanup during a cancel operation.
+    /// </summary>
+    /// <param name="jobId">The script that has been cancelled.</param>
+    protected virtual void OnCancel(string jobId) { }
 
     /// <summary>
     /// Execute the main script.
