@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -37,6 +38,9 @@ public partial class ScriptEngine
             _inputResponse = null;
         }
 
+        /* Set result outside of lock - just to reduce the minimal chance of a deadlock even further. */
+        Logger.LogTrace("Script {JobId} is processing {Key}={Value}.", response.JobId, response.Key, response.Value);
+
         inputResponse.SetResult(response);
     }
 
@@ -60,8 +64,11 @@ public partial class ScriptEngine
 
                 context?
                     .Send(ScriptEngineNotifyMethods.InputRequest, _inputRequest = inputRequest)
-                    .ContinueWith(t => { }, TaskContinuationOptions.NotOnRanToCompletion);
+                    .ContinueWith(t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", inputRequest.JobId, t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
             }
+
+            /* Report a promise on the result. */
+            Logger.LogTrace("Script {JobId} is requesting input for {Key}.", _active.JobId, key);
 
             return _inputResponse.Task.ContinueWith(t =>
             {

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace BlocklyNet.Scripting.Engine;
 
 public partial class ScriptEngine
@@ -51,7 +53,7 @@ public partial class ScriptEngine
 
             context?
                 .Send(ScriptEngineNotifyMethods.Progress, _lastProgress)
-                .ContinueWith(t => { }, TaskContinuationOptions.NotOnRanToCompletion);
+                .ContinueWith(t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
         }
     }
 }

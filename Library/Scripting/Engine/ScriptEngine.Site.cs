@@ -109,15 +109,27 @@ public partial class ScriptEngine
         /// <inheritdoc/>
         public void Start(StartScript request, StartScriptOptions? options = null)
         {
-            /* Create the script instance from the configuration model. */
-            if (Activator.CreateInstance(request.GetScriptType(), request, this) is not Script script)
-                throw new ArgumentException("bad script for '{Name}' request.", request.Name);
+            Logger.LogTrace("Nested script '{Name}' should be started.", request.Name);
 
-            /* Process options. */
-            script.ShouldStopNow = options?.ShouldStopNow;
+            try
+            {
+                /* Create the script instance from the configuration model. */
+                if (Activator.CreateInstance(request.GetScriptType(), request, this) is not Script script)
+                    throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
-            /* Start the background execution of the script. */
-            ThreadPool.QueueUserWorkItem(RunScript, script);
+                /* Process options. */
+                script.ShouldStopNow = options?.ShouldStopNow;
+
+                /* Start the background execution of the script. */
+                ThreadPool.QueueUserWorkItem(RunScript, script);
+
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Unable to start nested script '{Name}': {Exception}", request.Name, e.Message);
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -147,6 +159,8 @@ public partial class ScriptEngine
 
                 if (_error is TargetInvocationException target)
                     _error = target.InnerException ?? target;
+
+                Logger.LogError("Failed to execute nested script {JobId}: {Exception}", script.JobId, _error.Message);
             }
             finally
             {
