@@ -78,7 +78,11 @@ public class RunScript : Block
       .Single();
 
     /* Prepare to run generic script. */
-    var config = new StartGenericScript { Name = script.Name, ScriptId = script.Id, ResultType = script.ResultType };
+    var config = context.ServiceProvider.GetService<IGenericScriptFactory>()?.Create() ?? new StartGenericScript();
+
+    config.Name = script.Name;
+    config.ScriptId = script.Id;
+    config.ResultType = script.ResultType;
 
     /* Fill presets - just copy indicated variables with the same name. */
     var copies = await Values.Evaluate<IEnumerable>("ARGS", context, false);

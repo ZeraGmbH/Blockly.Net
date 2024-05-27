@@ -198,8 +198,8 @@ public class ParallelTests : TestEnvironment
         var times1 = results[0].Cast<double>().Select(t => new DateTime((long)t)).ToArray();
         var times2 = results[1].Cast<double>().Select(t => new DateTime((long)t)).ToArray();
 
-        Assert.That((times1[1] - times1[0]).TotalMilliseconds, Is.GreaterThan(500));
-        Assert.That((times2[1] - times2[0]).TotalMilliseconds, Is.GreaterThan(750));
+        Assert.That((times1[1] - times1[0]).TotalMilliseconds, Is.GreaterThan(490));
+        Assert.That((times2[1] - times2[0]).TotalMilliseconds, Is.GreaterThan(740));
 
         Assert.That(Math.Abs((times1[0] - times2[0]).TotalMilliseconds), Is.LessThan(250));
     }

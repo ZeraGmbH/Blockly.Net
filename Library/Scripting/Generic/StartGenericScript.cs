@@ -6,7 +6,7 @@ namespace BlocklyNet.Scripting.Generic;
 /// <summary>
 /// Start a generic script based on the integrated script language.
 /// </summary>
-public class StartGenericScript : StartScript<GenericScript, GenericResult>
+public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult> where TScript : GenericScript where TResult : GenericResult
 {
     /// <summary>
     /// Parameters for the script.
@@ -32,4 +32,11 @@ public class StartGenericScript : StartScript<GenericScript, GenericResult>
     /// Type of the result.
     /// </summary>
     public string? ResultType { get; set; }
+}
+
+/// <summary>
+/// Start a generic script based on the integrated script language.
+/// </summary>
+public class StartGenericScript : StartGenericScript<GenericScript, GenericResult>
+{
 }

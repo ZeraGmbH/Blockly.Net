@@ -6,7 +6,7 @@ namespace BlocklyNet.Scripting;
 /// <summary>
 /// Describes an active script.
 /// </summary>
-public abstract class Script(StartScriptOptions? options) : IScriptInstance
+public abstract class Script : IScriptInstance
 {
     /// <summary>
     /// The unique identifier of the active script.
@@ -32,7 +32,16 @@ public abstract class Script(StartScriptOptions? options) : IScriptInstance
     /// <summary>
     /// Can be used to check for early termination.
     /// </summary>
-    public StartScriptOptions? Options => options;
+    public abstract StartScriptOptions? Options { get; }
+}
+
+/// <summary>
+/// Describes an active script.
+/// </summary>
+public abstract class Script<TOption>(TOption? options) : Script where TOption : StartScriptOptions
+{
+    /// <inheritdoc/>
+    public override TOption? Options => options;
 }
 
 /// <summary>
@@ -42,7 +51,7 @@ public abstract class Script(StartScriptOptions? options) : IScriptInstance
 /// <typeparam name="TResult"></typeparam>
 /// <param name="request"></param>
 /// <param name="engine"></param>
-public abstract class Script<TRequest, TResult>(TRequest request, IScriptSite engine, StartScriptOptions? options) : Script(options) where TRequest : StartScript
+public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption>(options) where TRequest : StartScript where TOption : StartScriptOptions
 {
     /// <summary>
     /// 
