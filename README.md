@@ -47,7 +47,7 @@ The customizations allows for [easy creation](Library/Extensions/Delay.cs) of bl
 - each execution is asynchrous, but can simply be ported from a synchrous implementation using `Task.FromResult`
 - and additional `script engine site` provides more real life functionality, esp. accessing the dependency injection manager
 
-The definition builer supports:
+The definition builder supports:
 
 - auto block generation for enumerations blocks
 - auto model generation for models which some minor restrictions, e.g. if a model has a property with the type of another model this other model must be built first
