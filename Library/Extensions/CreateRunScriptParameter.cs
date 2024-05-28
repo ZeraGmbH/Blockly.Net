@@ -62,7 +62,7 @@ public class RunScriptParameter
         ""shadow"": {
           ""type"": ""text"",
           ""fields"": {
-            ""VALUE"": """"
+            ""TEXT"": """"
           }
         }
       }
