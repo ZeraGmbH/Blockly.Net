@@ -1,6 +1,6 @@
 # Blockly.NET
 
-Currently highly experimental, please wait for version 1ff for documentation. The repository is currently private but if you are interested in more details please contact [me](mailto:J.Manns@Zera.De). The following is the README of the repository just for information - no link can be used!
+Currently highly experimental, please wait for version 1ff for documentation. The repository is currently private but if you are interested in more details please contact J.Manns@Zera.De. The following is the README of the repository just for information - no link can be used!
 
 # Blockly as a scripting environment for .NET core 8ff based web server application
 
