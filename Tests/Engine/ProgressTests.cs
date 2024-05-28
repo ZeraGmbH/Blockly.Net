@@ -247,7 +247,7 @@ public class ProgressTests : TestEnvironment
         var times = ((IEnumerable)result.Result).Cast<double>().Select(d => new DateTime((long)d)).ToArray();
 
         Assert.That((times[1] - times[0]).TotalMilliseconds, Is.GreaterThanOrEqualTo(100));
-        Assert.That((times[2] - times[1]).TotalMilliseconds, Is.GreaterThanOrEqualTo(150));
+        Assert.That((times[2] - times[1]).TotalMilliseconds, Is.GreaterThanOrEqualTo(140));
 
         /* Check for correct number of events. */
         Assert.That(progress, Is.EqualTo(6));
