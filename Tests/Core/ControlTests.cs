@@ -40,7 +40,6 @@ public class ControlTests : TestEnvironment
         Assert.That(await script.Run(Site.Object), Is.EqualTo(1));
     }
 
-
     [Test]
     public async Task Can_Execute_WhileUntil()
     {
