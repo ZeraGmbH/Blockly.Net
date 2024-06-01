@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.Core;
