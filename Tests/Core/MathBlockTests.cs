@@ -24,8 +24,7 @@ public class MathBlockTests : TestEnvironment
                     </shadow>
                     </value>
                 </block>        
-            </xml>
-        ");
+            </xml>");
 
         /* Execute the block tree. */
         Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
@@ -61,8 +60,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>        
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(Math.Sin(Math.PI / 4)));
     }
@@ -97,8 +95,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-       ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.True);
     }
@@ -117,8 +114,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.True);
     }
@@ -137,8 +133,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.True);
     }
@@ -178,8 +173,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.True);
     }
@@ -198,8 +192,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.False);
     }
@@ -223,8 +216,7 @@ public class MathBlockTests : TestEnvironment
                 </block>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.True);
     }
@@ -242,8 +234,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(3.0));
     }
@@ -261,8 +252,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(4.0));
     }
@@ -280,8 +270,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(3.0));
     }
@@ -309,8 +298,7 @@ public class MathBlockTests : TestEnvironment
                 </block>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(15));
     }
@@ -338,8 +326,7 @@ public class MathBlockTests : TestEnvironment
                 </block>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
     }
@@ -367,8 +354,7 @@ public class MathBlockTests : TestEnvironment
                 </block>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
     }
@@ -395,8 +381,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(100));
     }
@@ -419,8 +404,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.EqualTo(4));
     }
@@ -432,8 +416,7 @@ public class MathBlockTests : TestEnvironment
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
             <variables></variables>
             <block type=""math_random_float""></block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.GreaterThanOrEqualTo(0d).And.LessThanOrEqualTo(1d));
     }
@@ -455,8 +438,7 @@ public class MathBlockTests : TestEnvironment
                 </shadow>
                 </value>
             </block>
-            </xml>
-        ");
+            </xml>");
 
         Assert.That(await script.Run(Site.Object), Is.GreaterThanOrEqualTo(1).And.LessThanOrEqualTo(100));
     }
