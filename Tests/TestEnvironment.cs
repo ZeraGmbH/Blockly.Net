@@ -228,7 +228,12 @@ public abstract class TestEnvironment
     [TearDown]
     public void TeardownTestEnvironment()
     {
+        /* Shutdown cancel helper. */
+        Cancel?.Dispose();
+        Cancel = null!;
+
         /* Shutdown the dependency injection - this will especially dispose all singletons. */
-        using (di) di = null!;
+        di?.Dispose();
+        di = null!;
     }
 }
