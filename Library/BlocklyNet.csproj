@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>Blockly.Net</PackageId>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Dr. Jochen Manns</Authors>
     <Company>ZERA GmbH</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
