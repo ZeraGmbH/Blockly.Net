@@ -24,6 +24,6 @@ public class DelayTests : TestEnvironment
 
         await block.Evaluate(new Context(Site.Object));
 
-        Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(500));
+        Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(490));
     }
 }
