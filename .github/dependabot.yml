@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget" 
+    directory: "/" 
+    schedule:
+      interval: "daily"
+      time: "00:00"
+      timezone: "Europe/Berlin"
+    groups:
+      ms-aspnetcore:
+        patterns:
+        - "Microsoft.AspNetCore.*"
+      ms-extensions:
+        patterns:
+        - "Microsoft.Extensions.*"
