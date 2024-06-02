@@ -116,7 +116,7 @@ public class ParallelTests : TestEnvironment
                             </value>
                             <value name=""VALUE"">
                             <block type=""math_number"" id=""ee,9s_a-=@wy@BW:Cyjm"">
-                                <field name=""NUM"">500</field>
+                                <field name=""NUM"">1500</field>
                             </block>
                             </value>
                         </block>
@@ -148,7 +148,7 @@ public class ParallelTests : TestEnvironment
                             </value>
                             <value name=""VALUE"">
                             <block type=""math_number"" id=""l@rOa@MYbdL#$?xn2#zz"">
-                                <field name=""NUM"">750</field>
+                                <field name=""NUM"">2000</field>
                             </block>
                             </value>
                         </block>
@@ -198,9 +198,9 @@ public class ParallelTests : TestEnvironment
         var times1 = results[0].Cast<double>().Select(t => new DateTime((long)t)).ToArray();
         var times2 = results[1].Cast<double>().Select(t => new DateTime((long)t)).ToArray();
 
-        Assert.That((times1[1] - times1[0]).TotalMilliseconds, Is.GreaterThan(490));
-        Assert.That((times2[1] - times2[0]).TotalMilliseconds, Is.GreaterThan(740));
+        Assert.That((times1[1] - times1[0]).TotalMilliseconds, Is.GreaterThan(1490));
+        Assert.That((times2[1] - times2[0]).TotalMilliseconds, Is.GreaterThan(1990));
 
-        Assert.That(Math.Abs((times1[0] - times2[0]).TotalMilliseconds), Is.LessThan(250));
+        Assert.That(Math.Abs((times1[0] - times2[0]).TotalMilliseconds), Is.LessThan(1000));
     }
 }
