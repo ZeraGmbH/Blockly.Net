@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Library
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
