@@ -24,7 +24,7 @@ public partial class ScriptEngine
 
     private void ReportProgress(object info, int depth)
     {
-        using (_lock.Wait())
+        using (Lock.Wait())
         {
             if (_active == null) return;
 

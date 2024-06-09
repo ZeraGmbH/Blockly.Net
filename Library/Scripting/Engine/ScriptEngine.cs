@@ -22,7 +22,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <summary>
     /// Synchronize modifying the result.
     /// </summary>
-    private readonly Semaphore _lock = new(1, 1);
+    protected readonly Semaphore Lock = new(1, 1);
 
     /// <summary>
     /// The active script.
@@ -74,7 +74,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not Script script)
                 throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
-            using (_lock.Wait())
+            using (Lock.Wait())
             {
                 /* There can be only one active script. */
                 if (_active != null)
@@ -134,7 +134,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <inheritdoc/>
     public void Cancel(string jobId)
     {
-        using (_lock.Wait())
+        using (Lock.Wait())
         {
             if (_active == null || _active.JobId != jobId)
                 throw new ArgumentException("not the sctive script", nameof(jobId));
@@ -240,7 +240,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <inheritdoc/>
     public object? FinishScriptAndGetResult(string jobId)
     {
-        using (_lock.Wait())
+        using (Lock.Wait())
         {
             /* Can only get the result for the active script. */
             var script = _active;
@@ -286,13 +286,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     public virtual void Dispose()
     {
         /* Release system resources. */
-        _lock.Dispose();
+        Lock.Dispose();
     }
 
     /// <inheritdoc/>
     public void Reconnect(IScriptEngineNotifySink client)
     {
-        using (_lock.Wait())
+        using (Lock.Wait())
         {
             /* Nothing to report. */
             if (_active == null) return;

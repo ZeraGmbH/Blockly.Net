@@ -22,7 +22,7 @@ public partial class ScriptEngine
     {
         TaskCompletionSource<UserInputResponse>? inputResponse;
 
-        using (mustLock ? _lock.Wait() : null)
+        using (mustLock ? Lock.Wait() : null)
         {
             /* The script requesting the input must still be the active one. */
             if (_active == null || _active.JobId != response.JobId)
@@ -47,7 +47,7 @@ public partial class ScriptEngine
     /// <inheritdoc/>
     public Task<T?> GetUserInput<T>(string key, string? type = null)
     {
-        using (_lock.Wait())
+        using (Lock.Wait())
         {
             /* We have no active script. */
             if (_active == null)

@@ -195,7 +195,7 @@ public partial class ScriptEngine
         /* Create execution context. */
         var site = CreateSite(parent, depth + 1);
 
-        using (_lock.Wait())
+        using (Lock.Wait())
         {
             /* Create a new progress entry for this child. */
             while (depth >= _allProgress.Count) _allProgress.Add([]);
@@ -213,7 +213,7 @@ public partial class ScriptEngine
         }
         finally
         {
-            using (_lock.Wait())
+            using (Lock.Wait())
                 if (depth < _allProgress.Count)
                     _allProgress[depth].Remove(site);
         }
