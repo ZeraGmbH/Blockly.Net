@@ -37,7 +37,7 @@ public abstract class TestEnvironment
             public string Code { get; set; } = null!;
 
             /// <inheritdoc/>
-            public List<ScriptParameter> Parameters { get; set; } = [];
+            public List<IScriptParameter> Parameters { get; set; } = [];
 
             /// <inheritdoc/>
             public string? ResultType { get; set; }
@@ -59,7 +59,7 @@ public abstract class TestEnvironment
         /// <param name="code">XML representation of the script's block tree.</param>
         /// <param name="args">Argument list of the script.</param>
         /// <returns>Unique identifier of the new script definition.</returns>
-        public string Add(string name, string code, List<ScriptParameter> args)
+        public string Add(string name, string code, List<IScriptParameter> args)
         {
             /* Create a new instance, remember it and report the unique identifier. */
             var definition = new Definition { Name = name, Code = code, Parameters = args };
@@ -168,7 +168,7 @@ public abstract class TestEnvironment
     /// <param name="code">Block tree in XML representation.</param>
     /// <param name="args">Argument list of the script.</param>
     /// <returns>Unique identifier of the new script definition.</returns>
-    protected string AddScript(string name, string code, List<ScriptParameter>? args = null)
+    protected string AddScript(string name, string code, List<IScriptParameter>? args = null)
     {
         var storage = (Storage)GetService<IScriptDefinitionStorage>();
 

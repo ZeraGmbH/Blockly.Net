@@ -1,28 +1,23 @@
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
 namespace BlocklyNet.Scripting.Definition;
 
 /// <summary>
 /// Parameter to a script a use can set before 
 /// starting the script.
 /// </summary>
-public class ScriptParameter
+public interface IScriptParameter
 {
     /// <summary>
     /// The type of the input.
     /// </summary>
-    [Required, NotNull]
-    public required string Type { get; set; }
+    string Type { get; }
 
     /// <summary>
     /// The name of the parameter.
     /// </summary>
-    [Required, NotNull, MinLength(1)]
-    public required string Name { get; set; }
+    string Name { get; }
 
     /// <summary>
     /// Set to indicate that the parameter is required.
     /// </summary>
-    public bool? Required { get; set; }
+    public bool? Required { get; }
 }

@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
 namespace BlocklyNet.Scripting.Definition;
 
 /// <summary>
@@ -11,24 +8,23 @@ public interface IScriptDefinition
     /// <summary>
     /// Unique identifier of the script.
     /// </summary>
-    string Id { get; set; }
+    string Id { get; }
 
     /// <summary>
     /// Display name of the script.
     /// </summary>
-    string Name { get; set; }
+    string Name { get; }
 
     /// <summary>
     /// The script code itself in the indicated serialisation.
     /// </summary>
-    string Code { get; set; }
+    string Code { get; }
 
     /// <summary>
     /// List of parameters for the script. These will be set
     /// when the script starts.
     /// </summary>
-    [Required, NotNull]
-    List<ScriptParameter> Parameters { get; set; }
+    List<IScriptParameter> Parameters { get; }
 
     /// <summary>
     /// The type of the result. There are currently no further
@@ -37,5 +33,5 @@ public interface IScriptDefinition
     /// .NET types are supported, as for example int, double, string
     /// but also void for scripts producing no result at all.
     /// </summary>
-    string? ResultType { get; set; }
+    string? ResultType { get; }
 }
