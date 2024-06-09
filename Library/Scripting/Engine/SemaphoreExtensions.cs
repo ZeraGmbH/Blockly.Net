@@ -1,6 +1,6 @@
 namespace BlocklyNet.Scripting.Engine;
 
-static class SemaphoreExtensions
+public static class SemaphoreExtensions
 {
     /// <summary>
     /// Helper to wait on a semaphore to synchronize data flow.
