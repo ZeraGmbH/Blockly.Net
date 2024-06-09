@@ -277,7 +277,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         Parser.Parse(scriptAsXml).Evaluate(presets, this);
 
     /// <inheritdoc/>
-    public virtual Task<TResult> Run<TResult>(StartScript request, StartScriptOptions? options = null)
+    public Task<TResult> Run<TResult>(StartScript request, StartScriptOptions? options = null)
         => StartChild<TResult>(request, _active, options, 0);
 
     /// <summary>

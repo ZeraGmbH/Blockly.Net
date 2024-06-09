@@ -15,32 +15,21 @@ namespace BlocklyNet.Scripting.Generic;
 public class GenericScript(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
     : Script<StartGenericScript, GenericResult, StartScriptOptions>(request, engine, options)
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public Action? OnPresetsConverted;
+
     /// <inheritdoc/>
     protected override async Task OnExecute()
     {
         /* Translate parameters. */
-        var presets = Request.Presets.ToDictionary(p => p.Key, p =>
-        {
-            if (p.Value is JsonElement json)
-                switch (json.ValueKind)
-                {
-                    case JsonValueKind.String:
-                        return json.Deserialize<string>();
-                    case JsonValueKind.Number:
-                        return json.Deserialize<double>();
-                    case JsonValueKind.Null:
-                        return null;
-                    case JsonValueKind.True:
-                        return true;
-                    case JsonValueKind.False:
-                        return false;
-                }
-
-            return p.Value;
-        });
+        var presets = Request.Presets.ToDictionary(p => p.Key, p => (p.Value is JsonElement json) ? json.ToJsonScalar() : p.Value);
 
         /* Prepare for logging. */
         Request.Presets = presets.Select(d => new GenericScriptPreset { Key = d.Key, Value = d.Value }).ToList();
+
+        OnPresetsConverted?.Invoke();
 
         /* Find the script. */
         var script = await Engine.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>().Get(Request.ScriptId) ?? throw new ArgumentException("Script not found.");

@@ -106,7 +106,11 @@ public partial class ScriptEngine
             });
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="options"></param>
         public void Start(StartScript request, StartScriptOptions? options = null)
         {
             Logger.LogTrace("Nested script '{Name}' should be started.", request.Name);
@@ -119,7 +123,6 @@ public partial class ScriptEngine
 
                 /* Start the background execution of the script. */
                 ThreadPool.QueueUserWorkItem(RunScript, script);
-
             }
             catch (Exception e)
             {
@@ -190,7 +193,7 @@ public partial class ScriptEngine
     /// <param name="options">Detailed configuration of the new script.</param>
     /// <param name="depth">Nestring depth of the child.</param>
     /// <returns>Task on the result.</returns>
-    private async Task<TResult> StartChild<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
+    protected virtual async Task<TResult> StartChild<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
     {
         /* Create execution context. */
         var site = CreateSite(parent, depth + 1);
