@@ -161,6 +161,7 @@ public static class BlocklyExtensions
         builder.AddBlock<Now>();
         builder.AddBlock<ParseJson>();
         builder.AddBlock<ReadFromModel>();
+        builder.AddBlock<RequestUserInput>();
         builder.AddBlock<RunParallel>();
         builder.AddBlock<RunScript>();
         builder.AddBlock<SetProgress>();
