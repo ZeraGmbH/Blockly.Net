@@ -15,29 +15,30 @@ namespace BlocklyNet.Scripting.Generic;
 public class GenericScript(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
     : Script<StartGenericScript, GenericResult, StartScriptOptions>(request, engine, options)
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public Action? OnPresetsConverted;
 
     /// <inheritdoc/>
-    protected override async Task OnExecute()
+    protected override Task OnExecute() => Execute(this);
+
+    public static async Task Execute<TRequest, TOptions>(Script<TRequest, GenericResult, TOptions> script, Action? afterPresets = null)
+        where TRequest : StartScript, IStartGenericScript
+        where TOptions : StartScriptOptions
     {
         /* Translate parameters. */
-        var presets = Request.Presets.ToDictionary(p => p.Key, p => (p.Value is JsonElement json) ? json.ToJsonScalar() : p.Value);
+        var presets = script.Request.Presets.ToDictionary(p => p.Key, p => (p.Value is JsonElement json) ? json.ToJsonScalar() : p.Value);
 
         /* Prepare for logging. */
-        Request.Presets = presets.Select(d => new GenericScriptPreset { Key = d.Key, Value = d.Value }).ToList();
+        script.Request.Presets = presets.Select(d => new GenericScriptPreset { Key = d.Key, Value = d.Value }).ToList();
 
-        OnPresetsConverted?.Invoke();
+        afterPresets?.Invoke();
 
         /* Find the script. */
-        var script = await Engine.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>().Get(Request.ScriptId) ?? throw new ArgumentException("Script not found.");
+        var di = script.Engine.ServiceProvider;
+        var def = await di.GetRequiredService<IScriptDefinitionStorage>().Get(script.Request.ScriptId) ?? throw new ArgumentException("Script not found.");
 
         /* Validate presets. */
-        var models = GetService<IScriptModels>();
+        var models = di.GetRequiredService<IScriptModels>();
 
-        foreach (var param in script.Parameters)
+        foreach (var param in def.Parameters)
         {
             /* Check requirement. */
             presets.TryGetValue(param.Name, out var preset);
@@ -63,11 +64,11 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
         }
 
         /* Execute the script. */
-        var result = await Engine.Evaluate(script.Code, presets);
+        var result = await script.Engine.Evaluate(def.Code, presets);
 
         /* Report variables as a result. */
-        var results = new GenericResult { Result = result, ResultType = Request.ResultType, ScriptId = Request.ScriptId };
+        var results = new GenericResult { Result = result, ResultType = script.Request.ResultType, ScriptId = script.Request.ScriptId };
 
-        SetResult(results);
+        script.SetResult(results);
     }
 }

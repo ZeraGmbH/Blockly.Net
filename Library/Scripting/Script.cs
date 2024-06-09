@@ -59,7 +59,7 @@ public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScri
     public readonly TRequest Request = request;
 
     /// <inheritdoc/>
-    protected void SetResult(TResult result) => Result = result;
+    public void SetResult(TResult result) => Result = result;
 
     /// <summary>
     /// 
@@ -69,7 +69,7 @@ public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScri
     /// <summary>
     /// 
     /// </summary>
-    protected readonly IScriptSite Engine = engine;
+    public readonly IScriptSite Engine = engine;
 
     /// <summary>
     /// Test for cancel.

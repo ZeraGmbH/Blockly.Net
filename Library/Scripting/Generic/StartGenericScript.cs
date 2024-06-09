@@ -4,9 +4,30 @@ using System.Diagnostics.CodeAnalysis;
 namespace BlocklyNet.Scripting.Generic;
 
 /// <summary>
+/// 
+/// </summary>
+public interface IStartGenericScript
+{
+    /// <summary>
+    /// The script to execute.
+    /// </summary>
+    string ScriptId { get; }
+
+    /// <summary>
+    /// Type of the result.
+    /// </summary>
+    string? ResultType { get; }
+
+    /// <summary>
+    /// Parameters of the script.
+    /// </summary>
+    List<GenericScriptPreset> Presets { get; set; }
+}
+
+/// <summary>
 /// Start a generic script based on the integrated script language.
 /// </summary>
-public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult> where TScript : GenericScript where TResult : GenericResult
+public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult>, IStartGenericScript where TScript : Script where TResult : GenericResult
 {
     /// <summary>
     /// Parameters for the script.
@@ -16,21 +37,15 @@ public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult
     /// <inheritdoc/>
     public override string ModelType => ScriptType;
 
-    /// <summary>
-    /// Parameters of the script.
-    /// </summary>
+    /// <inheritdoc/>
     [NotNull, Required]
     public List<GenericScriptPreset> Presets { get; set; } = [];
 
-    /// <summary>
-    /// The script to execute.
-    /// </summary>
+    /// <inheritdoc/>
     [Required, NotNull]
     public string ScriptId { get; set; } = null!;
 
-    /// <summary>
-    /// Type of the result.
-    /// </summary>
+    /// <inheritdoc/>
     public string? ResultType { get; set; }
 }
 
