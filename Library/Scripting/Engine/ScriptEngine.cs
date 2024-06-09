@@ -283,7 +283,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <summary>
     /// Finish using this instance.
     /// </summary>
-    public void Dispose()
+    public virtual void Dispose()
     {
         /* Release system resources. */
         _lock.Dispose();
