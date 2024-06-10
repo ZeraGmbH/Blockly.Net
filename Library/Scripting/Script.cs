@@ -56,7 +56,7 @@ public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScri
     /// <summary>
     /// 
     /// </summary>
-    public readonly TRequest Request = request;
+    public TRequest Request { get; } = request;
 
     /// <inheritdoc/>
     public void SetResult(TResult result) => Result = result;

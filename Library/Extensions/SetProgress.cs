@@ -96,7 +96,7 @@ public class SetProgress : Block
     /// <inheritdoc/>
     public override async Task<object?> Evaluate(Context context)
     {
-        var script = context.Engine.MainScript as GenericScript;
+        var script = context.Engine.MainScript as IGenericScript;
         var progress = await Values.Evaluate<double>("PROGRESS", context);
         var name = await Values.Evaluate<string?>("NAME", context, false);
 

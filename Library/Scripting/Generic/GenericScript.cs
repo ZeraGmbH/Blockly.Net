@@ -7,14 +7,26 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BlocklyNet.Scripting.Generic;
 
 /// <summary>
+/// 
+/// /// </summary>
+public interface IGenericScript
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    IStartGenericScript Request { get; }
+}
+
+/// <summary>
 /// Algorithm to execute an error measurement.
 /// </summary>
 /// <param name="request">All parameters for the measurement.</param>
 /// <param name="engine">Script engine executing the measurement.</param>
 /// <param name="options">Additional configuration of the script run-time.</param>
 public class GenericScript(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
-    : Script<StartGenericScript, GenericResult, StartScriptOptions>(request, engine, options)
+    : Script<StartGenericScript, GenericResult, StartScriptOptions>(request, engine, options), IGenericScript
 {
+    IStartGenericScript IGenericScript.Request => Request;
 
     /// <inheritdoc/>
     protected override Task OnExecute() => Execute(this);
