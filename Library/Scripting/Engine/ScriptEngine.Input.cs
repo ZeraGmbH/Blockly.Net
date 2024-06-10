@@ -75,25 +75,7 @@ public partial class ScriptEngine
                 /* object? will be serialized as a JsonElement. */
                 var value = t.Result.Value;
 
-                if (value is JsonElement json)
-                    switch (json.ValueKind)
-                    {
-                        case JsonValueKind.String:
-                            value = json.Deserialize<string>();
-                            break;
-                        case JsonValueKind.Number:
-                            value = json.Deserialize<double>();
-                            break;
-                        case JsonValueKind.Null:
-                            value = null;
-                            break;
-                        case JsonValueKind.True:
-                            value = true;
-                            break;
-                        case JsonValueKind.False:
-                            value = false;
-                            break;
-                    }
+                if (value is JsonElement json) value = json.ToJsonScalar();
 
                 return value == null ? default : (T?)value;
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
