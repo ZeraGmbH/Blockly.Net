@@ -8,13 +8,14 @@ public interface IScriptDefinitionStorage
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="id"></param>
     /// <returns></returns>
-    IQueryable<IScriptDefinition> Query();
+    Task<IScriptDefinition?> Get(string id);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    Task<IScriptDefinition?> Get(string id);
+    Task<IScriptDefinitionInfo> Find(string name);
 }

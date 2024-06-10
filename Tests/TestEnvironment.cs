@@ -50,7 +50,12 @@ public abstract class TestEnvironment
         public Task<IScriptDefinition?> Get(string id) => Task.FromResult(_definitions.TryGetValue(id, out var definition) ? definition : null);
 
         /* Query on script definitions. */
-        public IQueryable<IScriptDefinition> Query() => _definitions.Values.AsQueryable();
+        public Task<IScriptDefinitionInfo> Find(string byName) => Task.FromResult(
+            (IScriptDefinitionInfo)_definitions
+                .Values
+                .AsQueryable()
+                .Where(s => s.Name.Equals(byName, StringComparison.CurrentCultureIgnoreCase))
+                .Single());
 
         /// <summary>
         /// Add a single script definition to the mock.

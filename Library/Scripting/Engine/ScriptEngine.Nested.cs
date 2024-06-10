@@ -164,6 +164,9 @@ public partial class ScriptEngine
             }
             finally
             {
+                /* Customize. */
+                _engine.OnScriptDone(script, Parent);
+
                 /* Mark as done and wake up pending requests for result. */
                 lock (_resultLock)
                 {

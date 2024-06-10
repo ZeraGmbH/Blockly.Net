@@ -71,12 +71,7 @@ public class RunScript : Block
     /* Find the script by its name - character casing is ignored. */
     var store = context.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>();
     var byName = await Values.Evaluate<string>("NAME", context);
-
-    var script = store
-      .Query()
-      .Where(s => s.Name.Equals(byName, StringComparison.CurrentCultureIgnoreCase))
-      .Select(d => new { d.Id, d.Name, d.ResultType })
-      .Single();
+    var script = await store.Find(byName) ?? throw new ArgumentException($"script '{byName}' not found");
 
     /* Prepare to run generic script. */
     var config = context.ServiceProvider.GetService<IGenericScriptFactory>()?.Create() ?? new StartGenericScript();

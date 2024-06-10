@@ -206,6 +206,9 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
             /* In case of any error just log - actually this could be quite a problem. */
             task?.ContinueWith(t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+
+            /* Customize. */
+            OnScriptDone(script, null);
         }
         catch (Exception e)
         {
@@ -217,6 +220,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             if (error != null)
                 FinishScriptAndGetResult(script.JobId);
         }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    protected virtual void OnScriptDone(IScriptInstance script, IScript? parent)
+    {
     }
 
     /// <inheritdoc/>
@@ -242,8 +252,9 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             Logger.LogTrace("Processing result for script {JobId}", jobId);
 
             /* Inform all. */
-            context?.Send(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
-            .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+            context?
+                .Send(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
+                .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
 
             return script.Result;
         }
