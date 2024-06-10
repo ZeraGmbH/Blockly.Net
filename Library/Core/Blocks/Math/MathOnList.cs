@@ -4,9 +4,14 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Math;
 
+/// <summary>
+/// 
+/// </summary>
 public class MathOnList : Block
 {
   private static readonly Random rnd = new Random();
+
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var op = Fields["OP"];

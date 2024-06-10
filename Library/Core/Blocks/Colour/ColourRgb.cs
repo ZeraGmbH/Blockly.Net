@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Text;
 
+/// <summary>
+/// 
+/// </summary>
 public class ColourRgb : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var red = Convert.ToByte(await Values.Evaluate("RED", context));

@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Math;
 
+/// <summary>
+/// 
+/// </summary>
 public class MathConstrain : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var value = await Values.Evaluate<double>("VALUE", context);

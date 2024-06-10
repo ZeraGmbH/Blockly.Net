@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Lists;
 
+/// <summary>
+/// 
+/// </summary>
 public class ListsIndexOf : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var direction = Fields["END"];

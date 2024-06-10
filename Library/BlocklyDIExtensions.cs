@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlocklyNet;
 
+/// <summary>
+/// 
+/// </summary>
 public static class BlocklyDIExtensions
 {
     /// <summary>
@@ -35,6 +38,10 @@ public static class BlocklyDIExtensions
         services.AddSingleton<IConfigurationService, ConfigurationService>();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="services"></param>
     public static void StartBlocklyNet(this IServiceProvider services)
     {
         /* Start the engine on server startup to allow for timed script execution. */

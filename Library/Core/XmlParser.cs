@@ -6,8 +6,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core;
 
+/// <summary>
+/// 
+/// </summary>
 public class XmlParser : Parser<XmlParser>
 {
+  /// <inheritdoc/>
   public override Workspace Parse(string xml, bool preserveWhitespace = false)
   {
     var xdoc = new XmlDocument { PreserveWhitespace = preserveWhitespace };

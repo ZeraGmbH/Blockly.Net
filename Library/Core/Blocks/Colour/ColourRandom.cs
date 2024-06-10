@@ -4,9 +4,14 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Text;
 
+/// <summary>
+/// 
+/// </summary>
 public class ColourRandom : Block
 {
   private readonly Random random = new Random();
+
+  /// <inheritdoc/>
   public override Task<object?> Evaluate(Context context)
   {
     var bytes = new byte[3];

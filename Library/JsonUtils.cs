@@ -3,6 +3,9 @@ using System.Text.Json.Nodes;
 
 namespace BlocklyNet;
 
+/// <summary>
+/// 
+/// </summary>
 public static class JsonUtils
 {
     /// <summary>

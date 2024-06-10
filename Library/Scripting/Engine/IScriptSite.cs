@@ -2,6 +2,9 @@ using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IScriptSite
 {
     /// <summary>

@@ -1,5 +1,8 @@
 namespace BlocklyNet.Scripting.Engine;
 
+/// <summary>
+/// 
+/// </summary>
 public static class SemaphoreExtensions
 {
     /// <summary>

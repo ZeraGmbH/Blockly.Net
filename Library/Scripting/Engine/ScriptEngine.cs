@@ -107,13 +107,9 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
                 ThreadPool.QueueUserWorkItem(RunScript);
 
                 /* Inform all. */
-                context?.Send(ScriptEngineNotifyMethods.Started, new ScriptInformation
-                {
-                    JobId = script.JobId,
-                    ModelType = request.ModelType,
-                    Name = request.Name
-                })
-                .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                context?
+                    .Send(ScriptEngineNotifyMethods.Started, CreateStartNotification(script))
+                    .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
 
                 return script.JobId;
             }
@@ -204,23 +200,9 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             _done = true;
 
             /* Forward the information on the now terminated script. */
-            var request = script.GetRequest();
-            var requestName = request.Name;
-
             var task = error == null
-                ? context?.Send(ScriptEngineNotifyMethods.Done, new ScriptDone
-                {
-                    JobId = script.JobId,
-                    ModelType = request.ModelType,
-                    Name = requestName,
-                })
-                : context?.Send(ScriptEngineNotifyMethods.Error, new ScriptError
-                {
-                    ErrorMessage = error.Message,
-                    JobId = script.JobId,
-                    ModelType = request.ModelType,
-                    Name = requestName,
-                });
+                ? context?.Send(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
+                : context?.Send(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, error));
 
             /* In case of any error just log - actually this could be quite a problem. */
             task?.ContinueWith(t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
@@ -260,12 +242,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             Logger.LogTrace("Processing result for script {JobId}", jobId);
 
             /* Inform all. */
-            context?.Send(ScriptEngineNotifyMethods.Finished, new ScriptFinished
-            {
-                JobId = script.JobId,
-                ModelType = script.GetRequest().ModelType,
-                Name = script.GetRequest().Name,
-            })
+            context?.Send(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
             .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
 
             return script.Result;
@@ -299,7 +276,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
             /* Has been started. */
             client
-                .Send(ScriptEngineNotifyMethods.Current, new ScriptInformation { JobId = _active.JobId, ModelType = _active.GetRequest().ModelType, Name = _active.GetRequest().Name })
+                .Send(ScriptEngineNotifyMethods.Current, CreateCurrentNotification(_active))
                 .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
 
             /* Has some last progress. */
@@ -317,8 +294,49 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             /* Script is completed. */
             if (_done)
                 client
-                    .Send(ScriptEngineNotifyMethods.Done, new ScriptDone { Name = _active.GetRequest().Name, JobId = _active.JobId, ModelType = _active.GetRequest().ModelType })
+                    .Send(ScriptEngineNotifyMethods.Done, CreateDoneNotification(_active))
                     .ContinueWith(t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
         }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <returns></returns>
+    protected virtual ScriptInformation CreateStartNotification(Script script)
+        => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <returns></returns>
+    protected virtual ScriptInformation CreateCurrentNotification(IScriptInstance script)
+        => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <returns></returns>
+    protected virtual ScriptDone CreateDoneNotification(IScriptInstance script)
+        => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <param name="error"></param>
+    /// <returns></returns>
+    protected virtual ScriptError CreateErrorNotification(IScriptInstance script, Exception error)
+        => new() { ErrorMessage = error.Message, JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <returns></returns>
+    protected virtual ScriptFinished CreateFinishNotification(IScriptInstance script)
+            => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
 }

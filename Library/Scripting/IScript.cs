@@ -1,5 +1,8 @@
 namespace BlocklyNet.Scripting;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IScript
 {
     /// <summary>

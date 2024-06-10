@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Math;
 
+/// <summary>
+/// 
+/// </summary>
 public class MathSingle : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var op = Fields["OP"];

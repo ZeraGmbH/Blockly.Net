@@ -31,6 +31,14 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
     /// <inheritdoc/>
     protected override Task OnExecute() => Execute(this);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <param name="afterPresets"></param>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TOptions"></typeparam>
+    /// <returns></returns>
     public static async Task Execute<TRequest, TOptions>(Script<TRequest, GenericResult, TOptions> script, Action? afterPresets = null)
         where TRequest : StartScript, IStartGenericScript
         where TOptions : StartScriptOptions

@@ -4,9 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Variables;
 
-// Fast-Solution
+/// <summary>
+/// Fast solution.
+/// </summary>
 public class GlobalVariablesSet : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var value = await Values.Evaluate("VALUE", context);

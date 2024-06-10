@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Logic;
 
+/// <summary>
+/// 
+/// </summary>
 public class LogicOperation : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var a = await Values.Evaluate<bool?>("A", context) ?? false;

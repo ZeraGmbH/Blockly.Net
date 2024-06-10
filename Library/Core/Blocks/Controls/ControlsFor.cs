@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Controls;
 
+/// <summary>
+/// 
+/// </summary>
 public class ControlsFor : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var variableName = Fields["VAR"];

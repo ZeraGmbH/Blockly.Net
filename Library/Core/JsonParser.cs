@@ -5,11 +5,14 @@ using Newtonsoft.Json.Linq;
 using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core;
-
+/// <summary>
+/// 
+/// </summary>
 public class JsonParser : Parser<JsonParser>
 {
   private readonly Dictionary<string, string> _variables = [];
 
+  /// <inheritdoc/>
   public override Workspace Parse(string json, bool preserveWhitespace = false)
   {
     var workspace = new Workspace();

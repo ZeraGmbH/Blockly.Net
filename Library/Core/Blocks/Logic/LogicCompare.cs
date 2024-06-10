@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Logic;
 
+/// <summary>
+/// 
+/// </summary>
 public class LogicCompare : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var opValue = Fields["OP"];

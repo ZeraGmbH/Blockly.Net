@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Text;
 
+/// <summary>
+/// 
+/// </summary>
 public class ProceduresCallReturn : ProceduresCallNoReturn
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     // todo: add guard for missing name

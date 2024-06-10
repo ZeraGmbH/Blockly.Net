@@ -178,7 +178,6 @@ public partial class ScriptEngine
     /// <summary>
     /// Create a new script site to allow proper customization of the engine.
     /// </summary>
-    /// <param name="engine">Engine to use.</param>
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nesting depth.</param>
     /// <returns>The new site.</returns>

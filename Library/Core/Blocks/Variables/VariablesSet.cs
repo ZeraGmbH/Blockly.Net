@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Variables;
 
+/// <summary>
+/// 
+/// </summary>
 public class VariablesSet : Block
 {
+  /// <inheritdoc/>
   public override async Task<object?> Evaluate(Context context)
   {
     var variables = context.Variables;

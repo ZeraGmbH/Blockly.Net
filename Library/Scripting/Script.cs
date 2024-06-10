@@ -49,8 +49,7 @@ public abstract class Script<TOption>(TOption? options) : Script where TOption :
 /// </summary>
 /// <typeparam name="TRequest"></typeparam>
 /// <typeparam name="TResult"></typeparam>
-/// <param name="request"></param>
-/// <param name="engine"></param>
+/// <typeparam name="TOption"></typeparam>
 public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption>(options) where TRequest : StartScript where TOption : StartScriptOptions
 {
     /// <summary>

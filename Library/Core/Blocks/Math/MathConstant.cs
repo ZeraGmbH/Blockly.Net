@@ -4,8 +4,12 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Math;
 
+/// <summary>
+/// 
+/// </summary>
 public class MathConstant : Block
 {
+  /// <inheritdoc/>
   public override Task<object?> Evaluate(Context context)
   {
     var constant = Fields["CONSTANT"];

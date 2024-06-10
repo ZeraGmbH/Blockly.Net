@@ -3,6 +3,9 @@ using BlocklyNet.Scripting.Parsing;
 
 namespace BlocklyNet.Extensions.Builder;
 
+/// <summary>
+/// 
+/// </summary>
 public class ConfigurationService : IConfigurationService
 {
     /// <summary>
@@ -70,14 +73,17 @@ public class ConfigurationService : IConfigurationService
         };
     }
 
+    /// <inheritdoc/>
     public JsonObject Configuration => _cache;
 
+    /// <inheritdoc/>
     public IEnumerable<ScriptEngineModelInfo> ModelNames =>
         _models
             .Models
             .Select(e => new ScriptEngineModelInfo { Name = e.Value.Name, Type = e.Key })
             .OrderBy(i => i.Name, StringComparer.InvariantCultureIgnoreCase);
 
+    /// <inheritdoc/>
     public IEnumerable<ScriptEngineModelInfo> EnumerationNames =>
         _models
             .Enums

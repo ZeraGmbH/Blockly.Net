@@ -10,8 +10,18 @@ using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks;
 
+/// <summary>
+/// 
+/// </summary>
 public static class Extensions
 {
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="mutations"></param>
+  /// <param name="name"></param>
+  /// <param name="domain"></param>
+  /// <returns></returns>
   public static string GetValue(this IList<Mutation> mutations, string name, string domain = "mutation")
   {
     var mut = mutations.FirstOrDefault(x => x.Domain == domain && x.Name == name);
@@ -20,6 +30,11 @@ public static class Extensions
     return mut.Value;
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="context"></param>
+  /// <returns></returns>
   public static Context GetRootContext(this Context context)
   {
     var parentContext = context?.Parent;
@@ -35,6 +50,12 @@ public static class Extensions
     return context!;
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="parser"></param>
+  /// <typeparam name="T"></typeparam>
+  /// <returns></returns>
   public static T AddStandardBlocks<T>(this T parser) where T : Parser<T>
   {
     parser.AddBlock<ControlsRepeatExt>("controls_repeat_ext");

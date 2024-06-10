@@ -8,6 +8,9 @@ using BlocklyNet.Scripting.Parsing;
 
 namespace BlocklyNet.Core;
 
+/// <summary>
+/// 
+/// </summary>
 public abstract class Parser
 {
   private class ParserService(bool _xml, IScriptModels models, IParserConfiguration? custom) : IScriptParser
@@ -57,25 +60,69 @@ public abstract class Parser
     }
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <returns></returns>
   public static XmlParser CreateXml() => new();
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <returns></returns>
   public static JsonParser CreateJson() => new();
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <returns></returns>
   protected readonly IDictionary<string, Func<Block>> blocks = new Dictionary<string, Func<Block>>();
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="xml"></param>
+  /// <param name="models"></param>
+  /// <param name="custom"></param>
+  /// <returns></returns>
   public static IScriptParser CreateService(bool xml, IScriptModels models, IParserConfiguration? custom) => new ParserService(xml, models, custom);
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="script"></param>
+  /// <param name="preserveWhitespace"></param>
+  /// <returns></returns>
   public abstract Workspace Parse(string script, bool preserveWhitespace = false);
 }
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TParser"></typeparam>
 public abstract class Parser<TParser> : Parser where TParser : Parser
 {
+  /// <summary>
+  /// 
+  /// </summary>
   public readonly List<JsonObject> BlockDefinitions = [];
 
+  /// <summary>
+  /// 
+  /// </summary>
   public readonly List<JsonObject> ModelDefinitions = [];
 
+  /// <summary>
+  /// 
+  /// </summary>
   public readonly List<Tuple<string, JsonObject>> ToolboxEntries = [];
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="type"></param>
+  /// <typeparam name="T"></typeparam>
+  /// <returns></returns>
   public TParser AddBlock<T>(string type) where T : Block, new()
   {
     AddBlock(type, () => new T());
@@ -83,6 +130,13 @@ public abstract class Parser<TParser> : Parser where TParser : Parser
     return (this as TParser)!;
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="type"></param>
+  /// <param name="block"></param>
+  /// <typeparam name="T"></typeparam>
+  /// <returns></returns>
   public TParser AddBlock<T>(string type, T block) where T : Block
   {
     AddBlock(type, () => block);
@@ -90,6 +144,12 @@ public abstract class Parser<TParser> : Parser where TParser : Parser
     return (this as TParser)!;
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="type"></param>
+  /// <param name="blockFactory"></param>
+  /// <returns></returns>
   public TParser AddBlock(string type, Func<Block> blockFactory)
   {
     if (blocks.ContainsKey(type))
