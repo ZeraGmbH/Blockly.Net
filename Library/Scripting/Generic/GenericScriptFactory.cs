@@ -5,9 +5,6 @@ namespace BlocklyNet.Scripting.Generic;
 /// </summary>
 public class GenericScriptFactory : IGenericScriptFactory
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public StartGenericScript Create() => new();
+    /// <inheritdoc/>
+    public IStartGenericScript Create() => new StartGenericScript();
 }

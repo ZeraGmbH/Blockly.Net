@@ -61,7 +61,7 @@ public class RunParallel : Block
       var leading = await Values.Evaluate<double?>("LEADINGSCRIPT", context, false);
 
       /* Request configuration for all scripts - allow empty array elements. */
-      var configs = new List<StartGenericScript>();
+      var configs = new List<StartScript>();
 
       foreach (RunScript script in scripts)
         configs.Add(await script.ReadConfiguration(context));

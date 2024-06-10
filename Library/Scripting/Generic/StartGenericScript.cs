@@ -4,27 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 namespace BlocklyNet.Scripting.Generic;
 
 /// <summary>
-/// 
-/// </summary>
-public interface IStartGenericScript
-{
-    /// <summary>
-    /// The script to execute.
-    /// </summary>
-    string ScriptId { get; }
-
-    /// <summary>
-    /// Type of the result.
-    /// </summary>
-    string? ResultType { get; }
-
-    /// <summary>
-    /// Parameters of the script.
-    /// </summary>
-    List<GenericScriptPreset> Presets { get; set; }
-}
-
-/// <summary>
 /// Start a generic script based on the integrated script language.
 /// </summary>
 public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult>, IStartGenericScript where TScript : Script where TResult : GenericResult

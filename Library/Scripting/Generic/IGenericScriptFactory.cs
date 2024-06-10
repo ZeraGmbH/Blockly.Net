@@ -9,5 +9,5 @@ public interface IGenericScriptFactory
     /// 
     /// </summary>
     /// <returns></returns>
-    StartGenericScript Create();
+    IStartGenericScript Create();
 }
