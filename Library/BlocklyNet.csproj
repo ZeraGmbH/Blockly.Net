@@ -18,12 +18,12 @@
 
   <PropertyGroup>
     <PackageId>Blockly.Net</PackageId>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <Authors>Dr. Jochen Manns</Authors>
     <Company>ZERA GmbH</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/JMS-1/Blockly.Net</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ZeraGmbH/Blockly.Net.git</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
