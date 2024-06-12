@@ -84,16 +84,28 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <returns>Set if the type is supported.</returns>
     private static bool TestSupported(Type type, Dictionary<Type, string> models)
     {
-        // Enums are always good.
-        if (type.IsEnum) return true;
+        for (; ; )
+        {
+            // Enums are always good.
+            if (type.IsEnum) return true;
 
-        // Some of .NET base types.
-        if (_supportedTypes.ContainsKey(type)) return true;
+            // Some of .NET base types.
+            if (_supportedTypes.ContainsKey(type)) return true;
 
-        // Already known other model.
-        if (models.ContainsKey(type)) return true;
+            // Already known other model.
+            if (models.ContainsKey(type)) return true;
 
-        return false;
+            // Check for dictionary.
+            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Dictionary<,>)) return false;
+
+            // Key type must be enum.
+            if (!type.GenericTypeArguments[0].IsEnum) return false;
+
+            // Deep dive into value type.
+            type = type.GenericTypeArguments[1];
+
+            type = TestArray(type) ?? type;
+        }
     }
 
     /// <summary>
@@ -127,8 +139,8 @@ public class ModelBlock<T> : Block where T : class, new()
         /* Get all properties of supported types - including a generic list of supported types. */
         _props = typeof(T)
             .GetProperties()
-            .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models))
             .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null)
+            .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models))
             .ToArray();
 
         /* Generate the JSON descriptions of the model. */

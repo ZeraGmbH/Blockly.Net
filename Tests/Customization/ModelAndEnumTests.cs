@@ -1,5 +1,7 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using BlocklyNet;
 using BlocklyNet.Core;
 using BlocklyNet.Extensions.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +42,14 @@ public class OuterClass
     public List<InnerClass> Inner { get; set; } = [];
 }
 
+/// <summary>
+/// Array of dictionaries.
+/// </summary>
+public class ListDictClass
+{
+    public List<Dictionary<SampleEnum, bool>> TheList { get; set; } = [];
+}
+
 [TestFixture]
 public class ModelAndEnumTests : TestEnvironment
 {
@@ -57,6 +67,7 @@ public class ModelAndEnumTests : TestEnvironment
             /* Model classes leaves first. */
             builder.AddModel<InnerClass>("inner_class", "The inner model");
             builder.AddModel<OuterClass>("outer_class", "The outer model");
+            builder.AddModel<ListDictClass>("list_and_dictionary", "Complex list with dictionary");
         }
     }
 
@@ -196,5 +207,20 @@ public class ModelAndEnumTests : TestEnvironment
         var theToolbox = toolbox.Single(j => j!["type"]?.GetValue<string>() == "delay")!;
 
         Assert.That(theToolbox["_name"]!.GetValue<string>(), Is.EqualTo("Delay"));
+    }
+
+    /// <summary>
+    /// Check the construction of a dictionary nested inside a list.
+    /// </summary>
+    [Test]
+    public void Can_Create_A_Dictionary_Listed_In_An_Array()
+    {
+        var provider = GetService<IConfigurationService>();
+
+        /* The model block. */
+        var myModel = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "list_and_dictionary");
+        var defAsString = JsonSerializer.Serialize(myModel, JsonUtils.JsonSettings);
+
+        Assert.That(defAsString, Is.Null);
     }
 }
