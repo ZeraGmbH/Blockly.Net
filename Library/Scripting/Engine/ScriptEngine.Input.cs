@@ -1,4 +1,6 @@
 using System.Text.Json;
+using BlocklyNet.Extensions.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -75,7 +77,21 @@ public partial class ScriptEngine
                 /* object? will be serialized as a JsonElement. */
                 var value = t.Result.Value;
 
-                if (value is JsonElement json) value = json.ToJsonScalar();
+                if (value is JsonElement json)
+                {
+                    /* Check for scalar. */
+                    value = json.ToJsonScalar();
+
+                    /* Check for model. */
+                    if (value is JsonElement element && !string.IsNullOrEmpty(t.Result.ValueType))
+                    {
+                        /* Check for converter. */
+                        var models = ServiceProvider.GetRequiredService<IScriptModels>();
+
+                        if (models.Models.TryGetValue(t.Result.ValueType, out var modelInfo))
+                            value = JsonSerializer.Deserialize(element.ToString(), modelInfo.Type, JsonUtils.JsonSettings);
+                    }
+                }
 
                 return value == null ? default : (T?)value;
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
