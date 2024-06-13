@@ -1,5 +1,8 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using BlocklyNet;
 using BlocklyNet.Core;
 using BlocklyNet.Extensions.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,9 +43,19 @@ public class OuterClass
     public List<InnerClass> Inner { get; set; } = [];
 }
 
+/// <summary>
+/// Array of dictionaries.
+/// </summary>
+public class ListDictClass
+{
+    public List<Dictionary<SampleEnum, bool>> TheList { get; set; } = [];
+}
+
 [TestFixture]
 public class ModelAndEnumTests : TestEnvironment
 {
+    private static readonly Regex ClearWhiteSpaces = new(@"(\n|\s)");
+
     /// <summary>
     /// Add custom block definitions.
     /// </summary>
@@ -57,6 +70,7 @@ public class ModelAndEnumTests : TestEnvironment
             /* Model classes leaves first. */
             builder.AddModel<InnerClass>("inner_class", "The inner model");
             builder.AddModel<OuterClass>("outer_class", "The outer model");
+            builder.AddModel<ListDictClass>("list_and_dictionary", "Complex list with dictionary");
         }
     }
 
@@ -196,5 +210,89 @@ public class ModelAndEnumTests : TestEnvironment
         var theToolbox = toolbox.Single(j => j!["type"]?.GetValue<string>() == "delay")!;
 
         Assert.That(theToolbox["_name"]!.GetValue<string>(), Is.EqualTo("Delay"));
+    }
+
+    /// <summary>
+    /// Check the construction of a dictionary nested inside a list.
+    /// </summary>
+    [Test]
+    public void Can_Create_A_Dictionary_Listed_In_An_Array()
+    {
+        var provider = GetService<IConfigurationService>();
+
+        /* The model block. */
+        var myModel = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "list_and_dictionary");
+        var modelDef = JsonSerializer.Serialize(myModel, JsonUtils.JsonSettings);
+
+        var modelBlock = @"{ 
+            ""args0"":[
+                { ""type"":""input_dummy"" },
+                { ""type"":""field_label_serializable"", ""name"":""TheList"",""text"":""TheList""},
+                { ""type"":""input_value"",""name"":""TheList"",""check"":[""Array(list_and_dictionary_TheList)"", ""Array""]}
+            ],
+            ""message0"":""Complex list with dictionary %1 %2 %3"",
+            ""output"":""list_and_dictionary"",
+            ""tooltip"":""Complex list with dictionary"",
+            ""type"":""list_and_dictionary""
+        }";
+
+        Assert.That(ClearWhiteSpaces.Replace(modelDef, ""), Is.EqualTo(ClearWhiteSpaces.Replace(modelBlock, "")));
+
+        /* The dictionary block. */
+        var theDict = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "list_and_dictionary_TheList");
+        var dictDef = JsonSerializer.Serialize(theDict, JsonUtils.JsonSettings);
+
+        var dictBlock = @"{
+            ""args0"":[
+                {""type"":""input_dummy""},
+                {""type"":""field_label_serializable"",""name"":""One"",""text"":""One""},
+                {""type"":""input_value"",""name"":""One"",""check"":""Boolean""},
+                {""type"":""field_label_serializable"",""name"":""Two"",""text"":""Two""},
+                {""type"":""input_value"",""name"":""Two"",""check"":""Boolean""},
+                {""type"":""field_label_serializable"",""name"":""Three"",""text"":""Three""},
+                {""type"":""input_value"",""name"":""Three"",""check"":""Boolean""}
+            ],
+            ""message0"":"" %1 %2 %3 %4 %5 %6 %7"",
+            ""output"":""list_and_dictionary_TheList"",
+            ""tooltip"":"""",
+            ""type"":""list_and_dictionary_TheList""
+        }";
+
+        Assert.That(ClearWhiteSpaces.Replace(dictDef, ""), Is.EqualTo(ClearWhiteSpaces.Replace(dictBlock, "")));
+    }
+
+    [Test]
+    public async Task Set_Value_In_Dictionary()
+    {
+        var script = Engine.Parser.Parse(@"
+            <xml xmlns=""https://developers.google.com/blockly/xml"">
+                <block type=""list_and_dictionary"" id=""p6tuv;m2|h1zv,uwR;3%"">
+                    <value name=""TheList"">
+                        <block type=""lists_create_with"" id=""bauQm/Al%ZaW@A~$7+Qi"">
+                            <mutation items=""1""></mutation>
+                            <value name=""ADD0"">
+                                <block type=""list_and_dictionary_TheList"" id=""$u=_HZVP`Mw,M$KQX~}3"">
+                                    <value name=""Two"">
+                                        <block type=""logic_boolean"" id=""+1M;46]`hWv(Xo`vK=|D"">
+                                            <field name=""BOOL"">TRUE</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                    </value>
+                </block>
+            </xml>");
+
+        var result = (ListDictClass)(await script.Run(Site.Object))!;
+
+        Assert.That(result.TheList, Has.Count.EqualTo(1));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TheList[0].ContainsKey(SampleEnum.One), Is.False);
+            Assert.That(result.TheList[0][SampleEnum.Two], Is.True);
+            Assert.That(result.TheList[0].ContainsKey(SampleEnum.Three), Is.False);
+        });
     }
 }

@@ -94,7 +94,7 @@ public static class BlocklyExtensions
         public void AddModel<T>(string key, string name) where T : class, new()
         {
             /* Initialize the generic model generator. */
-            var (blockDefinition, toolboxEntry) = ModelBlock<T>.Initialize(key, name, _models);
+            var (blockDefinition, toolboxEntry) = ModelBlock<T>.Initialize(key, name, _models, CreateScratchModel);
 
             /* Register the block and toolbox definition in the parser. */
             _parser.ModelDefinitions.Add(blockDefinition);
@@ -108,6 +108,34 @@ public static class BlocklyExtensions
 
             /* Register. */
             models.SetModel<T>(key, name);
+        }
+
+        /// <summary>
+        /// See if we can create a model on the fly.
+        /// </summary>
+        /// <param name="type">Type to create a model for.</param>
+        /// <param name="key">Blockly key of the potentially created model.</param>
+        /// <returns>Set if a model has been created.</returns>
+        private bool CreateScratchModel(Type type, string key)
+        {
+            /* See if the type is a dictionary. */
+            if (!type.IsGenericType) return false;
+
+            if (type.GetGenericTypeDefinition() != typeof(Dictionary<,>)) return false;
+
+            /* Key must be a known enumeration. */
+            var keyType = type.GetGenericArguments()[0];
+
+            if (!keyType.IsEnum || !_models.ContainsKey(keyType)) return false;
+
+            /* Create the model. */
+            var addModelMethod = GetType().GetMethod("AddModel")!;
+            var addModel = addModelMethod.MakeGenericMethod(type);
+
+            addModel.Invoke(this, [key, ""]);
+
+            /* Did it. */
+            return true;
         }
 
         /// <summary>
