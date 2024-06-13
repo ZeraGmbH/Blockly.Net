@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -46,6 +47,39 @@ public class ModelBlock<T> : Block where T : class, new()
     }
 
     /// <summary>
+    /// Abstract access to a property.
+    /// </summary>
+    /// <remarks>
+    /// Initialize manually.
+    /// </remarks>
+    /// <param name="name">Name of the property.</param>
+    /// <param name="type">Type of the value.</param>
+    /// <param name="setValue">Method to set values.</param>
+    private class PropertyInformation(string name, Type type, Action<object, object?> setValue)
+    {
+        /// <summary>
+        /// Name of the property.
+        /// </summary>
+        public readonly string Name = name;
+
+        /// <summary>
+        /// Type of the property value.
+        /// </summary>
+        public readonly Type Type = type;
+
+        /// <summary>
+        /// Set the value of the property.
+        /// </summary>
+        public readonly Action<object, object?> SetValue = setValue;
+
+        /// <summary>
+        /// Initialize from reflection.
+        /// </summary>
+        /// <param name="info">Property information.</param>
+        public PropertyInformation(PropertyInfo info) : this(info.Name, info.PropertyType, info.SetValue) { }
+    }
+
+    /// <summary>
     /// All wellknown elementary types supported.
     /// </summary>
     private static readonly Dictionary<Type, TypeInformation> _supportedTypes = new(){
@@ -64,7 +98,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <summary>
     /// List of supported properties of the related type.
     /// </summary>
-    private static PropertyInfo[] _props = null!;
+    private static PropertyInformation[] _props = null!;
 
     /// <summary>
     /// Block key of the model.
@@ -81,31 +115,21 @@ public class ModelBlock<T> : Block where T : class, new()
     /// </summary>
     /// <param name="type">Some type of a property of the model.</param>
     /// <param name="models">All other known models.</param>
+    /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
+    /// <param name="propertyName">Name of the related property.</param>
     /// <returns>Set if the type is supported.</returns>
-    private static bool TestSupported(Type type, Dictionary<Type, string> models)
+    private static bool TestSupported(Type type, Dictionary<Type, string> models, Func<Type, string, bool> modelFactory, string propertyName)
     {
-        for (; ; )
-        {
-            // Enums are always good.
-            if (type.IsEnum) return true;
+        // Enums are always good.
+        if (type.IsEnum) return true;
 
-            // Some of .NET base types.
-            if (_supportedTypes.ContainsKey(type)) return true;
+        // Some of .NET base types.
+        if (_supportedTypes.ContainsKey(type)) return true;
 
-            // Already known other model.
-            if (models.ContainsKey(type)) return true;
+        // Already known other model.
+        if (models.ContainsKey(type)) return true;
 
-            // Check for dictionary.
-            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Dictionary<,>)) return false;
-
-            // Key type must be enum.
-            if (!type.GenericTypeArguments[0].IsEnum) return false;
-
-            // Deep dive into value type.
-            type = type.GenericTypeArguments[1];
-
-            type = TestArray(type) ?? type;
-        }
+        return modelFactory(type, $"{_key}_{propertyName}");
     }
 
     /// <summary>
@@ -131,16 +155,39 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <param name="key">Block key of the model.</param>
     /// <param name="name">Display name of the model.</param>
     /// <param name="models">Other models already registered.</param>
-    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, Dictionary<Type, string> models)
+    /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
+    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, Dictionary<Type, string> models, Func<Type, string, bool> modelFactory)
     {
         _key = key;
         _name = name;
+        _props = null!;
+
+        /* Special handling of dictionaries. */
+        if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            /* Key must be a known enumeration. */
+            var keyType = typeof(T).GetGenericArguments()[0];
+
+            if (keyType.IsEnum && models.ContainsKey(keyType))
+            {
+                /* Value type must be supported. */
+                var valueType = typeof(T).GetGenericArguments()[1];
+
+                if (TestSupported(TestArray(valueType) ?? valueType, models, modelFactory, "Value"))
+                    _props = Enum
+                        .GetValues(keyType)
+                        .Cast<object>()
+                        .Select(key => new PropertyInformation(key.ToString()!, valueType, (obj, value) => ((IDictionary)obj)[key] = value))
+                        .ToArray();
+            }
+        }
 
         /* Get all properties of supported types - including a generic list of supported types. */
-        _props = typeof(T)
+        _props ??= typeof(T)
             .GetProperties()
             .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null)
-            .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models))
+            .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
+            .Select(p => new PropertyInformation(p))
             .ToArray();
 
         /* Generate the JSON descriptions of the model. */
@@ -168,21 +215,21 @@ public class ModelBlock<T> : Block where T : class, new()
             });
 
             /* For enumerations provide a static selection list. */
-            if (prop.PropertyType.IsEnum)
+            if (prop.Type.IsEnum)
             {
                 /* Just add the reference. */
                 args.Add(new JsonObject
                 {
                     ["type"] = "input_value",
                     ["name"] = prop.Name,
-                    ["check"] = models[prop.PropertyType]
+                    ["check"] = models[prop.Type]
                 });
 
                 continue;
             }
 
             /* See if the property is a list. */
-            var elementType = TestArray(prop.PropertyType);
+            var elementType = TestArray(prop.Type);
 
             if (elementType != null)
             {
@@ -203,9 +250,9 @@ public class ModelBlock<T> : Block where T : class, new()
             }
 
             /* According to the preparation we either have some wellknown type or another model. */
-            var knownType = _supportedTypes.TryGetValue(prop.PropertyType, out var info)
+            var knownType = _supportedTypes.TryGetValue(prop.Type, out var info)
                 ? info.TypeName
-                : models[prop.PropertyType];
+                : models[prop.Type];
 
             /* Generate the related input. */
             args.Add(new JsonObject
@@ -247,16 +294,16 @@ public class ModelBlock<T> : Block where T : class, new()
 
         /* For all wellknown types we can provide a default value using a shadow block. */
         foreach (var prop in _props)
-            if (prop.PropertyType.IsEnum)
+            if (prop.Type.IsEnum)
                 inputs[prop.Name] = new JsonObject
                 {
                     ["shadow"] = new JsonObject
                     {
-                        ["type"] = models[prop.PropertyType],
-                        ["fields"] = new JsonObject { ["VALUE"] = Enum.GetValues(prop.PropertyType).GetValue(0)!.ToString() }
+                        ["type"] = models[prop.Type],
+                        ["fields"] = new JsonObject { ["VALUE"] = Enum.GetValues(prop.Type).GetValue(0)!.ToString() }
                     }
                 };
-            else if (_supportedTypes.TryGetValue(prop.PropertyType, out var info))
+            else if (_supportedTypes.TryGetValue(prop.Type, out var info))
                 inputs[prop.Name] = new JsonObject
                 {
                     ["shadow"] = new JsonObject
@@ -292,7 +339,7 @@ public class ModelBlock<T> : Block where T : class, new()
 
             /* Too make sure that the data fits run it to a serialize/deserialze sequence - currently performance should not be a problem. */
             var dataAsJson = JsonSerializer.Serialize(blocklyData, JsonUtils.JsonSettings);
-            var typedData = JsonSerializer.Deserialize(dataAsJson, prop.PropertyType, JsonUtils.JsonSettings);
+            var typedData = JsonSerializer.Deserialize(dataAsJson, prop.Type, JsonUtils.JsonSettings);
 
             /* Store the adapted value in the model. */
             prop.SetValue(model, typedData);
