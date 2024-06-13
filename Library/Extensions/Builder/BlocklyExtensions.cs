@@ -115,8 +115,9 @@ public static class BlocklyExtensions
         /// </summary>
         /// <param name="type">Type to create a model for.</param>
         /// <param name="key">Blockly key of the potentially created model.</param>
+        /// <param name="name">Name of the parent model.</param>
         /// <returns>Set if a model has been created.</returns>
-        private bool CreateScratchModel(Type type, string key)
+        private bool CreateScratchModel(Type type, string key, string name)
         {
             /* See if the type is a dictionary. */
             if (!type.IsGenericType) return false;
@@ -132,7 +133,7 @@ public static class BlocklyExtensions
             var addModelMethod = GetType().GetMethod("AddModel")!;
             var addModel = addModelMethod.MakeGenericMethod(type);
 
-            addModel.Invoke(this, [key, ""]);
+            addModel.Invoke(this, [key, $"{name} {key.Split("_").Last()}"]);
 
             /* Did it. */
             return true;

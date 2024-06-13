@@ -118,7 +118,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
     /// <param name="propertyName">Name of the related property.</param>
     /// <returns>Set if the type is supported.</returns>
-    private static bool TestSupported(Type type, Dictionary<Type, string> models, Func<Type, string, bool> modelFactory, string propertyName)
+    private static bool TestSupported(Type type, Dictionary<Type, string> models, Func<Type, string, string, bool> modelFactory, string propertyName)
     {
         // Enums are always good.
         if (type.IsEnum) return true;
@@ -129,7 +129,7 @@ public class ModelBlock<T> : Block where T : class, new()
         // Already known other model.
         if (models.ContainsKey(type)) return true;
 
-        return modelFactory(type, $"{_key}_{propertyName}");
+        return modelFactory(type, $"{_key}_{propertyName}", _name);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <param name="name">Display name of the model.</param>
     /// <param name="models">Other models already registered.</param>
     /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
-    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, Dictionary<Type, string> models, Func<Type, string, bool> modelFactory)
+    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, Dictionary<Type, string> models, Func<Type, string, string, bool> modelFactory)
     {
         _key = key;
         _name = name;

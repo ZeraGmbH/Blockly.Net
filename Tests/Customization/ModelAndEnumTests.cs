@@ -252,9 +252,9 @@ public class ModelAndEnumTests : TestEnvironment
                 {""type"":""field_label_serializable"",""name"":""Three"",""text"":""Three""},
                 {""type"":""input_value"",""name"":""Three"",""check"":""Boolean""}
             ],
-            ""message0"":"" %1 %2 %3 %4 %5 %6 %7"",
+            ""message0"":""Complex list with dictionary TheList %1 %2 %3 %4 %5 %6 %7"",
             ""output"":""list_and_dictionary_TheList"",
-            ""tooltip"":"""",
+            ""tooltip"":""Complex list with dictionary TheList"",
             ""type"":""list_and_dictionary_TheList""
         }";
 
