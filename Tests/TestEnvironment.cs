@@ -92,6 +92,24 @@ public abstract class TestEnvironment
     }
 
     /// <summary>
+    /// Helper class to simulate any type of data.
+    /// </summary>
+    protected class AnyValueBlock(object? value) : Block
+    {
+        /// <summary>
+        /// Value to report.
+        /// </summary>
+        private readonly object? _value = value;
+
+        /// <summary>
+        /// Report the value.
+        /// </summary>
+        /// <param name="context">Execution context - will be ignored.</param>
+        /// <returns>Our value.</returns>
+        public override Task<object?> Evaluate(Context context) => Task.FromResult(_value);
+    }
+
+    /// <summary>
     /// In manual mode create a block reporting a constant number.
     /// </summary>
     /// <param name="value">Number as text.</param>
