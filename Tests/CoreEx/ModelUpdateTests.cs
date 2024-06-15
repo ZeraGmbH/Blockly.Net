@@ -20,7 +20,7 @@ public class ModelUpdateTests : TestEnvironment
 
     public class InnerClass
     {
-        public int Id { get; set; }
+        public double Id { get; set; }
     }
 
     public class OuterClass
@@ -124,7 +124,7 @@ public class ModelUpdateTests : TestEnvironment
     [Test]
     public async Task Can_Update_Untyped_Dictionary()
     {
-        var instance = new Dictionary<string, int> { { "a", -1 }, { "b", -2 } };
+        var instance = new Dictionary<string, double> { { "a", -1 }, { "b", -2 } };
 
         Context.Variables["instance"] = instance;
 
@@ -145,7 +145,7 @@ public class ModelUpdateTests : TestEnvironment
     [Test]
     public async Task Can_Update_Typed_Dictionary()
     {
-        var instance = new Dictionary<Modes, int> { { Modes.One, -1 }, { Modes.Two, -2 } };
+        var instance = new Dictionary<Modes, double> { { Modes.One, -1 }, { Modes.Two, -2 } };
 
         Context.Variables["instance"] = instance;
 
@@ -248,7 +248,7 @@ public class ModelUpdateTests : TestEnvironment
         var block = new ReadFromModel
         {
             Fields = { new() { Name = "VAR", Value = "instance" } },
-            Values = { new() { Name = "PATH", Block = CreateNumberBlock(Modes.One.ToString()) }, }
+            Values = { new() { Name = "PATH", Block = CreateStringBlock(Modes.One.ToString()) }, }
         };
 
         Assert.That(await block.Evaluate(Context), Is.EqualTo(-1));
