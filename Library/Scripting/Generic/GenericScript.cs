@@ -37,10 +37,12 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
     /// <param name="script"></param>
     /// <param name="afterPresets"></param>
     /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
     /// <typeparam name="TOptions"></typeparam>
     /// <returns></returns>
-    public static async Task Execute<TRequest, TOptions>(Script<TRequest, GenericResult, TOptions> script, Action? afterPresets = null)
+    public static async Task Execute<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions> script, Action? afterPresets = null)
         where TRequest : StartScript, IStartGenericScript
+        where TResult : GenericResult, new()
         where TOptions : StartScriptOptions
     {
         /* Translate parameters. */
@@ -86,9 +88,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
         /* Execute the script. */
         var result = await script.Engine.Evaluate(def.Code, presets);
 
-        /* Report variables as a result. */
-        var results = new GenericResult { Result = result, ResultType = script.Request.ResultType, ScriptId = script.Request.ScriptId };
-
-        script.SetResult(results);
+        /* Create result information - with some redundant information copied from the request. */
+        script.SetResult(new TResult { Result = result, ResultType = script.Request.ResultType, ScriptId = script.Request.ScriptId });
     }
 }
