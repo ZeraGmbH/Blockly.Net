@@ -29,7 +29,7 @@ public static class JsonUtils
             JsonValueKind.Number => json.Deserialize<double>(),
             JsonValueKind.String => json.Deserialize<string>(),
             JsonValueKind.True => true,
-            _ => json,
+            _ => (object?)json,
         };
 
     /// <summary>
@@ -42,10 +42,10 @@ public static class JsonUtils
         {
             JsonValueKind.False => false,
             JsonValueKind.Null => null,
-            JsonValueKind.Number => json.Deserialize<double>(),
-            JsonValueKind.String => json.Deserialize<string>(),
+            JsonValueKind.Number => json.GetValue<double>(),
+            JsonValueKind.String => json.GetValue<string>(),
             JsonValueKind.True => true,
-            _ => json,
+            _ => (object?)json,
         };
 
     /// <summary>
