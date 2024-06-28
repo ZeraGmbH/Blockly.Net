@@ -187,7 +187,7 @@ public class ModelBlock<T> : Block where T : class, new()
         /* Get all properties of supported types - including a generic list of supported types. */
         _props ??= typeof(T)
             .GetProperties()
-            .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null)
+            .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
             .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
             .Select(p => new PropertyInformation(p))
             .ToArray();

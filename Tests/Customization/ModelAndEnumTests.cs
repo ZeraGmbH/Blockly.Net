@@ -29,6 +29,8 @@ public class InnerClass
     public string Name { get; set; } = null!;
 
     public SampleEnum What { get; set; }
+
+    public int Age { get; } = 33;
 }
 
 /// <summary>
@@ -294,5 +296,21 @@ public class ModelAndEnumTests : TestEnvironment
             Assert.That(result.TheList[0][SampleEnum.Two], Is.True);
             Assert.That(result.TheList[0].ContainsKey(SampleEnum.Three), Is.False);
         });
+    }
+
+    /// <summary>
+    /// A property must be writable to appear in the model.
+    /// </summary>
+    [Test]
+    public void Property_With_No_Getter_Must_Not_Be_In_Model()
+    {
+        var provider = GetService<IConfigurationService>();
+
+        /* The model block. */
+        var myModel = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "inner_class")!;
+        var args = (JsonArray)myModel["args0"]!;
+        var age = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "Age");
+
+        Assert.That(age, Is.Null);
     }
 }
