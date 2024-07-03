@@ -11,10 +11,12 @@ public static class JsonUtils
     /// <summary>
     /// Configure serializer to generate camel casing.
     /// </summary>
-    public static readonly JsonSerializerOptions JsonSettings = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    /// <remarks>
+    /// Can be customized if consumer uses customized serializsation rules.
+    /// </remarks>
+#pragma warning disable CA2211 // Non-constant fields should not be visible
+    public static JsonSerializerOptions JsonSettings = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+#pragma warning restore CA2211 // Non-constant fields should not be visible
 
     /// <summary>
     /// Extract a scalar value from a JsonElement.
