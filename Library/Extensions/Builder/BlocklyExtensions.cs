@@ -47,9 +47,9 @@ public static class BlocklyExtensions
         /// <summary>
         /// Add a self describing block class to the parser.
         /// </summary>
-        /// <param name="modelBlock">Set if this block should be handled like a model.</param>
+        /// <param name="registerAs">Set if this block should be handled like a model.</param>
         /// <typeparam name="TBlock">Type of the block.</typeparam>
-        public void AddBlock<TBlock>(bool modelBlock = false) where TBlock : Block, new()
+        public void AddBlock<TBlock>(Type? registerAs = null) where TBlock : Block, new()
         {
             /* Aattribute indicator is required. */
             var blockAttribute = typeof(TBlock).GetCustomAttributes<CustomBlockAttribute>().Single();
@@ -86,7 +86,7 @@ public static class BlocklyExtensions
             _parser.ToolboxEntries.Add(Tuple.Create(blockAttribute.Category, toolbox));
 
             /* Remember the model type - future models can now reference the property type. */
-            if (modelBlock) _models[typeof(TBlock)] = key;
+            if (registerAs != null) _models[registerAs] = key;
         }
 
         /// <summary>
