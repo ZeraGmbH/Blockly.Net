@@ -86,7 +86,13 @@ public static class BlocklyExtensions
             _parser.ToolboxEntries.Add(Tuple.Create(blockAttribute.Category, toolbox));
 
             /* Remember the model type - future models can now reference the property type. */
-            if (registerAs != null) _models[registerAs] = key;
+            if (registerAs != null)
+            {
+                _models[registerAs] = key;
+
+                /* For value types add a nullable as well. */
+                if (registerAs.IsValueType) _models[typeof(Nullable<>).MakeGenericType(registerAs)] = key;
+            }
         }
 
         /// <summary>
