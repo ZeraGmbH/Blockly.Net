@@ -47,8 +47,9 @@ public static class BlocklyExtensions
         /// <summary>
         /// Add a self describing block class to the parser.
         /// </summary>
+        /// <param name="registerAs">Set if this block should be handled like a model.</param>
         /// <typeparam name="TBlock">Type of the block.</typeparam>
-        public void AddBlock<TBlock>() where TBlock : Block, new()
+        public void AddBlock<TBlock>(Type? registerAs = null) where TBlock : Block, new()
         {
             /* Aattribute indicator is required. */
             var blockAttribute = typeof(TBlock).GetCustomAttributes<CustomBlockAttribute>().Single();
@@ -83,31 +84,40 @@ public static class BlocklyExtensions
             toolbox["type"] = key;
 
             _parser.ToolboxEntries.Add(Tuple.Create(blockAttribute.Category, toolbox));
+
+            /* Remember the model type - future models can now reference the property type. */
+            if (registerAs != null)
+            {
+                _models[registerAs] = key;
+
+                /* For value types add a nullable as well. */
+                if (registerAs.IsValueType) _models[typeof(Nullable<>).MakeGenericType(registerAs)] = key;
+            }
         }
 
         /// <summary>
         /// Register a model in the parser.
         /// </summary>
-        /// <typeparam name="T">Model type.</typeparam>
+        /// <typeparam name="TModel">Model type.</typeparam>
         /// <param name="key">Block key for the model.</param>
         /// <param name="name">Display name for the model.</param>
-        public void AddModel<T>(string key, string name) where T : class, new()
+        public void AddModel<TModel>(string key, string name) where TModel : class, new()
         {
             /* Initialize the generic model generator. */
-            var (blockDefinition, toolboxEntry) = ModelBlock<T>.Initialize(key, name, _models, CreateScratchModel);
+            var (blockDefinition, toolboxEntry) = ModelBlock<TModel>.Initialize(key, name, _models, CreateScratchModel);
 
             /* Register the block and toolbox definition in the parser. */
             _parser.ModelDefinitions.Add(blockDefinition);
             _parser.ToolboxEntries.Add(Tuple.Create("*", toolboxEntry));
 
             /* Add the related block to the parser. */
-            _parser.AddBlock<ModelBlock<T>>(key);
+            _parser.AddBlock<ModelBlock<TModel>>(key);
 
             /* Remember the model type - future models can now reference the property type. */
-            _models[typeof(T)] = key;
+            _models[typeof(TModel)] = key;
 
             /* Register. */
-            models.SetModel<T>(key, name);
+            models.SetModel<TModel>(key, name);
         }
 
         /// <summary>
