@@ -27,5 +27,5 @@ public class ScriptModels : IScriptModels
     public void SetEnum<T>(string key, string name) where T : Enum => Set(Enums, key, typeof(T), name);
 
     /// <inheritdoc/>
-    public void SetModel<T>(string key, string name) where T : class => Set(Models, key, typeof(T), name);
+    public void SetModel(Type t, string key, string name) => Set(Models, key, t, name);
 }
