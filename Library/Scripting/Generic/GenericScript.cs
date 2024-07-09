@@ -40,7 +40,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
     /// <typeparam name="TResult"></typeparam>
     /// <typeparam name="TOptions"></typeparam>
     /// <returns></returns>
-    public static async Task Execute<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions> script, Action? afterPresets = null)
+    public static async Task Execute<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions> script, Action<IScriptDefinition>? afterPresets = null)
         where TRequest : StartScript, IStartGenericScript
         where TResult : GenericResult, new()
         where TOptions : StartScriptOptions
@@ -48,14 +48,14 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
         /* Translate parameters. */
         var presets = script.Request.Presets.ToDictionary(p => p.Key, p => (p.Value is JsonElement json) ? json.ToJsonScalar() : p.Value);
 
-        /* Prepare for logging. */
-        script.Request.Presets = presets.Select(d => new GenericScriptPreset { Key = d.Key, Value = d.Value }).ToList();
-
-        afterPresets?.Invoke();
-
         /* Find the script. */
         var di = script.Engine.ServiceProvider;
         var def = await di.GetRequiredService<IScriptDefinitionStorage>().Get(script.Request.ScriptId) ?? throw new ArgumentException("Script not found.");
+
+        /* Prepare for logging. */
+        script.Request.Presets = presets.Select(d => new GenericScriptPreset { Key = d.Key, Value = d.Value }).ToList();
+
+        afterPresets?.Invoke(def);
 
         /* Validate presets. */
         var models = di.GetRequiredService<IScriptModels>();
