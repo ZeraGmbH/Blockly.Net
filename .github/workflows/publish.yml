@@ -26,6 +26,4 @@ jobs:
         run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
       - name: Push
         run: |
-          dotnet nuget push Blockly.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://nuget.pkg.github.com/ZeraGmbH/index.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          dotnet nuget push Blockly.Net.${VERSION}.nupkg --api-key ${{secrets.NUGET_PUBLISH}} --source https://api.nuget.org/v3/index.json
