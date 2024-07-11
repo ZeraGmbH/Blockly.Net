@@ -18,8 +18,7 @@
 
   <PropertyGroup>
     <PackageId>Blockly.Net</PackageId>
-    <Version>0.5.1</Version>
-    <Authors>Dr. Jochen Manns</Authors>
+    <Authors>The WebSAM Team</Authors>
     <Company>ZERA GmbH</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
