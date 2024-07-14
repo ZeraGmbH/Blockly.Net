@@ -5,7 +5,14 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
-
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "Run the workflow on another than the last commit"
+        required: false
+        default: ""
+        type: string
+  
 jobs:
   build:
     runs-on: ubuntu-latest
