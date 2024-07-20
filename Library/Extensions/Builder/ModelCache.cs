@@ -2,13 +2,76 @@ namespace BlocklyNet.Extensions.Builder;
 
 /// <summary>
 /// Helper class to manage the block building process
-/// /// </summary>
+/// </summary>
 public class ModelCache
 {
     /// <summary>
+    /// Wrapper on a function to make sure that it is executed only once.
+    /// </summary>
+    /// <param name="factory">Factory method to use.</param>
+    private class Factory(Action? factory)
+    {
+        /// <summary>
+        /// Check for cyclic references.
+        /// </summary>
+        private bool _cycleDetection = false;
+
+        /// <summary>
+        /// The factory method - will be reset after first call.
+        /// </summary>
+        private Action? _factory = factory;
+
+        /// <summary>
+        /// Execute the method once.
+        /// </summary>
+        public void ExecuteOnce()
+        {
+            /* May not create cyclic references. */
+            if (_cycleDetection) throw new InvalidOperationException("cyclic model reference detected");
+
+            /* Run the factory once. */
+            var factory = _factory;
+
+            if (factory == null) return;
+
+            _factory = null;
+
+            /* Make sure that we do not run into cycles. */
+            _cycleDetection = true;
+
+            factory();
+
+            _cycleDetection = false;
+        }
+    }
+
+    /// <summary>
+    /// A single type registraion.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="factory"></param>
+    private class TypeInfo(string name, Factory factory)
+    {
+        /// <summary>
+        /// Blockly type name of the model.
+        /// </summary>
+        public readonly string Name = name;
+
+        /// <summary>
+        /// Factory to call to create the block definition.
+        /// </summary>
+        public readonly Factory Factory = factory;
+    }
+
+    /// <summary>
+    /// All regular blocks.
+    /// </summary>
+    private readonly List<Factory> _blockFactories = [];
+
+    /// <summary>
     /// All defined blocks.
     /// </summary>
-    private readonly Dictionary<Type, string> _mapping = [];
+    private readonly Dictionary<Type, TypeInfo> _mapping = [];
 
     /// <summary>
     /// Check if a specific model is already known.
@@ -21,22 +84,44 @@ public class ModelCache
     /// Read a single mapping.
     /// </summary>
     /// <param name="type">Some model type.</param>
-    public string this[Type type] => _mapping[type];
+    public string this[Type type]
+    {
+        get
+        {
+            /* Create the definition once. */
+            var info = _mapping[type];
+
+            info.Factory.ExecuteOnce();
+
+            return info.Name;
+        }
+    }
 
     /// <summary>
     /// Register an additional block type.
     /// </summary>
     /// <param name="name">Blockly type name for the model.</param>
+    /// <param name="factory">Method to create the block.</param>
     /// <typeparam name="T">Model type.</typeparam>
-    public void Add<T>(string name) => Add(typeof(T), name);
+    public void Add<T>(string name, Action? factory = null) => Add(typeof(T), name, factory);
 
     /// <summary>
     /// Register an additional block type.
     /// </summary>
     /// <param name="type">Model type.</param>
+    /// <param name="factory">Method to create the block.</param>
     /// <param name="name">Blockly type name for the model.</param>
-    public void Add(Type type, string name)
+    public void Add(Type type, string name, Action? factory = null) => _mapping.Add(type, new(name, new Factory(factory)));
+
+    /// <summary>
+    /// Create all blocky definitions.
+    /// </summary>
+    public void CreateDefinitions()
     {
-        _mapping.Add(type, name);
+        /* Blocks first. */
+        _blockFactories.ForEach(f => f.ExecuteOnce());
+
+        /* Remaing extra definitions - if any. */
+        _mapping.Values.ToList().ForEach(i => i.Factory.ExecuteOnce());
     }
 }

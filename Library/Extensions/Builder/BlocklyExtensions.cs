@@ -45,13 +45,18 @@ public static class BlocklyExtensions
         private readonly Parser<TParser> _parser = parser;
 
         /// <summary>
+        /// Generate all blockly definitions including the toolbox entries.
+        /// </summary>
+        public void CreateDefinitions() => _models.CreateDefinitions();
+
+        /// <summary>
         /// Add a self describing block class to the parser.
         /// </summary>
         /// <param name="registerAs">Set if this block should be handled like a model.</param>
         /// <typeparam name="TBlock">Type of the block.</typeparam>
         public void AddBlock<TBlock>(Type? registerAs = null) where TBlock : Block, new()
         {
-            /* Aattribute indicator is required. */
+            /* Attribute indicator is required. */
             var blockAttribute = typeof(TBlock).GetCustomAttributes<CustomBlockAttribute>().Single();
 
             /* Add the block type using the unique block key from the attribute. */
@@ -104,23 +109,21 @@ public static class BlocklyExtensions
         /// <param name="key">Block key for the model.</param>
         /// <param name="name">Display name for the model.</param>
         public void AddModel<TModel>(string key, string name) where TModel : class, new()
-        {
-            /* Initialize the generic model generator. */
-            var (blockDefinition, toolboxEntry) = ModelBlock<TModel>.Initialize(key, name, _models, CreateScratchModel);
+            => _models.Add<TModel>(key, () =>
+                {
+                    /* Initialize the generic model generator. */
+                    var (blockDefinition, toolboxEntry) = ModelBlock<TModel>.Initialize(key, name, _models, CreateScratchModel);
 
-            /* Register the block and toolbox definition in the parser. */
-            _parser.ModelDefinitions.Add(blockDefinition);
-            _parser.ToolboxEntries.Add(Tuple.Create("*", toolboxEntry));
+                    /* Register the block and toolbox definition in the parser. */
+                    _parser.ModelDefinitions.Add(blockDefinition);
+                    _parser.ToolboxEntries.Add(Tuple.Create("*", toolboxEntry));
 
-            /* Add the related block to the parser. */
-            _parser.AddBlock<ModelBlock<TModel>>(key);
+                    /* Add the related block to the parser. */
+                    _parser.AddBlock<ModelBlock<TModel>>(key);
 
-            /* Remember the model type - future models can now reference the property type. */
-            _models.Add<TModel>(key);
-
-            /* Register. */
-            models.SetModel<TModel>(key, name);
-        }
+                    /* Register. */
+                    models.SetModel<TModel>(key, name);
+                });
 
         /// <summary>
         /// See if we can create a model on the fly.
@@ -158,23 +161,21 @@ public static class BlocklyExtensions
         /// <param name="key">Block key for the enumeration.</param>
         /// <param name="name">Display name for the enumeration.</param>
         public void AddEnum<T>(string key, string name) where T : Enum
-        {
-            /* Initialize the generic model generator. */
-            var (blockDefinition, toolboxEntry) = EnumBlock<T>.Initialize(key, name);
+            => _models.Add<T>(key, () =>
+            {
+                /* Initialize the generic model generator. */
+                var (blockDefinition, toolboxEntry) = EnumBlock<T>.Initialize(key, name);
 
-            /* Register the block and toolbox definition in the parser. */
-            _parser.ModelDefinitions.Add(blockDefinition);
-            _parser.ToolboxEntries.Add(Tuple.Create("Enum", toolboxEntry));
+                /* Register the block and toolbox definition in the parser. */
+                _parser.ModelDefinitions.Add(blockDefinition);
+                _parser.ToolboxEntries.Add(Tuple.Create("Enum", toolboxEntry));
 
-            /* Add the related block to the parser. */
-            _parser.AddBlock<EnumBlock<T>>(key);
+                /* Add the related block to the parser. */
+                _parser.AddBlock<EnumBlock<T>>(key);
 
-            /* Remember the model type - future models can now reference the property type. */
-            _models.Add<T>(key);
-
-            /* Register. */
-            models.SetEnum<T>(key, name);
-        }
+                /* Register. */
+                models.SetEnum<T>(key, name);
+            });
     }
 
     /// <summary>
@@ -212,6 +213,9 @@ public static class BlocklyExtensions
 
         /* Add custom definitions. */
         custom?.Invoke(builder);
+
+        /* Create definitions. */
+        builder.CreateDefinitions();
 
         /* And use the standard block definitions. */
         return parser.AddStandardBlocks();
