@@ -120,7 +120,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
     /// <param name="propertyName">Name of the related property.</param>
     /// <returns>Set if the type is supported.</returns>
-    private static bool TestSupported(Type type, Dictionary<Type, string> models, Func<Type, string, string, bool> modelFactory, string propertyName)
+    private static bool TestSupported(Type type, ModelCache models, Func<Type, string, string, bool> modelFactory, string propertyName)
     {
         // Enums are always good.
         if (type.IsEnum) return true;
@@ -129,7 +129,7 @@ public class ModelBlock<T> : Block where T : class, new()
         if (_supportedTypes.ContainsKey(type)) return true;
 
         // Already known other model.
-        if (models.ContainsKey(type)) return true;
+        if (models.Contains(type)) return true;
 
         return modelFactory(type, $"{_key}_{propertyName}", _name);
     }
@@ -158,7 +158,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// <param name="name">Display name of the model.</param>
     /// <param name="models">Other models already registered.</param>
     /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
-    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, Dictionary<Type, string> models, Func<Type, string, string, bool> modelFactory)
+    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, ModelCache models, Func<Type, string, string, bool> modelFactory)
     {
         _key = key;
         _name = name;
@@ -170,7 +170,7 @@ public class ModelBlock<T> : Block where T : class, new()
             /* Key must be a known enumeration. */
             var keyType = typeof(T).GetGenericArguments()[0];
 
-            if (keyType.IsEnum && models.ContainsKey(keyType))
+            if (keyType.IsEnum && models.Contains(keyType))
             {
                 /* Value type must be supported. */
                 var valueType = typeof(T).GetGenericArguments()[1];
@@ -201,7 +201,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// </summary>
     /// <param name="models">All models already registered.</param>
     /// <returns>The JSON description.</returns>
-    private static JsonObject CreateBlockDefinition(Dictionary<Type, string> models)
+    private static JsonObject CreateBlockDefinition(ModelCache models)
     {
         var args = new JsonArray { new JsonObject { ["type"] = "input_dummy" } };
 
@@ -290,7 +290,7 @@ public class ModelBlock<T> : Block where T : class, new()
     /// </summary>
     /// <param name="models">Other models already registered.</param>
     /// <returns>Desciption of a toolbox entry for this model.</returns>
-    private static JsonObject CreateToolboxEntry(Dictionary<Type, string> models)
+    private static JsonObject CreateToolboxEntry(ModelCache models)
     {
         var inputs = new JsonObject();
 

@@ -37,7 +37,7 @@ public static class BlocklyExtensions
         /// <summary>
         /// All models defined so far.
         /// </summary>
-        private readonly Dictionary<Type, string> _models = [];
+        private readonly ModelCache _models = new();
 
         /// <summary>
         /// The parser to configure.
@@ -88,10 +88,10 @@ public static class BlocklyExtensions
             /* Remember the model type - future models can now reference the property type. */
             if (registerAs == null) return;
 
-            _models[registerAs] = key;
+            _models.Add(registerAs, key);
 
             /* For value types add a nullable as well. */
-            if (registerAs.IsValueType) _models[typeof(Nullable<>).MakeGenericType(registerAs)] = key;
+            if (registerAs.IsValueType) _models.Add(typeof(Nullable<>).MakeGenericType(registerAs), key);
 
             /* Register. */
             models.SetModel(registerAs, key, part0 ?? key);
@@ -116,7 +116,7 @@ public static class BlocklyExtensions
             _parser.AddBlock<ModelBlock<TModel>>(key);
 
             /* Remember the model type - future models can now reference the property type. */
-            _models[typeof(TModel)] = key;
+            _models.Add<TModel>(key);
 
             /* Register. */
             models.SetModel<TModel>(key, name);
@@ -139,7 +139,7 @@ public static class BlocklyExtensions
             /* Key must be a known enumeration. */
             var keyType = type.GetGenericArguments()[0];
 
-            if (!keyType.IsEnum || !_models.ContainsKey(keyType)) return false;
+            if (!keyType.IsEnum || !_models.Contains(keyType)) return false;
 
             /* Create the model. */
             var addModelMethod = GetType().GetMethod("AddModel")!;
@@ -170,7 +170,7 @@ public static class BlocklyExtensions
             _parser.AddBlock<EnumBlock<T>>(key);
 
             /* Remember the model type - future models can now reference the property type. */
-            _models[typeof(T)] = key;
+            _models.Add<T>(key);
 
             /* Register. */
             models.SetEnum<T>(key, name);

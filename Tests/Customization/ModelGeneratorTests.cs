@@ -65,7 +65,11 @@ public class ModelGeneratorTests
     [Test]
     public void Can_Reference_Other_Model()
     {
-        var outer = ModelBlock<OuterRef>.Initialize("outer", "OUTER", new() { { typeof(InnerRef), "inner" } }, (type, key, name) => false);
+        var models = new ModelCache();
+
+        models.Add<InnerRef>("inner");
+
+        var outer = ModelBlock<OuterRef>.Initialize("outer", "OUTER", models, (type, key, name) => false);
 
         var blockJson = JsonSerializer.Serialize(outer.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(outer.Item2, JsonUtils.JsonSettings);
@@ -80,8 +84,12 @@ public class ModelGeneratorTests
     [Test]
     public void Can_Use_Enum()
     {
+        var models = new ModelCache();
+
+        models.Add<EnumModel>("enum_model");
+
         var emodel = EnumBlock<EnumModel>.Initialize("enum_model", "ENUMMODEL");
-        var model = ModelBlock<EnumRef>.Initialize("enum", "ENUM", new Dictionary<Type, string>() { { typeof(EnumModel), "enum_model" } }, (type, key, name) => false);
+        var model = ModelBlock<EnumRef>.Initialize("enum", "ENUM", models, (type, key, name) => false);
 
         var blockJson = JsonSerializer.Serialize(model.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(model.Item2, JsonUtils.JsonSettings);
@@ -96,7 +104,11 @@ public class ModelGeneratorTests
     [Test]
     public void Can_Use_Arrays()
     {
-        var outer = ModelBlock<ArrayRef>.Initialize("array", "ARRAY", new() { { typeof(InnerRef), "inner" } }, (type, key, name) => false);
+        var models = new ModelCache();
+
+        models.Add<InnerRef>("inner");
+
+        var outer = ModelBlock<ArrayRef>.Initialize("array", "ARRAY", models, (type, key, name) => false);
 
         var blockJson = JsonSerializer.Serialize(outer.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(outer.Item2, JsonUtils.JsonSettings);
@@ -111,7 +123,7 @@ public class ModelGeneratorTests
     [Test]
     public async Task Can_Create_Blockly_Model_Dynamically()
     {
-        var definitions = ModelBlock<TestModel>.Initialize("K-2", "N-3", [], (type, key, name) => false);
+        var definitions = ModelBlock<TestModel>.Initialize("K-2", "N-3", new ModelCache(), (type, key, name) => false);
         var blockJson = JsonSerializer.Serialize(definitions.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(definitions.Item2, JsonUtils.JsonSettings);
 
