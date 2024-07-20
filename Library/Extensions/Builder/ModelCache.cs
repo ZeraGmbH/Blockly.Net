@@ -12,11 +12,6 @@ public class ModelCache
     private class Factory(Action? factory)
     {
         /// <summary>
-        /// Check for cyclic references.
-        /// </summary>
-        private bool _cycleDetection = false;
-
-        /// <summary>
         /// The factory method - will be reset after first call.
         /// </summary>
         private Action? _factory = factory;
@@ -24,25 +19,7 @@ public class ModelCache
         /// <summary>
         /// Execute the method once.
         /// </summary>
-        public void ExecuteOnce()
-        {
-            /* May not create cyclic references. */
-            if (_cycleDetection) throw new InvalidOperationException("cyclic model reference detected");
-
-            /* Run the factory once. */
-            var factory = _factory;
-
-            if (factory == null) return;
-
-            _factory = null;
-
-            /* Make sure that we do not run into cycles. */
-            _cycleDetection = true;
-
-            factory();
-
-            _cycleDetection = false;
-        }
+        public void ExecuteOnce() => Interlocked.Exchange(ref _factory, null)?.Invoke();
     }
 
     /// <summary>
@@ -62,11 +39,6 @@ public class ModelCache
         /// </summary>
         public readonly Factory Factory = factory;
     }
-
-    /// <summary>
-    /// All regular blocks.
-    /// </summary>
-    private readonly List<Factory> _blockFactories = [];
 
     /// <summary>
     /// All defined blocks.
@@ -116,12 +88,5 @@ public class ModelCache
     /// <summary>
     /// Create all blocky definitions.
     /// </summary>
-    public void CreateDefinitions()
-    {
-        /* Blocks first. */
-        _blockFactories.ForEach(f => f.ExecuteOnce());
-
-        /* Remaing extra definitions - if any. */
-        _mapping.Values.ToList().ForEach(i => i.Factory.ExecuteOnce());
-    }
+    public void CreateDefinitions() => _mapping.Values.ToList().ForEach(i => i.Factory.ExecuteOnce());
 }

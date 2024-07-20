@@ -2,7 +2,6 @@ using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions;
 using BlocklyNet.Scripting.Engine;
 using Moq;
-using Moq.Protected;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.CoreEx;

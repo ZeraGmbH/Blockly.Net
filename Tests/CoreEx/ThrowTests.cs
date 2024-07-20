@@ -1,7 +1,6 @@
 using BlocklyNet.Core.Blocks.Variables;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions;
-using BlocklyNetTests;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.CoreEx;

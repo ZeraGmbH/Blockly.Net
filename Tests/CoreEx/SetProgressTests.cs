@@ -1,6 +1,5 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions;
-using BlocklyNet.Scripting;
 using BlocklyNet.Scripting.Generic;
 using Moq;
 using NUnit.Framework;
