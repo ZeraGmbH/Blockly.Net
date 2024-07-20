@@ -69,10 +69,10 @@ public class ModelAndEnumTests : TestEnvironment
             /* Enums first. */
             builder.AddEnum<SampleEnum>("sample_enum", "My example enumeration");
 
-            /* Model classes leaves first. */
-            builder.AddModel<InnerClass>("inner_class", "The inner model");
-            builder.AddModel<OuterClass>("outer_class", "The outer model");
+            /* Intentionally wrong dependency order. */
             builder.AddModel<ListDictClass>("list_and_dictionary", "Complex list with dictionary");
+            builder.AddModel<OuterClass>("outer_class", "The outer model");
+            builder.AddModel<InnerClass>("inner_class", "The inner model");
         }
     }
 
