@@ -19,4 +19,4 @@ public enum ErrorComparisionResult
 builder.AddEnum<ErrorComparisionResult>("error_measurement_comparison", "Error Measurement Comparision");
 ```
 
-![Enumeration model block](EnumBlock.png)
+![Enumeration block](EnumBlock.png)
