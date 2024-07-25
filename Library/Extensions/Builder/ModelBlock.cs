@@ -123,7 +123,7 @@ public class ModelBlock<T> : Block where T : class, new()
     private static bool TestSupported(Type type, ModelCache models, Func<Type, string, string, bool> modelFactory, string propertyName)
     {
         // Enums are always good.
-        if (type.IsEnum) return true;
+        if (type.IsEnum && models.Contains(type)) return true;
 
         // Some of .NET base types.
         if (_supportedTypes.ContainsKey(type)) return true;
