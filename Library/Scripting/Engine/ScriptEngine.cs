@@ -197,6 +197,9 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         }
         try
         {
+            /* Make sure child processes will terminate as soon as possible. */
+            _cancel.Cancel();
+
             _done = true;
 
             /* Forward the information on the now terminated script. */
