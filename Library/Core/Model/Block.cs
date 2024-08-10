@@ -49,8 +49,11 @@ public abstract class Block : IFragment
     public IList<Comment> Comments { get; } = [];
 
     /// <inheritdoc/>
-    public virtual Task<object?> Evaluate(Context context)
+    public virtual async Task<object?> Evaluate(Context context)
     {
+        /* Wait for debugger to allow execution. */
+        await context.Engine.SingleStep(this);
+
         /* Always check for cancel before proceeding with the execution of the next block in chain. */
         context.Cancellation.ThrowIfCancellationRequested();
 
@@ -60,8 +63,8 @@ public abstract class Block : IFragment
 
         /* Run the next block if we are not forcefully exiting a loop. */
         if (Next != null && context.EscapeMode == EscapeMode.None)
-            return Next.Evaluate(context);
+            return await Next.Evaluate(context);
 
-        return Task.FromResult((object?)null);
+        return null;
     }
 }

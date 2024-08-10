@@ -1,4 +1,5 @@
 using System.Reflection;
+using BlocklyNet.Core.Model;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -176,6 +177,9 @@ public partial class ScriptEngine
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public Task SingleStep(Block block) => Task.CompletedTask;
     }
 
     /// <summary>

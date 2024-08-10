@@ -1,4 +1,5 @@
 using System.Reflection;
+using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Parsing;
 using BlocklyNet.User;
 using Microsoft.Extensions.DependencyInjection;
@@ -353,4 +354,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <returns></returns>
     protected virtual ScriptFinished CreateFinishNotification(IScriptInstance script)
             => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+
+    /// <inheritdoc/>
+    public Task SingleStep(Block block) => Task.CompletedTask;
 }

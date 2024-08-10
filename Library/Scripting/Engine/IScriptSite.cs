@@ -1,3 +1,4 @@
+using BlocklyNet.Core.Model;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -66,4 +67,10 @@ public interface IScriptSite
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     Task<T?> GetUserInput<T>(string key, string? type = null);
+
+    /// <summary>
+    /// Call just before a block is executed.
+    /// </summary>
+    /// <param name="block">The block to execute.</param>
+    Task SingleStep(Block block);
 }
