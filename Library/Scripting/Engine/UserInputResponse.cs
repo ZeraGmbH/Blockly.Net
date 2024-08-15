@@ -7,7 +7,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// Reports the requested input - currently only numbers
 /// are supported.
 /// </summary>
-public class UserInputResponse : UserInputRequest
+public class UserInputResponse : UserInputRequestBase
 {
     /// <summary>
     /// The input provided by the user.

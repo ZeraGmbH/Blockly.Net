@@ -17,25 +17,44 @@ public partial class ScriptEngine
     /// </summary>
     private TaskCompletionSource<UserInputResponse>? _inputResponse;
 
-    /// <inheritdoc/>
-    public void SetUserInput(UserInputResponse response) => SetUserInput(response, true);
+    /// <summary>
+    /// Exact time the input was requested.
+    /// </summary>
+    private DateTime _inputStarted = DateTime.MinValue;
 
-    private void SetUserInput(UserInputResponse response, bool mustLock)
+    /// <summary>
+    /// Optional planned seconds to auto-close the input request.
+    /// </summary>
+    private double? _inputDelay = null;
+
+    /// <inheritdoc/>
+    public void SetUserInput(UserInputResponse? response) => SetUserInput(response, true);
+
+    private void SetUserInput(UserInputResponse? response, bool mustLock)
     {
         TaskCompletionSource<UserInputResponse>? inputResponse;
 
         using (mustLock ? Lock.Wait() : null)
         {
             /* The script requesting the input must still be the active one. */
-            if (_active == null || _active.JobId != response.JobId)
+            if (_active == null || (response != null && _active.JobId != response.JobId))
                 throw new ArgumentException("jobId");
 
-            /* See if there is anyone wating on the response and clear the pending request. */
+            /* See if there is anyone wating on the response. */
             inputResponse = _inputResponse;
 
             if (inputResponse == null)
                 return;
 
+            /* Copy from request. */
+            response ??= new UserInputResponse
+            {
+                JobId = _active.JobId,
+                Key = _inputRequest?.Key ?? string.Empty,
+                ValueType = _inputRequest?.ValueType
+            };
+
+            /* Clear the pending request. */
             _inputRequest = null;
             _inputResponse = null;
         }
@@ -47,7 +66,7 @@ public partial class ScriptEngine
     }
 
     /// <inheritdoc/>
-    public Task<T?> GetUserInput<T>(string key, string? type = null)
+    public Task<T?> GetUserInput<T>(string key, string? type = null, double? delay = null)
     {
         using (Lock.Wait())
         {
@@ -60,9 +79,18 @@ public partial class ScriptEngine
             {
                 /* Create a new response handler. */
                 _inputResponse = new TaskCompletionSource<UserInputResponse>();
+                _inputDelay = delay;
+                _inputStarted = DateTime.UtcNow;
 
                 /* Tell our clients that we would like to get some input. */
-                var inputRequest = new UserInputRequest { JobId = _active.JobId, Key = key, ValueType = type };
+                var inputRequest = new UserInputRequest
+                {
+                    JobId = _active.JobId,
+                    Key = key,
+                    SecondsToAutoClose = _inputDelay,
+                    StartedAt = _inputStarted,
+                    ValueType = type,
+                };
 
                 context?
                     .Send(ScriptEngineNotifyMethods.InputRequest, _inputRequest = inputRequest)

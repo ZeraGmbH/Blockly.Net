@@ -32,7 +32,7 @@ public interface IScriptEngine
     /// A client reports a requested value.
     /// </summary>
     /// <param name="value">Information on the request and the value.</param>
-    void SetUserInput(UserInputResponse value);
+    void SetUserInput(UserInputResponse? value);
 
     /// <summary>
     /// Report the script parsing engine to use.

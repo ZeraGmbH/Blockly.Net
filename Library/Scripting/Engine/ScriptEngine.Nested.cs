@@ -1,4 +1,5 @@
 using System.Reflection;
+using BlocklyNet.Core.Model;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -13,6 +14,9 @@ public partial class ScriptEngine
     /// <param name="depth">Nestring depth of the script, at least 1.</param>
     protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth) : IScriptSite
     {
+        /// <inheritdoc/>
+        public IScriptEngine Engine => _engine;
+
         /// <summary>
         /// Last progress information of this child script.
         /// </summary>
@@ -73,7 +77,8 @@ public partial class ScriptEngine
             => _engine.StartChild<TResult>(request, CurrentScript, options, depth);
 
         /// <inheritdoc/>
-        public Task<T?> GetUserInput<T>(string key, string? type = null) => _engine.GetUserInput<T>(key, type);
+        public Task<T?> GetUserInput<T>(string key, string? type = null, double? delay = null)
+            => _engine.GetUserInput<T>(key, type, delay);
 
         /// <inheritdoc/>
         public void ReportProgress(object info, double? progress, string? name)
@@ -176,6 +181,9 @@ public partial class ScriptEngine
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public Task SingleStep(Block block) => Task.CompletedTask;
     }
 
     /// <summary>
