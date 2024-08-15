@@ -7,7 +7,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// A script requires some user input - currently only
 /// numbers are supported.
 /// </summary>
-public class UserInputRequest
+public class UserInputRequestBase
 {
     /// <summary>
     /// The unique identifier of the active script.
@@ -27,4 +27,22 @@ public class UserInputRequest
     /// report something without requesting a value.
     /// </summary>
     public string? ValueType { get; set; }
+}
+
+/// <summary>
+/// A script requires some user input - currently only
+/// numbers are supported.
+/// </summary>
+public class UserInputRequest : UserInputRequestBase
+{
+    /// <summary>
+    /// Exact time the request was started.
+    /// </summary>
+    [Required, NotNull]
+    public DateTime StartedAt { get; set; }
+
+    /// <summary>
+    /// Optional delay to auto-close the request.
+    /// </summary>
+    public double? SecondsToAutoClose { get; set; }
 }

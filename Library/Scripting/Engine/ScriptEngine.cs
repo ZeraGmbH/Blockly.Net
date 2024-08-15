@@ -18,6 +18,9 @@ namespace BlocklyNet.Scripting.Engine;
 public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser parser, ILogger<ScriptEngine> logger, IScriptEngineNotifySink? context = null) : IScriptEngine, IScriptSite, IDisposable
 {
     /// <inheritdoc/>
+    public IScriptEngine Engine => this;
+
+    /// <inheritdoc/>
     public ILogger Logger => logger;
 
     /// <summary>

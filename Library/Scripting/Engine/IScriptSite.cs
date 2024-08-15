@@ -9,6 +9,11 @@ namespace BlocklyNet.Scripting.Engine;
 public interface IScriptSite
 {
     /// <summary>
+    /// The controlling engine.
+    /// </summary>
+    IScriptEngine Engine { get; }
+
+    /// <summary>
     /// Report the current logging helper of the script engine.
     /// </summary>
     ILogger Logger { get; }
@@ -63,10 +68,11 @@ public interface IScriptSite
     /// </summary>
     /// <param name="key"></param>
     /// <param name="type"></param>
+    /// <param name="delay"></param>
     /// <typeparam name="T">Expected type of the response.</typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    Task<T?> GetUserInput<T>(string key, string? type = null);
+    Task<T?> GetUserInput<T>(string key, string? type = null, double? delay = null);
 
     /// <summary>
     /// Call just before a block is executed.
