@@ -11,7 +11,7 @@ namespace BlocklyNet.Extensions;
   "request_user_input",
   "Scripts",
   @"{
-      ""message0"": ""RequestUserInput %1 %2 %3 %4 %5 %6 %7 %8 %9"",
+      ""message0"": ""AwaitUserInteraction %1 %2 %3 %4 %5 %6 %7 %8 %9"",
       ""args0"": [
           {
             ""type"": ""input_dummy""
@@ -58,7 +58,7 @@ namespace BlocklyNet.Extensions;
       ],
       ""output"": null,
       ""colour"": 230,
-      ""tooltip"": ""Request input from the user"",
+      ""tooltip"": ""Request interaction from the user"",
       ""helpUrl"": """"
   }",
   @"{
