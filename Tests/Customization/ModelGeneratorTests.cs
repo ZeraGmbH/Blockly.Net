@@ -55,6 +55,17 @@ public class ModelGeneratorTests
         public List<InnerRef> Values { get; set; } = [];
     }
 
+    private class ObjectValue
+    {
+        public object SingleRequired { get; set; } = null!;
+
+        public object? Single { get; set; }
+
+        public List<object> MultipleRequired { get; set; } = [];
+
+        public List<object?> Multiple { get; set; } = [];
+    }
+
     private class ConstantBlock(object? value) : Block
     {
         private readonly object? _value = value;
@@ -163,4 +174,24 @@ public class ModelGeneratorTests
             Assert.That(testModel.StringProp, Is.EqualTo("testString"));
         });
     }
+
+    [Test]
+    public void Can_Use_Object_Data_Type()
+    {
+        var models = new ModelCache();
+
+        models.Add<ObjectValue>("withObject");
+
+        var outer = ModelBlock<ObjectValue>.Initialize("obj", "OBJ", models, (type, key, name) => false);
+
+        var blockJson = JsonSerializer.Serialize(outer.Item1, JsonUtils.JsonSettings);
+        var toolJson = JsonSerializer.Serialize(outer.Item2, JsonUtils.JsonSettings);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(blockJson, Has.Length.EqualTo(642));
+            Assert.That(toolJson, Has.Length.EqualTo(55));
+        });
+    }
 }
+

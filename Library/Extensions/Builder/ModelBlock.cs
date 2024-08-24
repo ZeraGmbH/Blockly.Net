@@ -95,6 +95,8 @@ public class ModelBlock<T> : Block where T : class, new()
         {typeof(int?), new("Number","math_number","NUM","0")},
         /* String. */
         {typeof(string), new("String","text","TEXT","")},
+        /* Object. */
+        {typeof(object), new("","","","")},
     };
 
     /// <summary>
@@ -245,7 +247,7 @@ public class ModelBlock<T> : Block where T : class, new()
                 {
                     ["type"] = "input_value",
                     ["name"] = prop.Name,
-                    ["check"] = new JsonArray($"Array({itemType})", "Array")
+                    ["check"] = string.IsNullOrEmpty(itemType) ? "Array" : new JsonArray($"Array({itemType})", "Array")
                 });
 
                 continue;
@@ -257,12 +259,15 @@ public class ModelBlock<T> : Block where T : class, new()
                 : models[prop.Type];
 
             /* Generate the related input. */
-            args.Add(new JsonObject
+            var input = new JsonObject
             {
                 ["type"] = "input_value",
                 ["name"] = prop.Name,
-                ["check"] = knownType
-            });
+            };
+
+            if (!string.IsNullOrEmpty(knownType)) input["check"] = knownType;
+
+            args.Add(input);
         }
 
         /* Build a message string from our arguments. */
@@ -305,7 +310,7 @@ public class ModelBlock<T> : Block where T : class, new()
                         ["fields"] = new JsonObject { ["VALUE"] = Enum.GetValues(prop.Type).GetValue(0)!.ToString() }
                     }
                 };
-            else if (_supportedTypes.TryGetValue(prop.Type, out var info))
+            else if (_supportedTypes.TryGetValue(prop.Type, out var info) && !string.IsNullOrEmpty(info.BlockType))
                 inputs[prop.Name] = new JsonObject
                 {
                     ["shadow"] = new JsonObject
