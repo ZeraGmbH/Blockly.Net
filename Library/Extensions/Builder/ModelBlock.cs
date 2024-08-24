@@ -166,33 +166,43 @@ public class ModelBlock<T> : Block where T : class, new()
         _name = name;
         _props = null!;
 
-        /* Special handling of dictionaries. */
-        if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Dictionary<,>))
-        {
-            /* Key must be a known enumeration. */
-            var keyType = typeof(T).GetGenericArguments()[0];
-
-            if (keyType.IsEnum && models.Contains(keyType))
+        if (typeof(T).IsGenericType)
+            /* Special handling of dictionaries. */
+            if (typeof(T).GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                /* Value type must be supported. */
-                var valueType = typeof(T).GetGenericArguments()[1];
+                /* Key must be a known enumeration. */
+                var keyType = typeof(T).GetGenericArguments()[0];
 
-                if (TestSupported(TestArray(valueType) ?? valueType, models, modelFactory, "Value"))
-                    _props = Enum
-                        .GetValues(keyType)
-                        .Cast<object>()
-                        .Select(key => new PropertyInformation(key.ToString()!, valueType, (obj, value) => ((IDictionary)obj)[key] = value))
-                        .ToArray();
+                if (keyType.IsEnum && models.Contains(keyType))
+                {
+                    /* Value type must be supported. */
+                    var valueType = typeof(T).GetGenericArguments()[1];
+
+                    if (TestSupported(TestArray(valueType) ?? valueType, models, modelFactory, "Value"))
+                        _props = Enum
+                            .GetValues(keyType)
+                            .Cast<object>()
+                            .Select(key => new PropertyInformation(key.ToString()!, valueType, (obj, value) => ((IDictionary)obj)[key] = value))
+                            .ToArray();
+                }
             }
-        }
+            /* Special handling of lists. */
+            else if (typeof(T).GetGenericTypeDefinition() == typeof(List<>))
+                _props ??= typeof(T)
+                    .GetProperties()
+                    .Where(p => p.Name != nameof(List<object>.Capacity))
+                    .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
+                    .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
+                    .Select(p => new PropertyInformation(p))
+                    .ToArray();
 
         /* Get all properties of supported types - including a generic list of supported types. */
         _props ??= typeof(T)
-            .GetProperties()
-            .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
-            .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
-            .Select(p => new PropertyInformation(p))
-            .ToArray();
+                .GetProperties()
+                .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
+                .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
+                .Select(p => new PropertyInformation(p))
+                .ToArray();
 
         /* Generate the JSON descriptions of the model. */
         return Tuple.Create(CreateBlockDefinition(models), CreateToolboxEntry(models));

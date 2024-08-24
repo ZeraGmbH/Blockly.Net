@@ -132,13 +132,8 @@ public static class BlocklyExtensions
         /// <param name="key">Blockly key of the potentially created model.</param>
         /// <param name="name">Name of the parent model.</param>
         /// <returns>Set if a model has been created.</returns>
-        private bool CreateScratchModel(Type type, string key, string name)
+        private bool CreateScratchDictionary(Type type, string key, string name)
         {
-            /* See if the type is a dictionary. */
-            if (!type.IsGenericType) return false;
-
-            if (type.GetGenericTypeDefinition() != typeof(Dictionary<,>)) return false;
-
             /* Key must be a known enumeration. */
             var keyType = type.GetGenericArguments()[0];
 
@@ -152,6 +147,47 @@ public static class BlocklyExtensions
 
             /* Did it. */
             return true;
+        }
+
+        /// <summary>
+        /// See if we can create a model on the fly.
+        /// </summary>
+        /// <param name="type">Type to create a model for.</param>
+        /// <param name="key">Blockly key of the potentially created model.</param>
+        /// <param name="name">Name of the parent model.</param>
+        /// <returns>Set if a model has been created.</returns>
+        private bool CreateScratchList(Type type, string key, string name)
+        {
+            /* Create the model. */
+            var addModelMethod = GetType().GetMethod("AddModel")!;
+            var addModel = addModelMethod.MakeGenericMethod(type);
+
+            addModel.Invoke(this, [key, $"{name} {key.Split("_").Last()}"]);
+
+            /* Did it. */
+            return true;
+        }
+
+        /// <summary>
+        /// See if we can create a model on the fly.
+        /// </summary>
+        /// <param name="type">Type to create a model for.</param>
+        /// <param name="key">Blockly key of the potentially created model.</param>
+        /// <param name="name">Name of the parent model.</param>
+        /// <returns>Set if a model has been created.</returns>
+        private bool CreateScratchModel(Type type, string key, string name)
+        {
+            if (!type.IsGenericType) return false;
+
+            var generic = type.GetGenericTypeDefinition();
+
+            /* See if the type is a dictionary. */
+            if (generic == typeof(Dictionary<,>)) return CreateScratchDictionary(type, key, name);
+
+            /* See if the type is a list. */
+            if (generic == typeof(List<>)) return CreateScratchList(type, key, name);
+
+            return false;
         }
 
         /// <summary>

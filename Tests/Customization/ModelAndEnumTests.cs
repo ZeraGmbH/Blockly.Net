@@ -53,6 +53,14 @@ public class ListDictClass
     public List<Dictionary<SampleEnum, bool>> TheList { get; set; } = [];
 }
 
+/// <summary>
+/// Array of arrays.
+/// </summary>
+public class ListListClass
+{
+    public List<List<bool>> TheList { get; set; } = [];
+}
+
 [TestFixture]
 public class ModelAndEnumTests : TestEnvironment
 {
@@ -71,6 +79,7 @@ public class ModelAndEnumTests : TestEnvironment
 
             /* Intentionally wrong dependency order. */
             builder.AddModel<ListDictClass>("list_and_dictionary", "Complex list with dictionary");
+            builder.AddModel<ListListClass>("nested_list", "List in list");
             builder.AddModel<OuterClass>("outer_class", "The outer model");
             builder.AddModel<InnerClass>("inner_class", "The inner model");
         }
@@ -312,5 +321,28 @@ public class ModelAndEnumTests : TestEnvironment
         var age = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "Age");
 
         Assert.That(age, Is.Null);
+    }
+
+    /// <summary>
+    /// See if a list in a list property creates a helper class.
+    /// </summary>
+    [Test]
+    public void Can_Have_List_In_List()
+    {
+        var provider = GetService<IConfigurationService>();
+
+        /* The model block. */
+        var myModel = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "nested_list")!;
+        var args = (JsonArray)myModel["args0"]!;
+        var theList = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "TheList")!;
+
+        Assert.That(theList["check"]![0]!.GetValue<string>(), Is.EqualTo("Array(nested_list_TheList)"));
+
+        /* The dynamic list. */
+        myModel = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "nested_list_TheList")!;
+        args = (JsonArray)myModel["args0"]!;
+        var item = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "Item")!;
+
+        Assert.That(item["check"]!.GetValue<string>(), Is.EqualTo("Boolean"));
     }
 }
