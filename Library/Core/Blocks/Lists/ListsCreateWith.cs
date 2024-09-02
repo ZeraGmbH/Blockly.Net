@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Lists;
 public class ListsCreateWith : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var list = new List<object>();
 
@@ -18,7 +18,7 @@ public class ListsCreateWith : Block
     {
       context.Cancellation.ThrowIfCancellationRequested();
 
-      list.Add((await value.Evaluate(context))!);
+      list.Add((await value.EvaluateAsync(context))!);
     }
 
     return list;

@@ -13,7 +13,7 @@ public class UserInputTests : TestEnvironment
     {
         if (delay == null)
         {
-            site.Setup(s => s.GetUserInput<T>("the.key", "string", It.IsAny<double?>())).ReturnsAsync((T?)value);
+            site.Setup(s => s.GetUserInputAsync<T>("the.key", "string", It.IsAny<double?>())).ReturnsAsync((T?)value);
 
             return;
         }
@@ -25,12 +25,14 @@ public class UserInputTests : TestEnvironment
 
         site.SetupGet(s => s.Engine).Returns(engine.Object);
 
-        site.Setup(s => s.GetUserInput<T>("the.key", "string", It.IsAny<double?>())).Returns(() => task.Task);
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
+        site.Setup(s => s.GetUserInputAsync<T>("the.key", "string", It.IsAny<double?>())).Returns(() => task.Task);
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
     }
 
     [TestCase(null)]
     [TestCase(10.0)]
-    public async Task UserInput(double? delay)
+    public async Task UserInput_Async(double? delay)
     {
         var block = new RequestUserInput
         {
@@ -44,15 +46,15 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 42);
 
-        var input = await block.Evaluate(new Context(Site.Object));
+        var input = await block.EvaluateAsync(new Context(Site.Object));
 
         Assert.That(input, Is.EqualTo(42));
 
-        Site.Verify(e => e.GetUserInput<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
+        Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
     }
 
     [Test]
-    public async Task UserInputWithAutoClose()
+    public async Task UserInputWithAutoClose_Async()
     {
         var block = new RequestUserInput
         {
@@ -67,7 +69,7 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 
-        var input = await block.Evaluate(new Context(Site.Object));
+        var input = await block.EvaluateAsync(new Context(Site.Object));
 
         Assert.Multiple(() =>
         {
@@ -75,7 +77,7 @@ public class UserInputTests : TestEnvironment
             Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(750));
         });
 
-        Site.Verify(e => e.GetUserInput<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
+        Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
     }
 
     [Test]
@@ -95,7 +97,7 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 
-        var except = Assert.ThrowsAsync<TimeoutException>(() => block.Evaluate(new Context(Site.Object)));
+        var except = Assert.ThrowsAsync<TimeoutException>(() => block.EvaluateAsync(new Context(Site.Object)));
 
         Assert.That(except.Message, Is.EqualTo("busted"));
     }

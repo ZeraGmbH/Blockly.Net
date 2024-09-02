@@ -94,20 +94,20 @@ namespace BlocklyNet.Extensions;
 public class SetProgress : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
         var script = context.Engine.MainScript as IGenericScript;
-        var progress = await Values.Evaluate<double>("PROGRESS", context);
-        var name = await Values.Evaluate<string?>("NAME", context, false);
+        var progress = await Values.EvaluateAsync<double>("PROGRESS", context);
+        var name = await Values.EvaluateAsync<string?>("NAME", context, false);
 
         context.Engine.ReportProgress(new GenericProgress
         {
-            Payload = await Values.Evaluate("PAYLOAD", context, false),
-            PayloadType = await Values.Evaluate<string>("PAYLOADTYPE", context, false),
+            Payload = await Values.EvaluateAsync("PAYLOAD", context, false),
+            PayloadType = await Values.EvaluateAsync<string>("PAYLOADTYPE", context, false),
             Percentage = progress,
             ScriptId = script?.Request.ScriptId
         }, progress / 100d, name);
 
-        return await base.Evaluate(context);
+        return await base.EvaluateAsync(context);
     }
 }

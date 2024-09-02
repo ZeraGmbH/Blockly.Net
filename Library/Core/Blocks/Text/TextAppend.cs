@@ -10,12 +10,12 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextAppend : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var variables = context.Variables;
 
     var variableName = Fields["VAR"];
-    var textToAppend = (await Values.Evaluate("TEXT", context) ?? "").ToString();
+    var textToAppend = (await Values.EvaluateAsync("TEXT", context) ?? "").ToString();
 
     if (!variables.ContainsKey(variableName))
       variables.Add(variableName, "");
@@ -24,6 +24,6 @@ public class TextAppend : Block
 
     variables[variableName] = value + textToAppend;
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

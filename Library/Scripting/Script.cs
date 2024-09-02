@@ -22,7 +22,7 @@ public abstract class Script : IScriptInstance
     /// 
     /// </summary>
     /// <returns></returns>
-    public abstract Task Execute();
+    public abstract Task ExecuteAsync();
 
     /// <summary>
     /// 
@@ -85,8 +85,8 @@ public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScri
     /// <summary>
     /// Execute the script.
     /// </summary>
-    protected abstract Task OnExecute();
+    protected abstract Task OnExecuteAsync();
 
     /// <inheritdoc/>
-    public sealed override Task Execute() => OnExecute();
+    public sealed override Task ExecuteAsync() => OnExecuteAsync();
 }

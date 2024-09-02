@@ -12,7 +12,7 @@ public class MathRandomFloat : Block
   private static readonly Random rand = new Random();
 
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     return Task.FromResult((object?)rand.NextDouble());
   }

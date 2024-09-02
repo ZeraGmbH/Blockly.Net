@@ -10,9 +10,9 @@ namespace BlocklyNet.Core.Blocks.Variables;
 public class GlobalVariablesSet : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var value = await Values.Evaluate("VALUE", context);
+    var value = await Values.EvaluateAsync("VALUE", context);
     var variableName = Fields["VAR"];
 
     var rootContext = context.GetRootContext();
@@ -22,6 +22,6 @@ public class GlobalVariablesSet : Block
     else if (value != null)
       rootContext.Variables[variableName] = value;
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

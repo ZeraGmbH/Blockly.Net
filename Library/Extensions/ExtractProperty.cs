@@ -57,11 +57,11 @@ namespace BlocklyNet.Extensions;
 public class ExtractProperty : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
         /* Get the object and the property. */
-        var json = await Values.Evaluate<object>("JSON", context);
-        var property = await Values.Evaluate<string>("PROPERTY", context);
+        var json = await Values.EvaluateAsync<object>("JSON", context);
+        var property = await Values.EvaluateAsync<string>("PROPERTY", context);
 
         try
         {

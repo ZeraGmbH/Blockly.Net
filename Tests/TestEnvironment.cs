@@ -47,10 +47,10 @@ public abstract class TestEnvironment
         private readonly Dictionary<string, IScriptDefinition> _definitions = [];
 
         /* Find a script definition by its unique identifier. */
-        public Task<IScriptDefinition?> Get(string id) => Task.FromResult(_definitions.TryGetValue(id, out var definition) ? definition : null);
+        public Task<IScriptDefinition?> GetAsync(string id) => Task.FromResult(_definitions.TryGetValue(id, out var definition) ? definition : null);
 
         /* Query on script definitions. */
-        public Task<IScriptDefinitionInfo> Find(string byName) => Task.FromResult(
+        public Task<IScriptDefinitionInfo> FindAsync(string byName) => Task.FromResult(
             (IScriptDefinitionInfo)_definitions
                 .Values
                 .AsQueryable()
@@ -83,7 +83,7 @@ public abstract class TestEnvironment
         public Action<ScriptEngineNotifyMethods, object?>? OnEvent;
 
         /// <inheritdoc/>
-        public Task Send(ScriptEngineNotifyMethods method, object? arg1)
+        public Task SendAsync(ScriptEngineNotifyMethods method, object? arg1)
         {
             OnEvent?.Invoke(method, arg1);
 
@@ -106,7 +106,7 @@ public abstract class TestEnvironment
         /// </summary>
         /// <param name="context">Execution context - will be ignored.</param>
         /// <returns>Our value.</returns>
-        public override Task<object?> Evaluate(Context context) => Task.FromResult(_value);
+        public override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
     }
 
     /// <summary>

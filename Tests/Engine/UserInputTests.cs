@@ -74,7 +74,7 @@ public class UserInputTests : TestEnvironment
     }
 
     [Test]
-    public async Task Can_Provide_A_User_Input_Model()
+    public async Task Can_Provide_A_User_Input_Model_Async()
     {
         /* Termination helper. */
         var done = new TaskCompletionSource();

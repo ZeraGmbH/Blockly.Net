@@ -48,9 +48,9 @@ namespace BlocklyNet.Extensions;
 public class Now : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
-        var format = await Values.Evaluate<string>("FORMAT", context);
+        var format = await Values.EvaluateAsync<string>("FORMAT", context);
 
         return string.IsNullOrWhiteSpace(format)
             ? (double)DateTime.Now.Ticks

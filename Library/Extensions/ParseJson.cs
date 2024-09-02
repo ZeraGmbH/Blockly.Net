@@ -49,9 +49,9 @@ namespace BlocklyNet.Extensions;
 public class ParseJson : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
         /* Currently (.NET 8) rely on Newtonsoft.JSON since System.Text.Json will not handle ExpandoObject correctly: fields values will be JsonElement. */
-        return JsonConvert.DeserializeObject<ExpandoObject>(await Values.Evaluate<string>("JSON", context));
+        return JsonConvert.DeserializeObject<ExpandoObject>(await Values.EvaluateAsync<string>("JSON", context));
     }
 }

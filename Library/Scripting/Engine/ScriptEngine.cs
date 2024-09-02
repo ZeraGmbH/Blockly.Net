@@ -112,8 +112,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
                 /* Inform all. */
                 context?
-                    .Send(ScriptEngineNotifyMethods.Started, CreateStartNotification(script))
-                    .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                    .SendAsync(ScriptEngineNotifyMethods.Started, CreateStartNotification(script))
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
 
                 return script.JobId;
             }
@@ -181,7 +186,9 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         try
         {
             /* Now we can synchronously execute the script. */
-            script.Execute().Wait();
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+            script.ExecuteAsync().Wait();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
             /* Check for cancel. */
             _cancel.Token.ThrowIfCancellationRequested();
@@ -208,11 +215,16 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
             /* Forward the information on the now terminated script. */
             var task = error == null
-                ? context?.Send(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
-                : context?.Send(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, error));
+                ? context?.SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
+                : context?.SendAsync(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, error));
 
             /* In case of any error just log - actually this could be quite a problem. */
-            task?.ContinueWith(t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+            task?.ContinueWith(
+                    t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message),
+                    CancellationToken.None,
+                    TaskContinuationOptions.NotOnRanToCompletion,
+                    TaskScheduler.Current)
+                .Touch();
 
             /* Customize. */
             OnScriptDone(script, null);
@@ -260,20 +272,25 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
             /* Inform all. */
             context?
-                .Send(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
-                .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                .SendAsync(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
+                .ContinueWith(
+                    t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
+                    CancellationToken.None,
+                    TaskContinuationOptions.NotOnRanToCompletion,
+                    TaskScheduler.Current)
+                .Touch();
 
             return script.Result;
         }
     }
 
     /// <inheritdoc/>
-    public Task<object?> Evaluate(string scriptAsXml, Dictionary<string, object?> presets) =>
-        Parser.Parse(scriptAsXml).Evaluate(presets, this);
+    public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets) =>
+        Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
     /// <inheritdoc/>
-    public Task<TResult> Run<TResult>(StartScript request, StartScriptOptions? options = null)
-        => StartChild<TResult>(request, _active, options, 0);
+    public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
+        => StartChildAsync<TResult>(request, _active, options, 0);
 
     /// <summary>
     /// Finish using this instance.
@@ -294,26 +311,46 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
             /* Has been started. */
             client
-                .Send(ScriptEngineNotifyMethods.Current, CreateCurrentNotification(_active))
-                .ContinueWith(t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                .SendAsync(ScriptEngineNotifyMethods.Current, CreateCurrentNotification(_active))
+                .ContinueWith(
+                    t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
+                    CancellationToken.None,
+                    TaskContinuationOptions.NotOnRanToCompletion,
+                    TaskScheduler.Current)
+                .Touch();
 
             /* Has some last progress. */
             if (_lastProgress != null)
                 client
-                    .Send(ScriptEngineNotifyMethods.Progress, _lastProgress)
-                    .ContinueWith(t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                    .SendAsync(ScriptEngineNotifyMethods.Progress, _lastProgress)
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
 
             /* Is waiting for input. */
             if (_inputRequest != null)
                 client
-                    .Send(ScriptEngineNotifyMethods.InputRequest, _inputRequest)
-                    .ContinueWith(t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", _inputRequest.JobId, t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                    .SendAsync(ScriptEngineNotifyMethods.InputRequest, _inputRequest)
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", _inputRequest.JobId, t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
 
             /* Script is completed. */
             if (_done)
                 client
-                    .Send(ScriptEngineNotifyMethods.Done, CreateDoneNotification(_active))
-                    .ContinueWith(t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                    .SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(_active))
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
         }
     }
 
@@ -359,5 +396,5 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
 
     /// <inheritdoc/>
-    public Task SingleStep(Block block) => Task.CompletedTask;
+    public Task SingleStepAsync(Block block) => Task.CompletedTask;
 }

@@ -6,7 +6,7 @@ namespace BlocklyNetTests.Core;
 public class ControlTests : TestEnvironment
 {
     [Test]
-    public async Task Can_Execute_Simple_If()
+    public async Task Can_Execute_Simple_If_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -37,11 +37,11 @@ public class ControlTests : TestEnvironment
             </block>       
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(1));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(1));
     }
 
     [Test]
-    public async Task Can_Execute_WhileUntil()
+    public async Task Can_Execute_WhileUntil_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -93,11 +93,11 @@ public class ControlTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(1d));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(1d));
     }
 
     [Test]
-    public async Task Can_Continue_In_Lopp()
+    public async Task Can_Continue_In_Loop_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -152,11 +152,11 @@ public class ControlTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(0d));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(0d));
     }
 
     [Test]
-    public async Task Can_Break_Loop()
+    public async Task Can_Break_Loop_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -211,12 +211,12 @@ public class ControlTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(0d));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(0d));
 
     }
 
     [Test]
-    public async Task Can_Execute_For_Each()
+    public async Task Can_Execute_For_Each_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -270,11 +270,11 @@ public class ControlTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("abc"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("abc"));
     }
 
     [Test]
-    public async Task Can_Loop()
+    public async Task Can_Loop_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -311,6 +311,6 @@ public class ControlTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(4));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(4));
     }
 }

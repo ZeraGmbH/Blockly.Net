@@ -10,19 +10,19 @@ namespace BlocklyNet.Core.Blocks.Logic;
 public class LogicTernary : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var ifValue = await Values.Evaluate<bool>("IF", context);
+    var ifValue = await Values.EvaluateAsync<bool>("IF", context);
 
     if (ifValue)
     {
       if (Values.Has("THEN"))
-        return await Values.Evaluate("THEN", context);
+        return await Values.EvaluateAsync("THEN", context);
     }
     else
     {
       if (Values.Has("ELSE"))
-        return await Values.Evaluate("ELSE", context);
+        return await Values.EvaluateAsync("ELSE", context);
     }
 
     return null;

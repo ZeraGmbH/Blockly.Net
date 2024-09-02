@@ -52,8 +52,13 @@ public partial class ScriptEngine
             _lastProgress = nextProgress;
 
             context?
-                .Send(ScriptEngineNotifyMethods.Progress, _lastProgress)
-                .ContinueWith(t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                .SendAsync(ScriptEngineNotifyMethods.Progress, _lastProgress)
+                .ContinueWith(
+                    t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message),
+                    CancellationToken.None,
+                    TaskContinuationOptions.NotOnRanToCompletion,
+                    TaskScheduler.Current)
+                .Touch();
         }
     }
 }

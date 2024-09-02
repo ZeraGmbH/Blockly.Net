@@ -341,7 +341,7 @@ public class ModelBlock<T> : Block where T : class, new()
     }
 
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
         /* Create a new model instance. */
         var model = new T();
@@ -350,7 +350,7 @@ public class ModelBlock<T> : Block where T : class, new()
         foreach (var prop in _props)
         {
             /* Get the raw value from the script. This may be untyped which especially for lists can be quite a problem. */
-            var blocklyData = await Values.Evaluate(prop.Name, context, false);
+            var blocklyData = await Values.EvaluateAsync(prop.Name, context, false);
 
             if (blocklyData == null) continue;
 

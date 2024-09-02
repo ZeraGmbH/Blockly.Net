@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsFlowStatement : Block
 {
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     var flow = Fields["FLOW"];
 

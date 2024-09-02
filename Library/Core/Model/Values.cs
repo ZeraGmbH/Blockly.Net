@@ -20,7 +20,7 @@ public class Values : Entities<Value>
     /// <param name="required">If set the indicated value must exist.</param>
     /// <returns>Current result of the value.</returns>
     /// <exception cref="ArgumentException">Value does not exist.</exception>
-    public Task<object?> Evaluate(string name, Context context, bool required = true)
+    public Task<object?> EvaluateAsync(string name, Context context, bool required = true)
     {
         /* See if the value is known */
         var value = TryGet(name);
@@ -38,7 +38,7 @@ public class Values : Entities<Value>
         context.Cancellation.ThrowIfCancellationRequested();
 
         /* Try to evaluate the value. */
-        return value.Evaluate(context);
+        return value.EvaluateAsync(context);
     }
 
     /// <summary>
@@ -50,10 +50,10 @@ public class Values : Entities<Value>
     /// <typeparam name="T">Expected result type.</typeparam>
     /// <returns>Current result of the value.</returns>
     /// <exception cref="ArgumentException">Value does not exist.</exception>
-    public async Task<T> Evaluate<T>(string name, Context context, bool required = true)
+    public async Task<T> EvaluateAsync<T>(string name, Context context, bool required = true)
     {
         /* Execute the script. */
-        var result = await Evaluate(name, context, required);
+        var result = await EvaluateAsync(name, context, required);
 
         /* Try to change type of result if possible. */
         return result == null ? default! : (T)result;

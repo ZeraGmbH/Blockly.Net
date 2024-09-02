@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsIf : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var ifCount = 1;
     if (null != Mutations.GetValue("elseif"))
@@ -22,11 +22,11 @@ public class ControlsIf : Block
     var done = false;
     for (var i = 0; i < ifCount; i++)
     {
-      if (await Values.Evaluate<bool>($"IF{i}", context))
+      if (await Values.EvaluateAsync<bool>($"IF{i}", context))
       {
         context.Cancellation.ThrowIfCancellationRequested();
 
-        await Statements[$"DO{i}"].Evaluate(context);
+        await Statements[$"DO{i}"].EvaluateAsync(context);
 
         done = true;
         break;
@@ -43,11 +43,11 @@ public class ControlsIf : Block
         {
           context.Cancellation.ThrowIfCancellationRequested();
 
-          await Statements["ELSE"].Evaluate(context);
+          await Statements["ELSE"].EvaluateAsync(context);
         }
       }
     }
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

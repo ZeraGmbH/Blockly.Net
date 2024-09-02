@@ -69,16 +69,16 @@ public partial class ScriptEngine
         public IScript? MainScript => _engine.MainScript;
 
         /// <inheritdoc/>
-        public Task<object?> Evaluate(string scriptAsXml, Dictionary<string, object?> presets) =>
-            _engine.Parser.Parse(scriptAsXml).Evaluate(presets, this);
+        public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets) =>
+            _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public Task<TResult> Run<TResult>(StartScript request, StartScriptOptions? options = null)
-            => _engine.StartChild<TResult>(request, CurrentScript, options, depth);
+        public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
+            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, depth);
 
         /// <inheritdoc/>
-        public Task<T?> GetUserInput<T>(string key, string? type = null, double? delay = null)
-            => _engine.GetUserInput<T>(key, type, delay);
+        public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
+            => _engine.GetUserInputAsync<T>(key, type, delay);
 
         /// <inheritdoc/>
         public void ReportProgress(object info, double? progress, string? name)
@@ -94,7 +94,7 @@ public partial class ScriptEngine
         /// or the exception observed.
         /// </summary>
         /// <returns>Result of the script.</returns>
-        public Task<object?> WaitForResult()
+        public Task<object?> WaitForResultAsync()
         {
             return Task.Run(() =>
             {
@@ -150,7 +150,9 @@ public partial class ScriptEngine
                 CurrentScript = script;
 
                 /* Run the script and remember the result. */
-                script.Execute().Wait();
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+                script.ExecuteAsync().Wait();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
                 _result = script.Result;
             }
@@ -183,7 +185,7 @@ public partial class ScriptEngine
         }
 
         /// <inheritdoc/>
-        public Task SingleStep(Block block) => Task.CompletedTask;
+        public Task SingleStepAsync(Block block) => Task.CompletedTask;
     }
 
     /// <summary>
@@ -203,7 +205,7 @@ public partial class ScriptEngine
     /// <param name="options">Detailed configuration of the new script.</param>
     /// <param name="depth">Nestring depth of the child.</param>
     /// <returns>Task on the result.</returns>
-    protected virtual async Task<TResult> StartChild<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
+    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
     {
         /* Create execution context. */
         var site = CreateSite(parent, depth + 1);
@@ -222,7 +224,7 @@ public partial class ScriptEngine
             site.Start(request, options);
 
             /* Execute the script and report the result - or exception. */
-            return (TResult)(await site.WaitForResult())!;
+            return (TResult)(await site.WaitForResultAsync())!;
         }
         finally
         {

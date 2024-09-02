@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Logic;
 public class LogicBoolean : Block
 {
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     return Task.FromResult((object?)bool.Parse(Fields["BOOL"]));
   }

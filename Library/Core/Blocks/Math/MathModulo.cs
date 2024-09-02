@@ -10,10 +10,10 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathModulo : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var dividend = await Values.Evaluate<double>("DIVIDEND", context);
-    var divisor = await Values.Evaluate<double>("DIVISOR", context);
+    var dividend = await Values.EvaluateAsync<double>("DIVIDEND", context);
+    var divisor = await Values.EvaluateAsync<double>("DIVISOR", context);
 
     return dividend % divisor;
   }

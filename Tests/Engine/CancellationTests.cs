@@ -67,7 +67,7 @@ public class CancellationTests : TestEnvironment
 
         var script = Engine.Parser.Parse(EndLessLoop);
 
-        Assert.ThrowsAsync<OperationCanceledException>(async () => await script.Run(Site.Object));
+        Assert.ThrowsAsync<OperationCanceledException>(async () => await script.RunAsync(Site.Object));
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class CancellationTests : TestEnvironment
     /// result calculated so far can still be kept.
     /// </summary>
     [Test]
-    public async Task Can_Silently_Cancel_A_Running_Script()
+    public async Task Can_Silently_Cancel_A_Running_Script_Async()
     {
         /* Prepare to cancel after 0.5 seconds. */
         var cancel = new CancellationTokenSource();
@@ -84,7 +84,7 @@ public class CancellationTests : TestEnvironment
         cancel.CancelAfter(500);
 
         /* Execute the no longer so end-less loop. */
-        var result = await ((IScriptSite)Engine).Run<GenericResult>(
+        var result = await ((IScriptSite)Engine).RunAsync<GenericResult>(
             new StartGenericScript { Name = "Will be stopped", ScriptId = AddScript("SCRIPT", EndLessLoop) },
             new() { ShouldStopNow = () => cancel.IsCancellationRequested }
         );

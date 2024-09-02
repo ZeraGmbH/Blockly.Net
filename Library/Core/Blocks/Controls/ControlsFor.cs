@@ -10,13 +10,13 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsFor : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var variableName = Fields["VAR"];
 
-    var fromValue = await Values.Evaluate<double>("FROM", context);
-    var toValue = await Values.Evaluate<double>("TO", context);
-    var byValue = await Values.Evaluate<double>("BY", context);
+    var fromValue = await Values.EvaluateAsync<double>("FROM", context);
+    var toValue = await Values.EvaluateAsync<double>("TO", context);
+    var byValue = await Values.EvaluateAsync<double>("BY", context);
 
     var statement = Statements.TryGet("DO");
 
@@ -26,11 +26,11 @@ public class ControlsFor : Block
     {
       context.Cancellation.ThrowIfCancellationRequested();
 
-      await statement!.Evaluate(context);
+      await statement!.EvaluateAsync(context);
 
       context.Variables[variableName] = (double)context.Variables[variableName]! + byValue;
     }
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

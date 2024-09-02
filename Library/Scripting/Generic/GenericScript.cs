@@ -29,7 +29,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
     IStartGenericScript IGenericScript.Request => Request;
 
     /// <inheritdoc/>
-    protected override Task OnExecute() => Execute(this);
+    protected override Task OnExecuteAsync() => ExecuteAsync(this);
 
     /// <summary>
     /// 
@@ -40,7 +40,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
     /// <typeparam name="TResult"></typeparam>
     /// <typeparam name="TOptions"></typeparam>
     /// <returns></returns>
-    public static async Task Execute<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions> script, Action<IScriptDefinition>? afterPresets = null)
+    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions> script, Action<IScriptDefinition>? afterPresets = null)
         where TRequest : StartScript, IStartGenericScript
         where TResult : GenericResult, new()
         where TOptions : StartScriptOptions
@@ -50,7 +50,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
 
         /* Find the script. */
         var di = script.Engine.ServiceProvider;
-        var def = await di.GetRequiredService<IScriptDefinitionStorage>().Get(script.Request.ScriptId) ?? throw new ArgumentException("Script not found.");
+        var def = await di.GetRequiredService<IScriptDefinitionStorage>().GetAsync(script.Request.ScriptId) ?? throw new ArgumentException("Script not found.");
 
         /* Prepare for logging. */
         script.Request.Presets = presets.Select(d => new GenericScriptPreset { Key = d.Key, Value = d.Value }).ToList();
@@ -86,7 +86,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
         }
 
         /* Execute the script. */
-        var result = await script.Engine.Evaluate(def.Code, presets);
+        var result = await script.Engine.EvaluateAsync(def.Code, presets);
 
         /* Create result information - with some redundant information copied from the request. */
         script.SetResult(new TResult { Result = result, ResultType = script.Request.ResultType, ScriptId = script.Request.ScriptId });

@@ -6,7 +6,7 @@ namespace BlocklyNetTests.Core;
 public class ListTests : TestEnvironment
 {
     [Test]
-    public async Task Can_Create_List()
+    public async Task Can_Create_List_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -30,11 +30,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(new string[] { "x", "y", "z" }));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(new string[] { "x", "y", "z" }));
     }
 
     [Test]
-    public async Task Can_Split_List()
+    public async Task Can_Split_List_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -54,11 +54,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(new string[] { "x", "y", "z" }));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(new string[] { "x", "y", "z" }));
     }
 
     [Test]
-    public async Task Can_Join_Lists()
+    public async Task Can_Join_Lists_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -93,11 +93,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("x,y,z"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("x,y,z"));
     }
 
     [Test]
-    public async Task Can_Get_Length()
+    public async Task Can_Get_Length_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -121,11 +121,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3));
     }
 
     [Test]
-    public async Task Can_Repeat()
+    public async Task Can_Repeat_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -143,11 +143,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(new string[] { "hello", "hello", "hello" }));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(new string[] { "hello", "hello", "hello" }));
     }
 
     [Test]
-    public async Task Can_Test_For_Empty()
+    public async Task Can_Test_For_Empty_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -160,11 +160,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Find_Index()
+    public async Task Can_Find_Index_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -195,11 +195,11 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(2));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(2));
     }
 
     [Test]
-    public async Task Can_Get_Element()
+    public async Task Can_Get_Element_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -231,6 +231,6 @@ public class ListTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("bar"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("bar"));
     }
 }

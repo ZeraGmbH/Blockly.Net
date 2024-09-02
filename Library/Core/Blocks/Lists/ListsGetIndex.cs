@@ -12,9 +12,9 @@ public class ListsGetIndex : Block
   private static readonly Random rnd = new Random();
 
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var values = new ListWrapper(await Values.Evaluate("VALUE", context));
+    var values = new ListWrapper(await Values.EvaluateAsync("VALUE", context));
 
     var mode = Fields["MODE"];
     var where = Fields["WHERE"];
@@ -22,8 +22,8 @@ public class ListsGetIndex : Block
     var index = where switch
     {
       "FIRST" => 0,
-      "FROM_END" => values.Count - Convert.ToInt32(await Values.Evaluate("AT", context)),
-      "FROM_START" => Convert.ToInt32(await Values.Evaluate("AT", context)) - 1,
+      "FROM_END" => values.Count - Convert.ToInt32(await Values.EvaluateAsync("AT", context)),
+      "FROM_START" => Convert.ToInt32(await Values.EvaluateAsync("AT", context)) - 1,
       "LAST" => values.Count - 1,
       "RANDOM" => rnd.Next(values.Count),
       _ => throw new NotSupportedException($"unsupported where ({where})"),

@@ -17,7 +17,7 @@ public class Workspace : IFragment
   /// </summary>
   /// <param name="context">Execution context.</param>
   /// <returns>Result of the final block in the workspace.</returns>
-  public async Task<object?> Evaluate(Context context)
+  public async Task<object?> EvaluateAsync(Context context)
   {
     /* No result at all. */
     object? returnValue = null;
@@ -30,7 +30,7 @@ public class Workspace : IFragment
       /* Create the function itself and remember it. */
       context.Cancellation.ThrowIfCancellationRequested();
 
-      await block.Evaluate(context);
+      await block.EvaluateAsync(context);
 
       functions.Add(block);
     }
@@ -42,7 +42,7 @@ public class Workspace : IFragment
         /* Remember the result and report the last result afterwards. */
         context.Cancellation.ThrowIfCancellationRequested();
 
-        returnValue = await block.Evaluate(context);
+        returnValue = await block.EvaluateAsync(context);
       }
 
     return returnValue;

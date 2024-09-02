@@ -16,7 +16,7 @@ public class ExtractPropertyTests : TestEnvironment
     }
 
     [Test]
-    public async Task ExtractProperty_Parsed()
+    public async Task ExtractProperty_Parsed_Async()
     {
         var parsed = new ParseJson
         {
@@ -39,11 +39,11 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.Evaluate(new Context(Site.Object)), Is.EqualTo(12.3d));
+        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo(12.3d));
     }
 
     [Test]
-    public async Task ExtractProperty_ParsedNested()
+    public async Task ExtractProperty_ParsedNeste_Async()
     {
         var parsed = new ParseJson
         {
@@ -74,11 +74,11 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.Evaluate(new Context(Site.Object)), Is.True);
+        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.True);
     }
 
     [Test]
-    public async Task ExtractProperty_DotNetType()
+    public async Task ExtractProperty_DotNetType_Async()
     {
         var block = new ExtractProperty
         {
@@ -88,11 +88,11 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.Evaluate(new Context(Site.Object)), Is.EqualTo("0.1"));
+        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo("0.1"));
     }
 
     [Test]
-    public async Task ExtractProperty_AnonymousType()
+    public async Task ExtractProperty_AnonymousType_Async()
     {
         var block = new ExtractProperty
         {
@@ -102,6 +102,6 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.Evaluate(new Context(Site.Object)), Is.EqualTo("Jochen"));
+        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo("Jochen"));
     }
 }

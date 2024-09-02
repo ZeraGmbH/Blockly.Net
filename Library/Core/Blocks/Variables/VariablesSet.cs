@@ -10,10 +10,10 @@ namespace BlocklyNet.Core.Blocks.Variables;
 public class VariablesSet : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var variables = context.Variables;
-    var value = await Values.Evaluate("VALUE", context);
+    var value = await Values.EvaluateAsync("VALUE", context);
     var variableName = Fields["VAR"];
 
     // Fast-Solution
@@ -29,6 +29,6 @@ public class VariablesSet : Block
         variables.Add(variableName, value!);
     }
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

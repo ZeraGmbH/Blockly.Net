@@ -39,31 +39,31 @@ namespace BlocklyNet.Extensions;
 public class TryCatchFinally : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
         try
         {
             /* Fetch the block to run. */
             var exec = Statements.TryGet("TRY");
 
-            if (exec != null) await exec.Evaluate(context);
+            if (exec != null) await exec.EvaluateAsync(context);
         }
         catch (Exception)
         {
             /* Fetch the block to run. */
             var report = Statements.TryGet("CATCH");
 
-            if (report != null) await report.Evaluate(context);
+            if (report != null) await report.EvaluateAsync(context);
         }
         finally
         {
             /* Fetch the block to run. */
             var cleanup = Statements.TryGet("FINALLY");
 
-            if (cleanup != null) await cleanup.Evaluate(context);
+            if (cleanup != null) await cleanup.EvaluateAsync(context);
         }
 
         /* Proceed with next block in chain. */
-        return await base.Evaluate(context);
+        return await base.EvaluateAsync(context);
     }
 }

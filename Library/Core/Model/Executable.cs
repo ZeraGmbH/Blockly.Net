@@ -20,7 +20,7 @@ public abstract class Executable : IFragment
     /// </summary>
     /// <param name="context">Current execution context.</param>
     /// <returns>The value.</returns>
-    public Task<object?> Evaluate(Context context)
+    public Task<object?> EvaluateAsync(Context context)
     {
         /* See if script should be terminated. */
         context.Cancellation.ThrowIfCancellationRequested();
@@ -30,7 +30,7 @@ public abstract class Executable : IFragment
             return Task.FromResult((object?)null);
 
         /* Use the block to get the current value. */
-        return Block.Evaluate(context);
+        return Block.EvaluateAsync(context);
     }
 }
 

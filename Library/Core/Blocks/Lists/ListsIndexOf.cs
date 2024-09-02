@@ -10,11 +10,11 @@ namespace BlocklyNet.Core.Blocks.Lists;
 public class ListsIndexOf : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var direction = Fields["END"];
-    var value = await Values.Evaluate<IEnumerable<object>>("VALUE", context);
-    var find = await Values.Evaluate("FIND", context);
+    var value = await Values.EvaluateAsync<IEnumerable<object>>("VALUE", context);
+    var find = await Values.EvaluateAsync("FIND", context);
 
     switch (direction)
     {

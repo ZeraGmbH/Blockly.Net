@@ -10,19 +10,19 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsWhileUntil : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var mode = Fields["MODE"];
     var value = Values.TryGet("BOOL");
 
     if (!Statements.Has("DO") || null == value)
-      return await base.Evaluate(context);
+      return await base.EvaluateAsync(context);
 
     var statement = Statements["DO"];
 
     if (mode == "WHILE")
     {
-      while ((bool)(await value.Evaluate(context))!)
+      while ((bool)(await value.EvaluateAsync(context))!)
       {
         context.Cancellation.ThrowIfCancellationRequested();
 
@@ -32,17 +32,17 @@ public class ControlsWhileUntil : Block
           break;
         }
 
-        await statement.Evaluate(context);
+        await statement.EvaluateAsync(context);
       }
     }
     else
-      while (!(bool)(await value.Evaluate(context))!)
+      while (!(bool)(await value.EvaluateAsync(context))!)
       {
         context.Cancellation.ThrowIfCancellationRequested();
 
-        await statement.Evaluate(context);
+        await statement.EvaluateAsync(context);
       }
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

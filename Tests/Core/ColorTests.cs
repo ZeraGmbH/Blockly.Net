@@ -6,7 +6,7 @@ namespace BlocklyNetTests.Core;
 public class ColorTests : TestEnvironment
 {
     [Test]
-    public async Task Can_Parse_Color()
+    public async Task Can_Parse_Color_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -15,11 +15,11 @@ public class ColorTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("#ff0000"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("#ff0000"));
     }
 
     [Test]
-    public async Task Can_Get_Random_Color()
+    public async Task Can_Get_Random_Color_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -27,16 +27,16 @@ public class ColorTests : TestEnvironment
             </xml>");
 
 
-        var output = (string)(await script.Run(Site.Object))!;
+        var output = (string)(await script.RunAsync(Site.Object))!;
 
         Assert.That(output, Has.Length.EqualTo(7));
         Assert.That(output[0], Is.EqualTo('#'));
 
-        Assert.That(await script.Run(Site.Object), Is.Not.EqualTo(output));
+        Assert.That(await script.RunAsync(Site.Object), Is.Not.EqualTo(output));
     }
 
     [Test]
-    public async Task Can_Create_From_RGB()
+    public async Task Can_Create_From_RGB_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -59,11 +59,11 @@ public class ColorTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("#ff0001"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("#ff0001"));
     }
 
     [Test]
-    public async Task Can_Blend()
+    public async Task Can_Blend_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -86,6 +86,6 @@ public class ColorTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("#d60a33"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("#d60a33"));
     }
 }

@@ -273,7 +273,7 @@ public class ModelAndEnumTests : TestEnvironment
     }
 
     [Test]
-    public async Task Set_Value_In_Dictionary()
+    public async Task Set_Value_In_Dictionary_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -295,7 +295,7 @@ public class ModelAndEnumTests : TestEnvironment
                 </block>
             </xml>");
 
-        var result = (ListDictClass)(await script.Run(Site.Object))!;
+        var result = (ListDictClass)(await script.RunAsync(Site.Object))!;
 
         Assert.That(result.TheList, Has.Count.EqualTo(1));
 

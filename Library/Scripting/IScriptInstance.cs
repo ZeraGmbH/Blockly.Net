@@ -14,7 +14,7 @@ public interface IScriptInstance : IScript
     /// 
     /// </summary>
     /// <returns></returns>
-    Task Execute();
+    Task ExecuteAsync();
 
     /// <summary>
     /// 

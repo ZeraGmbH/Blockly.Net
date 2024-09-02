@@ -10,7 +10,7 @@ namespace BlocklyNetTests.CoreEx;
 public class ParseJsonTests : TestEnvironment
 {
     [Test]
-    public async Task ParseJson()
+    public async Task ParseJson_Async()
     {
         var json = JsonSerializer.Serialize(new
         {
@@ -22,7 +22,7 @@ public class ParseJsonTests : TestEnvironment
 
         var block = new ParseJson { Values = { new() { Name = "JSON", Block = CreateStringBlock(json) } } };
 
-        var result = await block.Evaluate(new Context(Site.Object));
+        var result = await block.EvaluateAsync(new Context(Site.Object));
 
         Assert.That(result, Is.TypeOf<ExpandoObject>());
 
