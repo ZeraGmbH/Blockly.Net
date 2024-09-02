@@ -70,7 +70,7 @@ public class ModelGeneratorTests
     {
         private readonly object? _value = value;
 
-        public override Task<object?> Evaluate(Context context) => Task.FromResult(_value);
+        public override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
     }
 
     [Test]
@@ -132,7 +132,7 @@ public class ModelGeneratorTests
     }
 
     [Test]
-    public async Task Can_Create_Blockly_Model_Dynamically()
+    public async Task Can_Create_Blockly_Model_Dynamically_Async()
     {
         var definitions = ModelBlock<TestModel>.Initialize("K-2", "N-3", new ModelCache(), (type, key, name) => false);
         var blockJson = JsonSerializer.Serialize(definitions.Item1, JsonUtils.JsonSettings);
@@ -156,7 +156,7 @@ public class ModelGeneratorTests
         model.Values.Add(new() { Name = nameof(TestModel.StringProp), Block = new ConstantBlock("testString") });
 
         var siteMock = new Mock<IScriptSite>();
-        var result = await model.Evaluate(new(siteMock.Object));
+        var result = await model.EvaluateAsync(new(siteMock.Object));
 
         Assert.That(result, Is.InstanceOf<TestModel>());
 

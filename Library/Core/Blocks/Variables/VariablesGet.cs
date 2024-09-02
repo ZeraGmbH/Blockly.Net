@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Variables;
 public class VariablesGet : Block
 {
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     var variableName = Fields["VAR"];
 

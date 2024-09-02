@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class ProceduresCallReturn : ProceduresCallNoReturn
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     // todo: add guard for missing name
 
@@ -29,7 +29,7 @@ public class ProceduresCallReturn : ProceduresCallNoReturn
     {
       context.Cancellation.ThrowIfCancellationRequested();
 
-      var value = await Values.Evaluate($"ARG{counter}", context);
+      var value = await Values.EvaluateAsync($"ARG{counter}", context);
 
       funcContext.Variables.Add(mutation.Value, value!);
 
@@ -38,6 +38,6 @@ public class ProceduresCallReturn : ProceduresCallNoReturn
 
     context.Cancellation.ThrowIfCancellationRequested();
 
-    return await statement.Evaluate(funcContext);
+    return await statement.EvaluateAsync(funcContext);
   }
 }

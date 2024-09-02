@@ -11,7 +11,7 @@ public class NowTests : TestEnvironment
     /// Check the readout and formatting of the current time.
     /// </summary>
     [Test]
-    public async Task Can_Get_Current_Date_And_Time()
+    public async Task Can_Get_Current_Date_And_Time_Async()
     {
         /* Build the block tree manually and run it. */
         var block = new Now
@@ -19,7 +19,7 @@ public class NowTests : TestEnvironment
             Values = { new() { Name = "FORMAT", Block = CreateStringBlock("dd.MM.yyyy") } }
         };
 
-        var value = await block.Evaluate(new Context(Site.Object));
+        var value = await block.EvaluateAsync(new Context(Site.Object));
 
         /* May fail when tested around midnight. */
         var now = DateTime.Now;

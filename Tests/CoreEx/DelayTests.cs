@@ -11,7 +11,7 @@ public class DelayTests : TestEnvironment
     /// See if the execution of a script can stall for a while.
     /// </summary>
     [Test]
-    public async Task Can_Delay_Execution()
+    public async Task Can_Delay_Execution_Async()
     {
         /* Build block tree. */
         var block = new Delay
@@ -22,7 +22,7 @@ public class DelayTests : TestEnvironment
         /* Run test and see if time advances for at least the given amount. */
         var start = DateTime.Now;
 
-        await block.Evaluate(new Context(Site.Object));
+        await block.EvaluateAsync(new Context(Site.Object));
 
         Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(490));
     }

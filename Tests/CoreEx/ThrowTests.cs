@@ -9,13 +9,13 @@ namespace BlocklyNetTests.CoreEx;
 public class ThrowTests : TestEnvironment
 {
     [Test]
-    public async Task CanThrow()
+    public async Task CanThrow_Async()
     {
         var block = new Throw { Values = { new() { Name = "MESSAGE", Block = CreateStringBlock("broken") } } };
 
         try
         {
-            await block.Evaluate(new Context(Site.Object));
+            await block.EvaluateAsync(new Context(Site.Object));
         }
         catch (Exception e)
         {
@@ -28,7 +28,7 @@ public class ThrowTests : TestEnvironment
     }
 
     [Test]
-    public async Task TryCatchFinally_Try()
+    public async Task TryCatchFinally_Try_Async()
     {
         var block = new TryCatchFinally
         {
@@ -46,13 +46,13 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.Evaluate(context);
+        await block.EvaluateAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(10));
     }
 
     [Test]
-    public async Task TryCatchFinally_Finally()
+    public async Task TryCatchFinally_Finally_Async()
     {
         var block = new TryCatchFinally
         {
@@ -70,13 +70,13 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.Evaluate(context);
+        await block.EvaluateAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(80));
     }
 
     [Test]
-    public async Task TryCatchFinally_Try_Finally()
+    public async Task TryCatchFinally_Try_Finally_Async()
     {
         var block = new TryCatchFinally
         {
@@ -102,13 +102,13 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.Evaluate(context);
+        await block.EvaluateAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(40));
     }
 
     [Test]
-    public async Task TryCatchFinally_Try_Catch()
+    public async Task TryCatchFinally_Try_Catch_Async()
     {
         var block = new TryCatchFinally
         {
@@ -135,13 +135,13 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.Evaluate(context);
+        await block.EvaluateAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(20));
     }
 
     [Test]
-    public async Task TryCatchFinally_Try_Catch_Finally()
+    public async Task TryCatchFinally_Try_Catch_Finally_Async()
     {
         var block = new TryCatchFinally
         {
@@ -176,7 +176,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.Evaluate(context);
+        await block.EvaluateAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(30));
     }

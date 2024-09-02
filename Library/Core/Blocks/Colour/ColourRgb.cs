@@ -10,11 +10,11 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class ColourRgb : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var red = Convert.ToByte(await Values.Evaluate("RED", context));
-    var green = Convert.ToByte(await Values.Evaluate("GREEN", context));
-    var blue = Convert.ToByte(await Values.Evaluate("BLUE", context));
+    var red = Convert.ToByte(await Values.EvaluateAsync("RED", context));
+    var green = Convert.ToByte(await Values.EvaluateAsync("GREEN", context));
+    var blue = Convert.ToByte(await Values.EvaluateAsync("BLUE", context));
 
     return $"#{red:x2}{green:x2}{blue:x2}";
   }

@@ -6,7 +6,7 @@ namespace BlocklyNetTests.Core;
 public class TextTests : TestEnvironment
 {
     [Test]
-    public async Task Can_Get_Length()
+    public async Task Can_Get_Length_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -19,11 +19,11 @@ public class TextTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3));
     }
 
     [Test]
-    public async Task Can_Test_On_Empty()
+    public async Task Can_Test_On_Empty_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -36,11 +36,11 @@ public class TextTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Trim()
+    public async Task Can_Trim_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -54,11 +54,11 @@ public class TextTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("ab c"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("ab c"));
     }
 
     [Test]
-    public async Task Can_Convert_To_Title_Case()
+    public async Task Can_Convert_To_Title_Case_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -72,11 +72,11 @@ public class TextTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("Hello World"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("Hello World"));
     }
 
     [Test]
-    public async Task Can_Append()
+    public async Task Can_Append_Async()
     {
         var script = Engine.Parser.Parse(@"
         <xml>
@@ -108,11 +108,11 @@ public class TextTests : TestEnvironment
         </block>
         </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("foobar"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("foobar"));
     }
 
     [Test]
-    public async Task Can_Join()
+    public async Task Can_Join_Async()
     {
         var script = Engine.Parser.Parse(@"
         <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -144,11 +144,11 @@ public class TextTests : TestEnvironment
         </block>
         </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("foobar"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("foobar"));
     }
 
     [Test]
-    public async Task Can_Find_Index()
+    public async Task Can_Find_Index_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -167,6 +167,6 @@ public class TextTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(5));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(5));
     }
 }

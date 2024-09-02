@@ -10,9 +10,9 @@ namespace BlocklyNet.Core.Blocks.Lists;
 public class ListsIsEmpty : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    if (await Values.Evaluate("VALUE", context) is not IEnumerable<object> value)
+    if (await Values.EvaluateAsync("VALUE", context) is not IEnumerable<object> value)
       return true;
 
     return !value.Any();

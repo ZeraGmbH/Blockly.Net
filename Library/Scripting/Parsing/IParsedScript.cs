@@ -13,12 +13,12 @@ public interface IParsedScript
     /// <param name="presets"></param>
     /// <param name="engine"></param>
     /// <returns></returns>
-    Task<object?> Evaluate(Dictionary<string, object?> presets, IScriptSite engine);
+    Task<object?> EvaluateAsync(Dictionary<string, object?> presets, IScriptSite engine);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="engine"></param>
     /// <returns></returns>
-    Task<object?> Run(IScriptSite engine);
+    Task<object?> RunAsync(IScriptSite engine);
 }

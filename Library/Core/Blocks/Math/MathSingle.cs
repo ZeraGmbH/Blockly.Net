@@ -10,10 +10,10 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathSingle : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var op = Fields["OP"];
-    var number = await Values.Evaluate<double>("NUM", context);
+    var number = await Values.EvaluateAsync<double>("NUM", context);
 
     switch (op)
     {

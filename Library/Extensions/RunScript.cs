@@ -66,12 +66,12 @@ public class RunScript : Block
   /// </summary>
   /// <param name="context"></param>
   /// <returns></returns>
-  public async Task<StartScript> ReadConfiguration(Context context)
+  public async Task<StartScript> ReadConfigurationAsync(Context context)
   {
     /* Find the script by its name - character casing is ignored. */
     var store = context.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>();
-    var byName = await Values.Evaluate<string>("NAME", context);
-    var script = await store.Find(byName) ?? throw new ArgumentException($"script '{byName}' not found");
+    var byName = await Values.EvaluateAsync<string>("NAME", context);
+    var script = await store.FindAsync(byName) ?? throw new ArgumentException($"script '{byName}' not found");
 
     /* Prepare to run generic script. */
     var config = context.ServiceProvider.GetService<IGenericScriptFactory>()?.Create() ?? new StartGenericScript();
@@ -81,7 +81,7 @@ public class RunScript : Block
     config.ResultType = script.ResultType;
 
     /* Fill presets - just copy indicated variables with the same name. */
-    var copies = await Values.Evaluate<IEnumerable>("ARGS", context, false);
+    var copies = await Values.EvaluateAsync<IEnumerable>("ARGS", context, false);
 
     if (copies != null)
       foreach (RunScriptParameter parameter in copies)
@@ -91,13 +91,13 @@ public class RunScript : Block
   }
 
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     /* We are prepared to be run in parallel to other scripts. */
     if (context.ParallelMode > 0) return this;
 
     /* Run the script and report the result - in a new isolated environment. */
-    var result = await context.Engine.Run<GenericResult>(await ReadConfiguration(context));
+    var result = await context.Engine.RunAsync<GenericResult>(await ReadConfigurationAsync(context));
 
     return result.Result;
   }

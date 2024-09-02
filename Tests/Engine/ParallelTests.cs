@@ -187,7 +187,7 @@ public class ParallelTests : TestEnvironment
     /// Run two scripts in parallel to each other.
     /// </summary>
     [Test]
-    public async Task Can_Run_In_Parallel()
+    public async Task Can_Run_In_Parallel_Async()
     {
         /* Termination helper. */
         var done = new TaskCompletionSource();

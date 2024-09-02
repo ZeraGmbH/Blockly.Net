@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathConstant : Block
 {
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     var constant = Fields["CONSTANT"];
 

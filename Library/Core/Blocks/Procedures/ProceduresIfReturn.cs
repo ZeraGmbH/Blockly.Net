@@ -10,13 +10,13 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class ProceduresIfReturn : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var condition = await Values.Evaluate<bool>("CONDITION", context);
+    var condition = await Values.EvaluateAsync<bool>("CONDITION", context);
 
     if (condition)
-      return await Values.Evaluate("VALUE", context);
+      return await Values.EvaluateAsync("VALUE", context);
 
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

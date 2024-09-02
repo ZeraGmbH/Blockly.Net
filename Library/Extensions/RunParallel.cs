@@ -49,7 +49,7 @@ namespace BlocklyNet.Extensions;
 public class RunParallel : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     /* Request the script blocks in configuration mode - will not execute on this thread. */
     context.ParallelMode++;
@@ -57,21 +57,21 @@ public class RunParallel : Block
     try
     {
       /* Load array of scripts. */
-      var scripts = await Values.Evaluate<IEnumerable>("SCRIPTS", context);
-      var leading = await Values.Evaluate<double?>("LEADINGSCRIPT", context, false);
+      var scripts = await Values.EvaluateAsync<IEnumerable>("SCRIPTS", context);
+      var leading = await Values.EvaluateAsync<double?>("LEADINGSCRIPT", context, false);
 
       /* Request configuration for all scripts - allow empty array elements. */
       var configs = new List<StartScript>();
 
       foreach (RunScript script in scripts)
-        configs.Add(await script.ReadConfiguration(context));
+        configs.Add(await script.ReadConfigurationAsync(context));
 
       /* Lifetime control. */
       var leadingDone = false;
 
       /* Create separate tasks for each script. */
       var options = new StartScriptOptions { ShouldStopNow = () => leadingDone };
-      var tasks = configs.Select(config => context.Engine.Run<GenericResult>(config, options)).ToArray();
+      var tasks = configs.Select(config => context.Engine.RunAsync<GenericResult>(config, options)).ToArray();
 
       /* Wait for the leading task to finish. */
       if (leading is double)

@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextBlock : Block
 {
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     return Task.FromResult((object?)Fields["TEXT"]);
   }

@@ -52,7 +52,7 @@ public interface IScriptSite
     /// <param name="scriptAsXml">Blockly XML representation of a workspace.</param>
     /// <param name="presets">Preset variables.</param>
     /// <returns>Variables after execution.</returns>
-    Task<object?> Evaluate(string scriptAsXml, Dictionary<string, object?> presets);
+    Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets);
 
     /// <summary>
     /// Start a nested script.
@@ -61,7 +61,7 @@ public interface IScriptSite
     /// <param name="options">Detailed configuration.</param>
     /// <returns>Result of the script.</returns>
     /// <typeparam name="TResult">Type of the result.</typeparam>
-    Task<TResult> Run<TResult>(StartScript request, StartScriptOptions? options = null);
+    Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null);
 
     /// <summary>
     /// 
@@ -72,11 +72,11 @@ public interface IScriptSite
     /// <typeparam name="T">Expected type of the response.</typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    Task<T?> GetUserInput<T>(string key, string? type = null, double? delay = null);
+    Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null);
 
     /// <summary>
     /// Call just before a block is executed.
     /// </summary>
     /// <param name="block">The block to execute.</param>
-    Task SingleStep(Block block);
+    Task SingleStepAsync(Block block);
 }

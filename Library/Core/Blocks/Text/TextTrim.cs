@@ -10,11 +10,11 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextTrim : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var mode = Fields["MODE"];
 
-    var text = (await Values.Evaluate("TEXT", context) ?? "").ToString();
+    var text = (await Values.EvaluateAsync("TEXT", context) ?? "").ToString();
 
     switch (mode)
     {

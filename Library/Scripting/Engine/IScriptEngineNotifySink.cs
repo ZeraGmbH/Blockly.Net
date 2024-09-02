@@ -11,5 +11,5 @@ public interface IScriptEngineNotifySink
     /// <param name="method"></param>
     /// <param name="arg1"></param>
     /// <returns></returns>
-    Task Send(ScriptEngineNotifyMethods method, object? arg1);
+    Task SendAsync(ScriptEngineNotifyMethods method, object? arg1);
 }

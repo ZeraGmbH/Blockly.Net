@@ -10,12 +10,12 @@ namespace BlocklyNet.Core.Blocks.Logic;
 public class LogicCompare : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var opValue = Fields["OP"];
 
-    var a = await Values.Evaluate<object>("A", context);
-    var b = await Values.Evaluate<object>("B", context);
+    var a = await Values.EvaluateAsync<object>("A", context);
+    var b = await Values.EvaluateAsync<object>("B", context);
 
     if (a == null || b == null) return Compare(opValue, a == null, b == null);
 

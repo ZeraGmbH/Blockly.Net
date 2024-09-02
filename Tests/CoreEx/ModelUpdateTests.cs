@@ -31,7 +31,7 @@ public class ModelUpdateTests : TestEnvironment
     }
 
     [Test]
-    public async Task Can_Update_Class_Instance()
+    public async Task Can_Update_Class_Instance_Async()
     {
         var instance = new OuterClass
         {
@@ -50,7 +50,7 @@ public class ModelUpdateTests : TestEnvironment
             }
         };
 
-        await block.Evaluate(Context);
+        await block.EvaluateAsync(Context);
 
         Assert.That(instance.Name, Is.EqualTo("Replace-Outer"));
 
@@ -66,7 +66,7 @@ public class ModelUpdateTests : TestEnvironment
                 }
             };
 
-            await test.Evaluate(Context);
+            await test.EvaluateAsync(Context);
 
             Assert.That(instance.Inner[i].Id, Is.EqualTo(42 + i));
         }
@@ -82,11 +82,11 @@ public class ModelUpdateTests : TestEnvironment
     }";
 
     [Test]
-    public async Task Can_Update_Parsed_Json()
+    public async Task Can_Update_Parsed_Json_Async()
     {
         var parser = new ParseJson { Values = { new() { Name = "JSON", Block = CreateStringBlock(jsonModel) } } };
 
-        dynamic instance = (await parser.Evaluate(Context))!;
+        dynamic instance = (await parser.EvaluateAsync(Context))!;
 
         Context.Variables["instance"] = instance;
 
@@ -99,7 +99,7 @@ public class ModelUpdateTests : TestEnvironment
         }
         };
 
-        await block.Evaluate(Context);
+        await block.EvaluateAsync(Context);
 
         Assert.That(instance.name, Is.EqualTo("Replace-Outer"));
 
@@ -115,14 +115,14 @@ public class ModelUpdateTests : TestEnvironment
             }
             };
 
-            await test.Evaluate(Context);
+            await test.EvaluateAsync(Context);
 
             Assert.That(instance.inner[i].id, Is.EqualTo(42 + i));
         }
     }
 
     [Test]
-    public async Task Can_Update_Untyped_Dictionary()
+    public async Task Can_Update_Untyped_Dictionary_Async()
     {
         var instance = new Dictionary<string, double> { { "a", -1 }, { "b", -2 } };
 
@@ -137,13 +137,13 @@ public class ModelUpdateTests : TestEnvironment
         }
         };
 
-        await block.Evaluate(Context);
+        await block.EvaluateAsync(Context);
 
         Assert.That(instance["b"], Is.EqualTo(42));
     }
 
     [Test]
-    public async Task Can_Update_Typed_Dictionary()
+    public async Task Can_Update_Typed_Dictionary_Async()
     {
         var instance = new Dictionary<Modes, double> { { Modes.One, -1 }, { Modes.Two, -2 } };
 
@@ -158,13 +158,13 @@ public class ModelUpdateTests : TestEnvironment
         }
         };
 
-        await block.Evaluate(Context);
+        await block.EvaluateAsync(Context);
 
         Assert.That(instance[Modes.One], Is.EqualTo(42));
     }
 
     [Test]
-    public async Task Can_Read_Class_Instance()
+    public async Task Can_Read_Class_Instance_Async()
     {
 
         Context.Variables["instance"] = new OuterClass
@@ -179,7 +179,7 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock("Name") }, }
         };
 
-        Assert.That(await block.Evaluate(Context), Is.EqualTo("Outer"));
+        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo("Outer"));
 
         for (var i = 0; i < 3; i++)
         {
@@ -192,16 +192,16 @@ public class ModelUpdateTests : TestEnvironment
             }
             };
 
-            Assert.That(await test.Evaluate(Context), Is.EqualTo(-(i + 1)));
+            Assert.That(await test.EvaluateAsync(Context), Is.EqualTo(-(i + 1)));
         }
     }
 
     [Test]
-    public async Task Can_Read_Parsed_Json()
+    public async Task Can_Read_Parsed_Json_Async()
     {
         var parser = new ParseJson { Values = { new() { Name = "JSON", Block = CreateStringBlock(jsonModel) } } };
 
-        Context.Variables["instance"] = await parser.Evaluate(Context);
+        Context.Variables["instance"] = await parser.EvaluateAsync(Context);
 
         var block = new ReadFromModel
         {
@@ -209,7 +209,7 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock("name") }, }
         };
 
-        Assert.That(await block.Evaluate(Context), Is.EqualTo("Outer"));
+        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo("Outer"));
 
         for (var i = 0; i < 3; i++)
         {
@@ -222,12 +222,12 @@ public class ModelUpdateTests : TestEnvironment
             }
             };
 
-            Assert.That(await test.Evaluate(Context), Is.EqualTo(-(i + 1)));
+            Assert.That(await test.EvaluateAsync(Context), Is.EqualTo(-(i + 1)));
         }
     }
 
     [Test]
-    public async Task Can_Read_Untyped_Dictionary()
+    public async Task Can_Read_Untyped_Dictionary_Async()
     {
         Context.Variables["instance"] = new Dictionary<string, int> { { "a", -1 }, { "b", -2 } };
 
@@ -237,11 +237,11 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock("b") }, }
         };
 
-        Assert.That(await block.Evaluate(Context), Is.EqualTo(-2));
+        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo(-2));
     }
 
     [Test]
-    public async Task Can_Read_Typed_Dictionary()
+    public async Task Can_Read_Typed_Dictionary_Async()
     {
         Context.Variables["instance"] = new Dictionary<Modes, int> { { Modes.One, -1 }, { Modes.Two, -2 } };
 
@@ -251,6 +251,6 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock(Modes.One.ToString()) }, }
         };
 
-        Assert.That(await block.Evaluate(Context), Is.EqualTo(-1));
+        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo(-1));
     }
 }

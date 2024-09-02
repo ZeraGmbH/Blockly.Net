@@ -72,12 +72,12 @@ public class RunScriptParameter
 public class CreateRunScriptParameter : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     return new RunScriptParameter
     {
-      VariableName = await Values.Evaluate<string>("NAME", context),
-      Value = await Values.Evaluate("VALUE", context)
+      VariableName = await Values.EvaluateAsync<string>("NAME", context),
+      Value = await Values.EvaluateAsync("VALUE", context)
     };
   }
 }

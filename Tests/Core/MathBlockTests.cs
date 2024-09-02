@@ -11,7 +11,7 @@ public class MathBlockTests : TestEnvironment
     /// See if we can run the square root block from the XML representation.
     /// </summary>
     [Test]
-    public async Task Can_Get_Square_Root_From_Xml()
+    public async Task Can_Get_Square_Root_From_Xml_Async()
     {
         /* Parse string to block tree. */
         var script = Engine.Parser.Parse(@"
@@ -27,14 +27,14 @@ public class MathBlockTests : TestEnvironment
             </xml>");
 
         /* Execute the block tree. */
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3));
     }
 
     /// <summary>
     /// See if we can execute a manually created block tree for a square root.
     /// </summary>
     [Test]
-    public async Task Can_Get_Square_Root_As_Block()
+    public async Task Can_Get_Square_Root_As_Block_Async()
     {
         /* Manually create the block tree. */
         var block = new MathSingle
@@ -44,11 +44,11 @@ public class MathBlockTests : TestEnvironment
         };
 
         /* Execute the block tree. */
-        Assert.That(await block.Evaluate(new Context(Site.Object)), Is.EqualTo(3));
+        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo(3));
     }
 
     [Test]
-    public async Task Can_Calculate_Sin()
+    public async Task Can_Calculate_Sin_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -62,13 +62,13 @@ public class MathBlockTests : TestEnvironment
             </block>        
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(Math.Sin(Math.PI / 4)));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(Math.Sin(Math.PI / 4)));
     }
 
     [TestCase("E", Math.E)]
     [TestCase("INFINITY", double.PositiveInfinity)]
     [TestCase("PI", Math.PI)]
-    public async Task Can_Supply_Constant(string name, double expected)
+    public async Task Can_Supply_Constant_Async(string name, double expected)
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -78,11 +78,11 @@ public class MathBlockTests : TestEnvironment
             </xml>
         ".Replace("$$CONSTANT$$", name));
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(expected));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(expected));
     }
 
     [Test]
-    public async Task Can_Detect_Even_Number()
+    public async Task Can_Detect_Even_Number_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -97,11 +97,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Detect_Odd_Number()
+    public async Task Can_Detect_Odd_Number_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -116,11 +116,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Detect_Prime()
+    public async Task Can_Detect_Prime_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -135,12 +135,12 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [TestCase("7", true)]
     [TestCase("7.1", false)]
-    public async Task Can_Detect_Whole_Number(string number, bool expected)
+    public async Task Can_Detect_Whole_Number_Async(string number, bool expected)
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -156,11 +156,11 @@ public class MathBlockTests : TestEnvironment
             </xml>
         ".Replace("$$NUMBER$$", number));
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(expected));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(expected));
     }
 
     [Test]
-    public async Task Can_Detect_Positive_Number()
+    public async Task Can_Detect_Positive_Number_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -175,11 +175,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Detect_Negative_Number()
+    public async Task Can_Detect_Negative_Number_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -194,11 +194,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.False);
+        Assert.That(await script.RunAsync(Site.Object), Is.False);
     }
 
     [Test]
-    public async Task Can_Test_For_Divisible_By()
+    public async Task Can_Test_For_Divisible_By_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -218,11 +218,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Round()
+    public async Task Can_Round_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -236,11 +236,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3.0));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3.0));
     }
 
     [Test]
-    public async Task Can_Round_Up()
+    public async Task Can_Round_Up_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -254,11 +254,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(4.0));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(4.0));
     }
 
     [Test]
-    public async Task Can_Round_Down()
+    public async Task Can_Round_Down_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -272,11 +272,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3.0));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3.0));
     }
 
     [Test]
-    public async Task Can_Sum_List()
+    public async Task Can_Sum_List_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -300,11 +300,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(15));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(15));
     }
 
     [Test]
-    public async Task Can_Choose_Random_List_Element()
+    public async Task Can_Choose_Random_List_Element_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -328,11 +328,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3));
     }
 
     [Test]
-    public async Task Can_Group_On_List()
+    public async Task Can_Group_On_List_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -356,11 +356,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(3));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(3));
     }
 
     [Test]
-    public async Task Can_Contrain()
+    public async Task Can_Contrain_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -383,11 +383,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(100));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(100));
     }
 
     [Test]
-    public async Task Can_Get_Modulo()
+    public async Task Can_Get_Modulo_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -406,11 +406,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(4));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(4));
     }
 
     [Test]
-    public async Task Can_Generate_Random_Number()
+    public async Task Can_Generate_Random_Number_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -418,11 +418,11 @@ public class MathBlockTests : TestEnvironment
             <block type=""math_random_float""></block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.GreaterThanOrEqualTo(0d).And.LessThanOrEqualTo(1d));
+        Assert.That(await script.RunAsync(Site.Object), Is.GreaterThanOrEqualTo(0d).And.LessThanOrEqualTo(1d));
     }
 
     [Test]
-    public async Task Can_Generate_Integral_Random_Number()
+    public async Task Can_Generate_Integral_Random_Number_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -440,11 +440,11 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.GreaterThanOrEqualTo(1).And.LessThanOrEqualTo(100));
+        Assert.That(await script.RunAsync(Site.Object), Is.GreaterThanOrEqualTo(1).And.LessThanOrEqualTo(100));
     }
 
     [Test]
-    public async Task Can_Change_Number_Variable()
+    public async Task Can_Change_Number_Variable_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -476,6 +476,6 @@ public class MathBlockTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(2d));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(2d));
     }
 }

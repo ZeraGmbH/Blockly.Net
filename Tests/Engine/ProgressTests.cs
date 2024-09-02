@@ -194,7 +194,7 @@ public class ProgressTests : TestEnvironment
     /// Check if the engine will provide progress information.
     /// </summary>
     [Test]
-    public async Task Can_Provide_Progress()
+    public async Task Can_Provide_Progress_Async()
     {
         /* Termination helper. */
         var done = new TaskCompletionSource();

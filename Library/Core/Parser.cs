@@ -29,9 +29,9 @@ public abstract class Parser
     {
       private readonly Workspace _workspace = workspace;
 
-      public Task<object?> Run(IScriptSite engine) => _workspace.Evaluate(new Context(engine));
+      public Task<object?> RunAsync(IScriptSite engine) => _workspace.EvaluateAsync(new Context(engine));
 
-      public async Task<object?> Evaluate(Dictionary<string, object?> presets, IScriptSite engine)
+      public async Task<object?> EvaluateAsync(Dictionary<string, object?> presets, IScriptSite engine)
       {
         var ctx = new Context(engine);
 
@@ -40,7 +40,7 @@ public abstract class Parser
 
         try
         {
-          await _workspace.Evaluate(ctx);
+          await _workspace.EvaluateAsync(ctx);
         }
         catch (ScriptStoppedEarlyException)
         {

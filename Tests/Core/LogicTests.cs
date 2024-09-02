@@ -6,7 +6,7 @@ namespace BlocklyNetTests.Core;
 public class LogicTests : TestEnvironment
 {
     [Test]
-    public async Task Can_Report_True()
+    public async Task Can_Report_True_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -15,11 +15,11 @@ public class LogicTests : TestEnvironment
                 </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_Or()
+    public async Task Can_Or_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -38,11 +38,11 @@ public class LogicTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.True);
+        Assert.That(await script.RunAsync(Site.Object), Is.True);
     }
 
     [Test]
-    public async Task Can_And()
+    public async Task Can_And_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -61,11 +61,11 @@ public class LogicTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.False);
+        Assert.That(await script.RunAsync(Site.Object), Is.False);
     }
 
     [Test]
-    public async Task Can_Not()
+    public async Task Can_Not_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -78,22 +78,22 @@ public class LogicTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.False);
+        Assert.That(await script.RunAsync(Site.Object), Is.False);
     }
 
     [Test]
-    public async Task Can_Report_Null()
+    public async Task Can_Report_Null_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
             <block type=""logic_null""></block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.Null);
+        Assert.That(await script.RunAsync(Site.Object), Is.Null);
     }
 
     [Test]
-    public async Task Can_Switch_Ternary()
+    public async Task Can_Switch_Ternary_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml>
@@ -116,6 +116,6 @@ public class LogicTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.False);
+        Assert.That(await script.RunAsync(Site.Object), Is.False);
     }
 }

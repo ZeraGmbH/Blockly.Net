@@ -108,13 +108,13 @@ namespace BlocklyNet.Extensions;
 public class HttpRequest : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     /* Get the endpoint. */
-    var uri = await Values.Evaluate<string>("URI", context);
+    var uri = await Values.EvaluateAsync<string>("URI", context);
 
     /* The body is optional and if given is expected to be in JSON string representation, */
-    var body = await Values.Evaluate<string>("BODY", context, false);
+    var body = await Values.EvaluateAsync<string>("BODY", context, false);
     var payload = body == null ? null : new StringContent(body, Encoding.UTF8, "application/json");
 
     /* Get a client to process the request. */
@@ -128,12 +128,12 @@ public class HttpRequest : Block
 
     if (!string.IsNullOrEmpty(auth))
     {
-      var header = await Values.Evaluate<string?>("AUTHHEADER", context, false);
+      var header = await Values.EvaluateAsync<string?>("AUTHHEADER", context, false);
 
       if (string.IsNullOrEmpty(header) || header == "Authorization")
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(auth, await Values.Evaluate<string>("AUTHTOKEN", context));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(auth, await Values.EvaluateAsync<string>("AUTHTOKEN", context));
       else
-        client.DefaultRequestHeaders.Add(header, $"{auth} {await Values.Evaluate<string>("AUTHTOKEN", context)}");
+        client.DefaultRequestHeaders.Add(header, $"{auth} {await Values.EvaluateAsync<string>("AUTHTOKEN", context)}");
     }
 
     /* Generate the request from the configuration of the block. */

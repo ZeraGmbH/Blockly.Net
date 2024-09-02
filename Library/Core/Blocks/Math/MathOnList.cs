@@ -12,10 +12,10 @@ public class MathOnList : Block
   private static readonly Random rnd = new Random();
 
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var op = Fields["OP"];
-    var list = await Values.Evaluate<IEnumerable<object>>("LIST", context);
+    var list = await Values.EvaluateAsync<IEnumerable<object>>("LIST", context);
 
     var doubleList = list.Select(x => (double)x).ToArray();
 

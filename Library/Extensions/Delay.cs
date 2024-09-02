@@ -48,12 +48,12 @@ namespace BlocklyNet.Extensions;
 public class Delay : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
-        var delay = (int)await Values.Evaluate<double>("DELAY", context);
+        var delay = (int)await Values.EvaluateAsync<double>("DELAY", context);
 
         if (delay > 0) await Task.Delay(delay, context.Cancellation);
 
-        return await base.Evaluate(context);
+        return await base.EvaluateAsync(context);
     }
 }

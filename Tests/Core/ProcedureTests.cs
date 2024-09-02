@@ -6,7 +6,7 @@ namespace BlocklyNetTests.Core;
 public class ProcedureTests : TestEnvironment
 {
     [Test]
-    public async Task Can_Execute_Procedure()
+    public async Task Can_Execute_Procedure_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -82,11 +82,11 @@ public class ProcedureTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo(",hello world,hello world,hello world"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(",hello world,hello world,hello world"));
     }
 
     [Test]
-    public async Task Can_Return()
+    public async Task Can_Return_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -104,11 +104,11 @@ public class ProcedureTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("hello world"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("hello world"));
     }
 
     [Test]
-    public async Task Can_If_Return()
+    public async Task Can_If_Return_Async()
     {
         var script = Engine.Parser.Parse(@"
             <xml xmlns=""http://www.w3.org/1999/xhtml"">
@@ -141,6 +141,6 @@ public class ProcedureTests : TestEnvironment
             </block>
             </xml>");
 
-        Assert.That(await script.Run(Site.Object), Is.EqualTo("hello world"));
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("hello world"));
     }
 }

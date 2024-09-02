@@ -10,12 +10,12 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class ColourBlend : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var colour1 = (await Values.Evaluate("COLOUR1", context) ?? "").ToString();
-    var colour2 = (await Values.Evaluate("COLOUR2", context) ?? "").ToString();
+    var colour1 = (await Values.EvaluateAsync("COLOUR1", context) ?? "").ToString();
+    var colour2 = (await Values.EvaluateAsync("COLOUR2", context) ?? "").ToString();
 
-    var ratio = System.Math.Min(System.Math.Max(await Values.Evaluate<double>("RATIO", context), 0), 1);
+    var ratio = System.Math.Min(System.Math.Max(await Values.EvaluateAsync<double>("RATIO", context), 0), 1);
 
     if (string.IsNullOrWhiteSpace(colour1) || colour1.Length != 7)
       return null!;

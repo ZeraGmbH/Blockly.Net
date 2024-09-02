@@ -75,12 +75,12 @@ namespace BlocklyNet.Extensions;
 public class UpdateModelProperty : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> Evaluate(Context context)
+    public override async Task<object?> EvaluateAsync(Context context)
     {
         var data = context.Variables[Fields["VAR"]];
-        var value = await Values.Evaluate("VALUE", context);
-        var path = await Values.Evaluate<string>("PATH", context) ?? "";
-        var rawIndexes = await Values.Evaluate<IEnumerable>("INDEXES", context, false);
+        var value = await Values.EvaluateAsync("VALUE", context);
+        var path = await Values.EvaluateAsync<string>("PATH", context) ?? "";
+        var rawIndexes = await Values.EvaluateAsync<IEnumerable>("INDEXES", context, false);
         var indexes = rawIndexes?.Cast<object>().ToArray() ?? [];
 
         var parts = path.Split(".");
@@ -132,6 +132,6 @@ public class UpdateModelProperty : Block
         else
             data!.GetType().InvokeMember(leaf, BindingFlags.SetProperty | BindingFlags.SetField, null, data, [value]);
 
-        return await base.Evaluate(context);
+        return await base.EvaluateAsync(context);
     }
 }

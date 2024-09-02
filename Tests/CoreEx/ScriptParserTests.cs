@@ -34,7 +34,7 @@ public class ScriptParserTests
     }
 
     [Test]
-    public async Task Can_Parse_And_Compile_Xml_Script()
+    public async Task Can_Parse_And_Compile_Xml_Script_Async()
     {
         const string xml = @"
             <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -157,12 +157,12 @@ public class ScriptParserTests
 
         var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
 
-        await engine.Evaluate(xml, []);
+        await engine.EvaluateAsync(xml, []);
     }
 
     [TestCase(null)]
     [TestCase(30d)]
-    public async Task Can_Evaluate_With_Variables(double? a)
+    public async Task Can_Evaluate_With_Variables_Async(double? a)
     {
         const string xml = @"
             <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -256,7 +256,7 @@ public class ScriptParserTests
 
         if (a.HasValue) presets["a"] = a.Value;
 
-        var vars = (IList<object?>)(await engine.Evaluate(xml, presets))!;
+        var vars = (IList<object?>)(await engine.EvaluateAsync(xml, presets))!;
 
         Assert.Multiple(() =>
         {
@@ -268,7 +268,7 @@ public class ScriptParserTests
     }
 
     [Test]
-    public async Task Can_Execute_Generic_Http_Request()
+    public async Task Can_Execute_Generic_Http_Request_Async()
     {
         const string xml = @"
             <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -301,13 +301,13 @@ public class ScriptParserTests
 
         var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
 
-        var body = await engine.Evaluate(xml, []);
+        var body = await engine.EvaluateAsync(xml, []);
 
         Assert.That(body, Has.Length.GreaterThan(1000));
     }
 
     [Test]
-    public async Task Can_Execute_Try_Catch_Finally()
+    public async Task Can_Execute_Try_Catch_Finally_Async()
     {
         var xml = @"
             <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -422,7 +422,7 @@ public class ScriptParserTests
 
         var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
 
-        var vars = (IList<object>)(await engine.Evaluate(xml, []))!;
+        var vars = (IList<object>)(await engine.EvaluateAsync(xml, []))!;
 
         Assert.Multiple(() =>
         {

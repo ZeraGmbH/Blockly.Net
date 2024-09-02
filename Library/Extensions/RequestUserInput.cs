@@ -85,35 +85,37 @@ namespace BlocklyNet.Extensions;
 public class RequestUserInput : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    var key = await Values.Evaluate<string>("KEY", context);
-    var type = await Values.Evaluate<string>("TYPE", context, false);
-    var delay = await Values.Evaluate<double?>("DELAY", context, false);
+    var key = await Values.EvaluateAsync<string>("KEY", context);
+    var type = await Values.EvaluateAsync<string>("TYPE", context, false);
+    var delay = await Values.EvaluateAsync<double?>("DELAY", context, false);
     var secs = delay.GetValueOrDefault(0);
 
     /* No delay necessary - just wait for the reply to be available. */
-    if (secs <= 0) return await context.Engine.GetUserInput<object>(key, type);
+    if (secs <= 0) return await context.Engine.GetUserInputAsync<object>(key, type);
 
     var cancel = new CancellationTokenSource();
     var delayTask = Task.Delay(TimeSpan.FromSeconds(secs), cancel.Token);
-    var inputTask = context.Engine.GetUserInput<object>(key, type, delay);
+    var inputTask = context.Engine.GetUserInputAsync<object>(key, type, delay);
 
     /* User has terminated the task. */
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
     if (Task.WaitAny(inputTask, delayTask) == 0)
     {
       /* Cancel timer. */
-      cancel.Cancel();
+      await cancel.CancelAsync();
 
       /* Report result. */
-      return inputTask.Result;
+      return await inputTask;
     }
+#pragma warning restore VSTHRD103 // Call async methods when in an async method
 
     /* Simulate user input. */
     context.Engine.Engine.SetUserInput(null);
 
     /* May want to throw an exception. */
-    var message = await Values.Evaluate<string?>("THROWMESSAGE", context, false);
+    var message = await Values.EvaluateAsync<string?>("THROWMESSAGE", context, false);
 
     if (message != null) throw new TimeoutException(message);
 

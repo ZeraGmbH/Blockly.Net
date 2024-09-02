@@ -10,12 +10,12 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextIndexOf : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     var mode = Fields["END"];
 
-    var text = (await Values.Evaluate("VALUE", context) ?? "").ToString();
-    var term = (await Values.Evaluate("FIND", context) ?? "").ToString();
+    var text = (await Values.EvaluateAsync("VALUE", context) ?? "").ToString();
+    var term = (await Values.EvaluateAsync("FIND", context) ?? "").ToString();
 
     switch (mode)
     {

@@ -10,12 +10,12 @@ public interface IScriptDefinitionStorage
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<IScriptDefinition?> Get(string id);
+    Task<IScriptDefinition?> GetAsync(string id);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    Task<IScriptDefinitionInfo> Find(string name);
+    Task<IScriptDefinitionInfo> FindAsync(string name);
 }

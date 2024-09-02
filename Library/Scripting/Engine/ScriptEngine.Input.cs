@@ -66,7 +66,7 @@ public partial class ScriptEngine
     }
 
     /// <inheritdoc/>
-    public Task<T?> GetUserInput<T>(string key, string? type = null, double? delay = null)
+    public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
     {
         using (Lock.Wait())
         {
@@ -93,8 +93,13 @@ public partial class ScriptEngine
                 };
 
                 context?
-                    .Send(ScriptEngineNotifyMethods.InputRequest, _inputRequest = inputRequest)
-                    .ContinueWith(t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", inputRequest.JobId, t.Exception?.Message), TaskContinuationOptions.NotOnRanToCompletion);
+                    .SendAsync(ScriptEngineNotifyMethods.InputRequest, _inputRequest = inputRequest)
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", inputRequest.JobId, t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
             }
 
             /* Report a promise on the result. */
@@ -122,7 +127,7 @@ public partial class ScriptEngine
                 }
 
                 return value == null ? default : (T?)value;
-            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
     }
 }

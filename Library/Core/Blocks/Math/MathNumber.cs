@@ -11,7 +11,7 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathNumber : Block
 {
   /// <inheritdoc/>
-  public override Task<object?> Evaluate(Context context)
+  public override Task<object?> EvaluateAsync(Context context)
   {
     return Task.FromResult((object?)double.Parse(Fields["NUM"], CultureInfo.InvariantCulture));
   }

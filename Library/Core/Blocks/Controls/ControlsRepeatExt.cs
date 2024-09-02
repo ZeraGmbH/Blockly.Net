@@ -8,21 +8,21 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsRepeatExt : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
     /* See if there is a inner block we can execute. */
     var statement = Statements.TryGet("DO");
 
     if (statement == null)
-      return await base.Evaluate(context);
+      return await base.EvaluateAsync(context);
 
     /* Number of times to execute the inner block. */
-    for (var i = await Values.Evaluate<double>("TIMES", context); i-- > 0;)
+    for (var i = await Values.EvaluateAsync<double>("TIMES", context); i-- > 0;)
     {
       /* Execute the inner block. */
       context.Cancellation.ThrowIfCancellationRequested();
 
-      await statement.Evaluate(context);
+      await statement.EvaluateAsync(context);
 
       try
       {
@@ -40,6 +40,6 @@ public class ControlsRepeatExt : Block
     context.EscapeMode = EscapeMode.None;
 
     /* Continue with the next block. */
-    return await base.Evaluate(context);
+    return await base.EvaluateAsync(context);
   }
 }

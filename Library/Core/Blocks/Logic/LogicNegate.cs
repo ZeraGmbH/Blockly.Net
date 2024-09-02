@@ -10,8 +10,8 @@ namespace BlocklyNet.Core.Blocks.Logic;
 public class LogicNegate : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> Evaluate(Context context)
+  public override async Task<object?> EvaluateAsync(Context context)
   {
-    return !(await Values.Evaluate<bool?>("BOOL", context) ?? false);
+    return !(await Values.EvaluateAsync<bool?>("BOOL", context) ?? false);
   }
 }
