@@ -162,10 +162,7 @@ public class HttpRequest : Block
 
     /* In case of any error just report the status code. */
     if (response.StatusCode != HttpStatusCode.OK)
-    {
-      Console.WriteLine(await response.Content.ReadAsStringAsync());
       return (int)response.StatusCode;
-    }
 
     /* Report the resulting body as a string - further script steps may be necessary e.g for JSON parsing. */
     return await response.Content.ReadAsStringAsync();

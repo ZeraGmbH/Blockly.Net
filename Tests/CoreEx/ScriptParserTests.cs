@@ -285,7 +285,7 @@ public class ScriptParserTests
                     <field name=""AUTHMETHOD""></field>
                     <value name=""URI"">
                         <block type=""text"" id=""|]4bW:=rJR0N43C8qBm7"">
-                            <field name=""TEXT"">https://www.psimarron.net</field>
+                            <field name=""TEXT"">https://github.com</field>
                         </block>
                     </value>
                     <value name=""BODY"">
