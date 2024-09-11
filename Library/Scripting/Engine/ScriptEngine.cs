@@ -366,7 +366,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
-            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+            ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
         };
 
     /// <summary>
@@ -380,7 +380,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
-            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+            ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
         };
 
     /// <summary>
@@ -394,7 +394,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
-            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+            ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
         };
 
     /// <summary>
@@ -410,7 +410,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
-            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+            ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
         };
 
     /// <summary>
@@ -424,7 +424,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
                 JobId = script.JobId,
                 ModelType = script.GetRequest().ModelType,
                 Name = script.GetRequest().Name,
-                ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+                ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
             };
 
     /// <inheritdoc/>
