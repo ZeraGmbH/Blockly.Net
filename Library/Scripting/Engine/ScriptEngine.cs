@@ -361,7 +361,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <param name="script"></param>
     /// <returns></returns>
     protected virtual ScriptInformation CreateStartNotification(Script script)
-        => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+        => new()
+        {
+            JobId = script.JobId,
+            ModelType = script.GetRequest().ModelType,
+            Name = script.GetRequest().Name,
+            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+        };
 
     /// <summary>
     /// 
@@ -369,7 +375,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <param name="script"></param>
     /// <returns></returns>
     protected virtual ScriptInformation CreateCurrentNotification(IScriptInstance script)
-        => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+        => new()
+        {
+            JobId = script.JobId,
+            ModelType = script.GetRequest().ModelType,
+            Name = script.GetRequest().Name,
+            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+        };
 
     /// <summary>
     /// 
@@ -392,7 +404,14 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <param name="error"></param>
     /// <returns></returns>
     protected virtual ScriptError CreateErrorNotification(IScriptInstance script, Exception error)
-        => new() { ErrorMessage = error.Message, JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+        => new()
+        {
+            ErrorMessage = error.Message,
+            JobId = script.JobId,
+            ModelType = script.GetRequest().ModelType,
+            Name = script.GetRequest().Name,
+            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+        };
 
     /// <summary>
     /// 
@@ -400,7 +419,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <param name="script"></param>
     /// <returns></returns>
     protected virtual ScriptFinished CreateFinishNotification(IScriptInstance script)
-            => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+            => new()
+            {
+                JobId = script.JobId,
+                ModelType = script.GetRequest().ModelType,
+                Name = script.GetRequest().Name,
+                ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+            };
 
     /// <inheritdoc/>
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
