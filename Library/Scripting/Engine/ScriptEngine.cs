@@ -1,5 +1,6 @@
 using System.Reflection;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Generic;
 using BlocklyNet.Scripting.Parsing;
 using BlocklyNet.User;
 using Microsoft.Extensions.DependencyInjection;
@@ -376,7 +377,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <param name="script"></param>
     /// <returns></returns>
     protected virtual ScriptDone CreateDoneNotification(IScriptInstance script)
-        => new() { JobId = script.JobId, ModelType = script.GetRequest().ModelType, Name = script.GetRequest().Name };
+        => new()
+        {
+            JobId = script.JobId,
+            ModelType = script.GetRequest().ModelType,
+            Name = script.GetRequest().Name,
+            ScriptId = script.GetRequest() is StartGenericScript generic ? generic.ScriptId : null,
+        };
 
     /// <summary>
     /// 

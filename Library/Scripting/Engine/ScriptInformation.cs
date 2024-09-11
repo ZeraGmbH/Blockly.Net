@@ -25,4 +25,9 @@ public class ScriptInformation
     /// </summary>
     [NotNull, Required]
     public required string ModelType { get; set; }
+
+    /// <summary>
+    /// Identifier of the script if known.
+    /// </summary>
+    public string? ScriptId { get; set; }
 }
