@@ -99,13 +99,13 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
                 _lastProgress = null;
                 _lastProgressValue = null;
 
-                /* Do additional cleanup */
-                OnPrepareStart();
-
                 _activeScope = _rootProvider.CreateScope();
 
                 /* If the notion of a user is enabled attach the user to the script execution threads. */
                 ServiceProvider.GetService<ICurrentUser>()?.FromToken(userToken);
+
+                /* Do additional cleanup */
+                OnPrepareStart();
 
                 Logger.LogTrace("Script '{Name}' started as {JobId}.", request.Name, script.JobId);
 

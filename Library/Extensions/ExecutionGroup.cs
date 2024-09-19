@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Dynamic;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
-using Newtonsoft.Json;
 
 namespace BlocklyNet.Extensions;
 
