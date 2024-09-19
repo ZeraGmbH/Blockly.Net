@@ -79,4 +79,15 @@ public interface IScriptSite
     /// </summary>
     /// <param name="block">The block to execute.</param>
     Task SingleStepAsync(Block block);
+
+    /// <summary>
+    /// Start the execution of a new group.
+    /// </summary>
+    /// <param name="key">Unique identifier of the group.</param>
+    void BeginGroup(string key);
+
+    /// <summary>
+    /// End the execution of the current group.
+    /// </summary>
+    void EndGroup(object? result);
 }

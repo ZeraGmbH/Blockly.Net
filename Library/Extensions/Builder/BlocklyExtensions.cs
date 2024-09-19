@@ -234,6 +234,7 @@ public static class BlocklyExtensions
         /* Add library extensions: blocks, any order. */
         builder.AddBlock<CreateRunScriptParameter>();
         builder.AddBlock<Delay>();
+        builder.AddBlock<ExecutionGroup>();
         builder.AddBlock<ExtractProperty>();
         builder.AddBlock<HttpRequest>();
         builder.AddBlock<Now>();

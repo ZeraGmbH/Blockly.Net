@@ -16,7 +16,10 @@ namespace BlocklyNet.Scripting.Engine;
 /// <param name="_rootProvider">Dependency injection manager.</param>
 /// <param name="logger">Logging helper.</param>
 /// <param name="parser">Script parser to use.</param>
-public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser parser, ILogger<ScriptEngine> logger, IScriptEngineNotifySink? context = null) : IScriptEngine, IScriptSite, IDisposable
+public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser parser, ILogger<ScriptEngine> logger, IScriptEngineNotifySink? context = null) :
+    IScriptEngine,
+    IScriptSite,
+    IDisposable
 {
     /// <inheritdoc/>
     public IScriptEngine Engine => this;
@@ -429,4 +432,14 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
     /// <inheritdoc/>
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public void BeginGroup(string key)
+    {
+    }
+
+    /// <inheritdoc/>
+    public void EndGroup(object? result)
+    {
+    }
 }

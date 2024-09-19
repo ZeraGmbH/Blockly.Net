@@ -73,6 +73,16 @@ public partial class ScriptEngine
             _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
+        public void BeginGroup(string key)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void EndGroup(object? result)
+        {
+        }
+
+        /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
             => _engine.StartChildAsync<TResult>(request, CurrentScript, options, depth);
 
