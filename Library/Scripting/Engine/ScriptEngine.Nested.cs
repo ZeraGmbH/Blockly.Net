@@ -12,7 +12,8 @@ public partial class ScriptEngine
     /// <param name="engine">The main script engine.</param>
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nestring depth of the script, at least 1.</param>
-    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth) : IScriptSite
+    /// <param name="_groupManager">Group management for this nested script only.</param>
+    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth, IGroupManager _groupManager) : IScriptSite
     {
         /// <inheritdoc/>
         public IScriptEngine Engine => _engine;
@@ -73,14 +74,10 @@ public partial class ScriptEngine
             _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public void BeginGroup(string key)
-        {
-        }
+        public void BeginGroup(string key) => _groupManager.Start(key);
 
         /// <inheritdoc/>
-        public void EndGroup(object? result)
-        {
-        }
+        public void EndGroup(object? result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
@@ -204,7 +201,7 @@ public partial class ScriptEngine
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nesting depth.</param>
     /// <returns>The new site.</returns>
-    protected virtual ScriptSite CreateSite(IScript? parent, int depth) => new(this, parent, depth);
+    protected virtual ScriptSite CreateSite(IScript? parent, int depth) => new(this, parent, depth, _groupManager.CreateNested());
 
     /// <summary>
     /// Start a child script.
