@@ -109,7 +109,7 @@ public class UserInputTests : TestEnvironment
             }
         };
 
-        var jobId = Engine.Start(new StartGenericScript { Name = "Will request user input", ScriptId = AddScript("SCRIPT", Script1) }, "");
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Will request user input", ScriptId = AddScript("SCRIPT", Script1) }, "");
 
         /* Wait for the script to finish. */
         await done.Task;

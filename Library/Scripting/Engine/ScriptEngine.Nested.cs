@@ -135,7 +135,7 @@ public partial class ScriptEngine
                     throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
                 /* Start the background execution of the script. */
-                ThreadPool.QueueUserWorkItem(RunScript, script);
+                Task.Factory.StartNew(() => RunScriptAsync(script), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
             }
             catch (Exception e)
             {
@@ -148,19 +148,14 @@ public partial class ScriptEngine
         /// <summary>
         /// Process the script.
         /// </summary>
-        /// <param name="state">The script in this site.</param>
-        private void RunScript(object? state)
+        private async Task RunScriptAsync(Script script)
         {
-            var script = (Script)state!;
-
             try
             {
                 CurrentScript = script;
 
                 /* Run the script and remember the result. */
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                script.ExecuteAsync().Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                await script.ExecuteAsync();
 
                 _result = script.Result;
             }
@@ -180,7 +175,7 @@ public partial class ScriptEngine
             finally
             {
                 /* Customize. */
-                _engine.OnScriptDone(script, Parent);
+                await _engine.OnScriptDoneAsync(script, Parent);
 
                 /* Mark as done and wake up pending requests for result. */
                 lock (_resultLock)

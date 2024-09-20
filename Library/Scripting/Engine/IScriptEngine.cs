@@ -13,7 +13,7 @@ public interface IScriptEngine
     /// <param name="request">Configuration of the script run.</param>
     /// <param name="userToken">Totken used by a user to identify himself.</param>
     /// <param name="options">Further configuration of the script.</param>
-    string Start(StartScript request, string userToken, StartScriptOptions? options = null);
+    Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null);
 
     /// <summary>
     /// Abort the currently running script.

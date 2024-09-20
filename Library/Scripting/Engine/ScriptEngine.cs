@@ -79,7 +79,7 @@ public partial class ScriptEngine(
     public IScriptParser Parser { get; } = parser;
 
     /// <inheritdoc/>
-    public string Start(StartScript request, string userToken, StartScriptOptions? options = null)
+    public async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
     {
         Logger.LogTrace("Script '{Name}' should be started for {Token}.", request.Name, userToken);
 
@@ -113,14 +113,14 @@ public partial class ScriptEngine(
                 ServiceProvider.GetService<ICurrentUser>()?.FromToken(userToken);
 
                 /* Do additional cleanup */
-                OnPrepareStart();
+                await OnPrepareStartAsync();
 
                 Logger.LogTrace("Script '{Name}' started as {JobId}.", request.Name, script.JobId);
 
                 /* Process the script on a separate thread. */
                 _cancel = new();
 
-                ThreadPool.QueueUserWorkItem(RunScript);
+                Task.Factory.StartNew(RunScriptAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
 
                 /* Inform all. */
                 context?
@@ -146,7 +146,7 @@ public partial class ScriptEngine(
     /// <summary>
     /// Allow customization to prepare for a script execution.
     /// </summary>
-    protected virtual void OnPrepareStart() { }
+    protected virtual Task OnPrepareStartAsync() => Task.CompletedTask;
 
     /// <inheritdoc/>
     public void Cancel(string jobId)
@@ -179,8 +179,7 @@ public partial class ScriptEngine(
     /// <summary>
     /// Execute the main script.
     /// </summary>
-    /// <param name="state">Not used.</param>
-    private void RunScript(object? state)
+    private async Task RunScriptAsync()
     {
         /* Script to use. */
         var script = _active;
@@ -198,9 +197,7 @@ public partial class ScriptEngine(
         try
         {
             /* Now we can synchronously execute the script. */
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-            script.ExecuteAsync().Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+            await script.ExecuteAsync();
 
             /* Check for cancel. */
             _cancel.Token.ThrowIfCancellationRequested();
@@ -221,7 +218,7 @@ public partial class ScriptEngine(
         try
         {
             /* Make sure child processes will terminate as soon as possible. */
-            _cancel.Cancel();
+            await _cancel.CancelAsync();
 
             _done = true;
 
@@ -239,7 +236,7 @@ public partial class ScriptEngine(
                 .Touch();
 
             /* Customize. */
-            OnScriptDone(script, null);
+            await OnScriptDoneAsync(script, null);
         }
         catch (Exception e)
         {
@@ -256,9 +253,7 @@ public partial class ScriptEngine(
     /// <summary>
     /// 
     /// </summary>
-    protected virtual void OnScriptDone(IScriptInstance script, IScript? parent)
-    {
-    }
+    protected virtual Task OnScriptDoneAsync(IScriptInstance script, IScript? parent) => Task.CompletedTask;
 
     /// <inheritdoc/>
     public object? FinishScriptAndGetResult(string jobId)
