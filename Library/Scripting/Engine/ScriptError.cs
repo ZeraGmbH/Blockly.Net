@@ -6,7 +6,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// Describes an Out-of-Bound exception during script execution.
 /// </summary>
-public class ScriptError : ScriptInformation
+public class ScriptError : ScriptInformationWithGroupStatus
 {
     /// <summary>
     /// A string describing the error.

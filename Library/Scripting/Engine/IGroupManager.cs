@@ -64,5 +64,5 @@ public interface IGroupManager
     /// Convert to protocol structure.
     /// </summary>
     /// <returns>List of all group execution results.</returns>
-    GroupStatus[] Serialize();
+    List<GroupStatus> Serialize();
 }

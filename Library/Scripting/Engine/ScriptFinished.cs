@@ -3,6 +3,6 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// Reports a finished script.
 /// </summary>
-public class ScriptFinished : ScriptInformation
+public class ScriptFinished : ScriptInformationWithGroupStatus
 {
 }

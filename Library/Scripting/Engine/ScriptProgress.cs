@@ -26,4 +26,10 @@ public class ScriptProgress
     /// </summary>
     [Required, NotNull]
     public List<ProgressDetails> AllProgress { get; set; } = [];
+
+    /// <summary>
+    /// Information on the execution group status.
+    /// </summary>
+    [NotNull, Required]
+    public List<GroupStatus> GroupStatus { get; set; } = [];
 }

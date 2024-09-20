@@ -1,7 +1,6 @@
 using System.Collections;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
-using BlocklyNet.Scripting;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;
