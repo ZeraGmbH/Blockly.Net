@@ -56,7 +56,9 @@ public interface IGroupManager
     /// <summary>
     /// Create a nested group manager.
     /// </summary>
-    IGroupManager CreateNested();
+    /// <param name="scriptId">Unique identifier of the script.</param>
+    /// <param name="name">Name of the Script.</param>
+    IGroupManager CreateNested(string scriptId, string name);
 
     /// <summary>
     /// Convert to protocol structure.

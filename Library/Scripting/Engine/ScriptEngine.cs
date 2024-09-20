@@ -301,8 +301,8 @@ public partial class ScriptEngine(
         Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
     /// <inheritdoc/>
-    public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
-        => StartChildAsync<TResult>(request, _active, options, 0);
+    public Task<TResult> RunAsync<TResult, TScript>(TScript request, StartScriptOptions? options = null) where TScript : StartScript, IStartGenericScript
+        => StartChildAsync<TResult, TScript>(request, _active, options, 0);
 
     /// <summary>
     /// Finish using this instance.

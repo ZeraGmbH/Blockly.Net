@@ -66,7 +66,7 @@ public class RunScript : Block
   /// </summary>
   /// <param name="context"></param>
   /// <returns></returns>
-  public async Task<StartScript> ReadConfigurationAsync(Context context)
+  public async Task<StartGenericScript> ReadConfigurationAsync(Context context)
   {
     /* Find the script by its name - character casing is ignored. */
     var store = context.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>();
@@ -87,7 +87,7 @@ public class RunScript : Block
       foreach (RunScriptParameter parameter in copies)
         config.Presets.Add(new() { Key = parameter.VariableName, Value = parameter.Value });
 
-    return (StartScript)config;
+    return (StartGenericScript)config;
   }
 
   /// <inheritdoc/>
@@ -97,7 +97,7 @@ public class RunScript : Block
     if (context.ParallelMode > 0) return this;
 
     /* Run the script and report the result - in a new isolated environment. */
-    var result = await context.Engine.RunAsync<GenericResult>(await ReadConfigurationAsync(context));
+    var result = await context.Engine.RunAsync<GenericResult, StartGenericScript>(await ReadConfigurationAsync(context));
 
     return result.Result;
   }

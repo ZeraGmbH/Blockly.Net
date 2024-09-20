@@ -12,6 +12,11 @@ public class GroupManager : IGroupManager
     public GroupManager? _parent = null;
 
     /// <summary>
+    /// For nested groups the status to serialize to.
+    /// </summary>
+    public GroupStatus? _parentStatus = null;
+
+    /// <summary>
     /// All known groups.
     /// </summary>
     private readonly List<GroupStatus> _groups = [];
@@ -38,12 +43,17 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public IGroupManager CreateNested()
+    public IGroupManager CreateNested(string scriptId, string name)
     {
-        var child = new GroupManager { _parent = this };
+        var asGroup = new GroupStatus { Key = scriptId, Name = name };
+        var child = new GroupManager { _parent = this, _parentStatus = asGroup };
 
         lock (_groups)
+        {
             _scripts.Add(child);
+
+            _groups.Add(asGroup);
+        }
 
         return child;
     }
@@ -79,9 +89,14 @@ public class GroupManager : IGroupManager
     {
         lock (_groups)
         {
-            if (_active.Count < 1) return [.. _groups];
+            if (_active.Count > 0) throw new InvalidOperationException("invalid execution group nesting");
 
-            throw new InvalidOperationException("invalid execution group nesting");
+            /* Ask the whole tree to serialize itself. */
+            foreach (var nested in _scripts)
+                nested._parentStatus!.Children = [.. nested.Serialize()];
+
+            /* Just report what we collected. */
+            return [.. _groups];
         }
     }
 }
