@@ -12,12 +12,12 @@ public class GroupStatus
     /// Unique identifier of the group.
     /// </summary>
     [NotNull, Required]
-    public required string Key { get; set; }
+    public string Key { get; set; } = null!;
 
     /// <summary>
     /// Optional name of the group.
     /// </summary>
-    public required string? Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// Result of the execution.
