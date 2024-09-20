@@ -1,10 +1,4 @@
-using System.Reflection;
-using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Generic;
-using BlocklyNet.Scripting.Parsing;
-using BlocklyNet.User;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -46,6 +40,7 @@ public partial class ScriptEngine
     protected virtual ScriptDone CreateDoneNotification(IScriptInstance script)
         => new()
         {
+            GroupStatus = SerializeGroupStatus(),
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
@@ -62,6 +57,7 @@ public partial class ScriptEngine
         => new()
         {
             ErrorMessage = error.Message,
+            GroupStatus = SerializeGroupStatus(),
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
@@ -76,6 +72,7 @@ public partial class ScriptEngine
     protected virtual ScriptFinished CreateFinishNotification(IScriptInstance script)
             => new()
             {
+                GroupStatus = SerializeGroupStatus(),
                 JobId = script.JobId,
                 ModelType = script.GetRequest().ModelType,
                 Name = script.GetRequest().Name,

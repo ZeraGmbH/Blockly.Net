@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace BlocklyNet.Scripting.Engine;
 
 /// <summary>
@@ -85,18 +87,16 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public GroupStatus[] Serialize()
+    public List<GroupStatus> Serialize()
     {
         lock (_groups)
         {
-            if (_active.Count > 0) throw new InvalidOperationException("invalid execution group nesting");
-
             /* Ask the whole tree to serialize itself. */
             foreach (var nested in _scripts)
-                nested._parentStatus!.Children = [.. nested.Serialize()];
+                nested._parentStatus!.Children = nested.Serialize();
 
-            /* Just report what we collected. */
-            return [.. _groups];
+            /* Just report what we collected - make sure that we clone inside the lock. */
+            return JsonSerializer.Deserialize<List<GroupStatus>>(JsonSerializer.Serialize(_groups, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
         }
     }
 }

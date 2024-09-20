@@ -1,7 +1,3 @@
-using System.Text.Json;
-using BlocklyNet;
-using BlocklyNet.Core;
-using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;

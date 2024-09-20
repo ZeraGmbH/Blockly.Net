@@ -1,6 +1,5 @@
 using System.Reflection;
 using BlocklyNet.Core.Model;
-using BlocklyNet.Scripting.Generic;
 using BlocklyNet.Scripting.Parsing;
 using BlocklyNet.User;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +76,12 @@ public partial class ScriptEngine(
     /// Script parser to use.
     /// </summary>
     public IScriptParser Parser { get; } = parser;
+
+    /// <summary>
+    /// Get the current status of the group execution information.
+    /// </summary>
+    /// <returns>Group execution status.</returns>
+    protected List<GroupStatus> SerializeGroupStatus() => _groupManager.Serialize();
 
     /// <inheritdoc/>
     public async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)

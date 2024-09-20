@@ -31,3 +31,15 @@ public class ScriptInformation
     /// </summary>
     public string? ScriptId { get; set; }
 }
+
+/// <summary>
+/// Describe a script.
+/// </summary>
+public class ScriptInformationWithGroupStatus : ScriptInformation
+{
+    /// <summary>
+    /// Information on the execution group status.
+    /// </summary>
+    [NotNull, Required]
+    public List<GroupStatus> GroupStatus { get; set; } = [];
+}
