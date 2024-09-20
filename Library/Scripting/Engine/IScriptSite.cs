@@ -62,8 +62,7 @@ public interface IScriptSite
     /// <param name="options">Detailed configuration.</param>
     /// <returns>Result of the script.</returns>
     /// <typeparam name="TResult">Type of the result.</typeparam>
-    /// <typeparam name="TStart">Type of the script.</typeparam>
-    Task<TResult> RunAsync<TResult, TStart>(TStart request, StartScriptOptions? options = null) where TStart : StartScript, IStartGenericScript;
+    Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null);
 
     /// <summary>
     /// 

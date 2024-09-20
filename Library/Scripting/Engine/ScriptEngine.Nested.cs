@@ -81,8 +81,8 @@ public partial class ScriptEngine
         public void EndGroup(object? result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
-        public Task<TResult> RunAsync<TResult, TScript>(TScript request, StartScriptOptions? options = null) where TScript : StartScript, IStartGenericScript
-            => _engine.StartChildAsync<TResult, TScript>(request, CurrentScript, options, depth);
+        public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
+            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, depth);
 
         /// <inheritdoc/>
         public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
@@ -124,7 +124,7 @@ public partial class ScriptEngine
         /// </summary>
         /// <param name="request"></param>
         /// <param name="options"></param>
-        public void Start<TStart>(TStart request, StartScriptOptions? options = null) where TStart : StartScript, IStartGenericScript
+        public void Start(StartScript request, StartScriptOptions? options = null)
         {
             Logger.LogTrace("Nested script '{Name}' should be started.", request.Name);
 
@@ -205,16 +205,15 @@ public partial class ScriptEngine
     /// Start a child script.
     /// </summary>
     /// <typeparam name="TResult">Type of the result data.</typeparam>
-    /// <typeparam name="TStart">Type of the script.</typeparam>
     /// <param name="request">Script configuration.</param>
     /// <param name="parent">Parent script.</param>
     /// <param name="options">Detailed configuration of the new script.</param>
     /// <param name="depth">Nestring depth of the child.</param>
     /// <returns>Task on the result.</returns>
-    protected virtual async Task<TResult> StartChildAsync<TResult, TStart>(TStart request, IScript? parent, StartScriptOptions? options, int depth) where TStart : StartScript, IStartGenericScript
+    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
     {
         /* Create execution context. */
-        var site = CreateSite(parent, depth + 1, _groupManager.CreateNested(request.ScriptId, request.Name));
+        var site = CreateSite(parent, depth + 1, _groupManager.CreateNested((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));
 
         using (Lock.Wait())
         {
