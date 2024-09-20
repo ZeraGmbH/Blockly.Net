@@ -97,7 +97,7 @@ public class RunScript : Block
     if (context.ParallelMode > 0) return this;
 
     /* Run the script and report the result - in a new isolated environment. */
-    var result = await context.Engine.RunAsync<GenericResult, StartGenericScript>(await ReadConfigurationAsync(context));
+    var result = await context.Engine.RunAsync<GenericResult>(await ReadConfigurationAsync(context));
 
     return result.Result;
   }

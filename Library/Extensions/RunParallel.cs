@@ -71,7 +71,7 @@ public class RunParallel : Block
 
       /* Create separate tasks for each script. */
       var options = new StartScriptOptions { ShouldStopNow = () => leadingDone };
-      var tasks = configs.Select(config => context.Engine.RunAsync<GenericResult, StartGenericScript>(config, options)).ToArray();
+      var tasks = configs.Select(config => context.Engine.RunAsync<GenericResult>(config, options)).ToArray();
 
       /* Wait for the leading task to finish. */
       if (leading is double)
