@@ -227,6 +227,9 @@ public partial class ScriptEngine(
 
             _done = true;
 
+            /* Customize. */
+            await OnScriptDoneAsync(script, null);
+
             /* Forward the information on the now terminated script. */
             var task = error == null
                 ? context?.SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
@@ -239,9 +242,6 @@ public partial class ScriptEngine(
                     TaskContinuationOptions.NotOnRanToCompletion,
                     TaskScheduler.Current)
                 .Touch();
-
-            /* Customize. */
-            await OnScriptDoneAsync(script, null);
         }
         catch (Exception e)
         {
