@@ -68,10 +68,10 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public void Start(string id)
+    public void Start(string id, string? name)
     {
         lock (_groups)
-            _active.Push(new() { Key = id });
+            _active.Push(new() { Key = id, Name = name });
     }
 
     /// <inheritdoc/>

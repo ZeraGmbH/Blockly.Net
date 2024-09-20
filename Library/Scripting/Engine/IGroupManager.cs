@@ -15,6 +15,11 @@ public class GroupStatus
     public required string Key { get; set; }
 
     /// <summary>
+    /// Optional name of the group.
+    /// </summary>
+    public required string? Name { get; set; }
+
+    /// <summary>
     /// Result of the execution.
     /// </summary>
     public object? Result { get; set; }
@@ -39,7 +44,8 @@ public interface IGroupManager
     /// Start a new group of execution.
     /// </summary>
     /// <param name="id">Unique identifer of the group.</param>
-    void Start(string id);
+    /// <param name="name">Optional name of the group.</param>
+    void Start(string id, string? name);
 
     /// <summary>
     /// Finish a group of execution.

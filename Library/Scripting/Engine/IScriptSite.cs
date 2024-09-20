@@ -84,7 +84,8 @@ public interface IScriptSite
     /// Start the execution of a new group.
     /// </summary>
     /// <param name="key">Unique identifier of the group.</param>
-    void BeginGroup(string key);
+    /// <param name="name">Optional name of the group.</param>
+    void BeginGroup(string key, string? name);
 
     /// <summary>
     /// End the execution of the current group.

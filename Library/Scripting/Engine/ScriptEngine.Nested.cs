@@ -74,7 +74,7 @@ public partial class ScriptEngine
             _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public void BeginGroup(string key) => _groupManager.Start(key);
+        public void BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
         /// <inheritdoc/>
         public void EndGroup(object? result) => _groupManager.Finish(result);

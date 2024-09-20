@@ -24,8 +24,8 @@ public class GroupExecutionTests : TestEnvironment
 
         await block.EvaluateAsync(new Context(Site.Object));
 
-        Site.Verify(s => s.BeginGroup("A"), Times.Once);
-        Site.Verify(s => s.BeginGroup("B"), Times.Once);
+        Site.Verify(s => s.BeginGroup("A", null), Times.Once);
+        Site.Verify(s => s.BeginGroup("B", null), Times.Once);
         Site.Verify(s => s.EndGroup(It.IsAny<object?>()), Times.Exactly(2));
         Site.Verify(s => s.SingleStepAsync(It.IsAny<Block>()), Times.Exactly(2));
         Site.VerifyGet(s => s.Cancellation, Times.Exactly(6));
