@@ -57,7 +57,7 @@ public class GroupingTests : TestEnvironment
                 done.SetResult();
         };
 
-        var jobId = Engine.Start(new StartGenericScript { Name = "Run Groups", ScriptId = AddScript("SCRIPT", Script1) }, "");
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Run Groups", ScriptId = AddScript("SCRIPT", Script1) }, "");
 
         /* Wait for the script to finish. */
         await done.Task;

@@ -155,7 +155,7 @@ public class ScriptParserTests
             </xml>
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
+        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
 
         await engine.EvaluateAsync(xml, []);
     }
@@ -250,7 +250,7 @@ public class ScriptParserTests
             </xml>
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
+        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
 
         var presets = new Dictionary<string, object?> { { "d", "Jochen" } };
 
@@ -299,7 +299,7 @@ public class ScriptParserTests
             </xml>        
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
+        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
 
         var body = await engine.EvaluateAsync(xml, []);
 
@@ -420,7 +420,7 @@ public class ScriptParserTests
             </xml>
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new NullLogger<ScriptEngine>(), null);
+        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
 
         var vars = (IList<object>)(await engine.EvaluateAsync(xml, []))!;
 

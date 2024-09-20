@@ -84,8 +84,8 @@ public class CancellationTests : TestEnvironment
         cancel.CancelAfter(500);
 
         /* Execute the no longer so end-less loop. */
-        var result = await ((IScriptSite)Engine).RunAsync<GenericResult>(
-            new StartGenericScript { Name = "Will be stopped", ScriptId = AddScript("SCRIPT", EndLessLoop) },
+        var result = await ((IScriptSite)Engine).RunAsync<GenericResult, StartGenericScript>(
+            new() { Name = "Will be stopped", ScriptId = AddScript("SCRIPT", EndLessLoop) },
             new() { ShouldStopNow = () => cancel.IsCancellationRequested }
         );
 

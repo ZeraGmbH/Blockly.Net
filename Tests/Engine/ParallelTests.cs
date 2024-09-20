@@ -197,7 +197,7 @@ public class ParallelTests : TestEnvironment
 
         AddScript("SINGLE", single, [new Parameter("delay", "number", true)]);
 
-        var jobId = Engine.Start(new StartGenericScript { Name = "Will run in parallel", ScriptId = AddScript("MULTI", parallel) }, "");
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Will run in parallel", ScriptId = AddScript("MULTI", parallel) }, "");
 
         /* Wait for the script to finish. */
         await done.Task;

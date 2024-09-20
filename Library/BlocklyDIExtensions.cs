@@ -36,6 +36,9 @@ public static class BlocklyDIExtensions
 
         /* Overall access to the cached blocky configuration. */
         services.AddSingleton<IConfigurationService, ConfigurationService>();
+
+        /* Group management algorithms. */
+        services.AddTransient<IGroupManager, GroupManager>();
     }
 
     /// <summary>

@@ -237,7 +237,7 @@ public class ProgressTests : TestEnvironment
             }
         };
 
-        var jobId = Engine.Start(new StartGenericScript { Name = "Will generate progress", ScriptId = AddScript("SCRIPT", script) }, "");
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Will generate progress", ScriptId = AddScript("SCRIPT", script) }, "");
 
         /* Wait for the script to finish. */
         await done.Task;

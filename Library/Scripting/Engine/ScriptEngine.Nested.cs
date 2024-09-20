@@ -1,5 +1,6 @@
 using System.Reflection;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -12,7 +13,8 @@ public partial class ScriptEngine
     /// <param name="engine">The main script engine.</param>
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nestring depth of the script, at least 1.</param>
-    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth) : IScriptSite
+    /// <param name="_groupManager">Group management for this nested script only.</param>
+    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth, IGroupManager _groupManager) : IScriptSite
     {
         /// <inheritdoc/>
         public IScriptEngine Engine => _engine;
@@ -73,18 +75,14 @@ public partial class ScriptEngine
             _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public void BeginGroup(string key)
-        {
-        }
+        public void BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
         /// <inheritdoc/>
-        public void EndGroup(object? result)
-        {
-        }
+        public void EndGroup(object? result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
-        public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
-            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, depth);
+        public Task<TResult> RunAsync<TResult, TScript>(TScript request, StartScriptOptions? options = null) where TScript : StartScript, IStartGenericScript
+            => _engine.StartChildAsync<TResult, TScript>(request, CurrentScript, options, depth);
 
         /// <inheritdoc/>
         public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
@@ -126,7 +124,7 @@ public partial class ScriptEngine
         /// </summary>
         /// <param name="request"></param>
         /// <param name="options"></param>
-        public void Start(StartScript request, StartScriptOptions? options = null)
+        public void Start<TStart>(TStart request, StartScriptOptions? options = null) where TStart : StartScript, IStartGenericScript
         {
             Logger.LogTrace("Nested script '{Name}' should be started.", request.Name);
 
@@ -137,7 +135,7 @@ public partial class ScriptEngine
                     throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
                 /* Start the background execution of the script. */
-                ThreadPool.QueueUserWorkItem(RunScript, script);
+                Task.Factory.StartNew(() => RunScriptAsync(script), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
             }
             catch (Exception e)
             {
@@ -150,19 +148,14 @@ public partial class ScriptEngine
         /// <summary>
         /// Process the script.
         /// </summary>
-        /// <param name="state">The script in this site.</param>
-        private void RunScript(object? state)
+        private async Task RunScriptAsync(Script script)
         {
-            var script = (Script)state!;
-
             try
             {
                 CurrentScript = script;
 
                 /* Run the script and remember the result. */
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                script.ExecuteAsync().Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                await script.ExecuteAsync();
 
                 _result = script.Result;
             }
@@ -182,7 +175,7 @@ public partial class ScriptEngine
             finally
             {
                 /* Customize. */
-                _engine.OnScriptDone(script, Parent);
+                await _engine.OnScriptDoneAsync(script, Parent);
 
                 /* Mark as done and wake up pending requests for result. */
                 lock (_resultLock)
@@ -203,22 +196,25 @@ public partial class ScriptEngine
     /// </summary>
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nesting depth.</param>
+    /// <param name="groupManager">Execution group management helper.</param>
     /// <returns>The new site.</returns>
-    protected virtual ScriptSite CreateSite(IScript? parent, int depth) => new(this, parent, depth);
+    protected virtual ScriptSite CreateSite(IScript? parent, int depth, IGroupManager groupManager)
+        => new(this, parent, depth, groupManager);
 
     /// <summary>
     /// Start a child script.
     /// </summary>
     /// <typeparam name="TResult">Type of the result data.</typeparam>
+    /// <typeparam name="TStart">Type of the script.</typeparam>
     /// <param name="request">Script configuration.</param>
     /// <param name="parent">Parent script.</param>
     /// <param name="options">Detailed configuration of the new script.</param>
     /// <param name="depth">Nestring depth of the child.</param>
     /// <returns>Task on the result.</returns>
-    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
+    protected virtual async Task<TResult> StartChildAsync<TResult, TStart>(TStart request, IScript? parent, StartScriptOptions? options, int depth) where TStart : StartScript, IStartGenericScript
     {
         /* Create execution context. */
-        var site = CreateSite(parent, depth + 1);
+        var site = CreateSite(parent, depth + 1, _groupManager.CreateNested(request.ScriptId, request.Name));
 
         using (Lock.Wait())
         {

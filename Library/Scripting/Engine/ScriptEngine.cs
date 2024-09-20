@@ -16,7 +16,14 @@ namespace BlocklyNet.Scripting.Engine;
 /// <param name="_rootProvider">Dependency injection manager.</param>
 /// <param name="logger">Logging helper.</param>
 /// <param name="parser">Script parser to use.</param>
-public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser parser, ILogger<ScriptEngine> logger, IScriptEngineNotifySink? context = null) :
+/// <param name="_groupManager">Helper to manage execution groups.</param>
+public partial class ScriptEngine(
+    IServiceProvider _rootProvider,
+    IScriptParser parser,
+    IGroupManager _groupManager,
+    ILogger<ScriptEngine> logger,
+    IScriptEngineNotifySink? context = null
+) :
     IScriptEngine,
     IScriptSite,
     IDisposable
@@ -72,7 +79,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     public IScriptParser Parser { get; } = parser;
 
     /// <inheritdoc/>
-    public string Start(StartScript request, string userToken, StartScriptOptions? options = null)
+    public async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
     {
         Logger.LogTrace("Script '{Name}' should be started for {Token}.", request.Name, userToken);
 
@@ -93,6 +100,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
 
                 _active = script;
                 _allProgress.Clear();
+                _groupManager.Clear();
                 _done = false;
                 _inputRequest = null;
                 _inputResponse = null;
@@ -105,14 +113,14 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
                 ServiceProvider.GetService<ICurrentUser>()?.FromToken(userToken);
 
                 /* Do additional cleanup */
-                OnPrepareStart();
+                await OnPrepareStartAsync();
 
                 Logger.LogTrace("Script '{Name}' started as {JobId}.", request.Name, script.JobId);
 
                 /* Process the script on a separate thread. */
                 _cancel = new();
 
-                ThreadPool.QueueUserWorkItem(RunScript);
+                Task.Factory.StartNew(RunScriptAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
 
                 /* Inform all. */
                 context?
@@ -138,7 +146,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <summary>
     /// Allow customization to prepare for a script execution.
     /// </summary>
-    protected virtual void OnPrepareStart() { }
+    protected virtual Task OnPrepareStartAsync() => Task.CompletedTask;
 
     /// <inheritdoc/>
     public void Cancel(string jobId)
@@ -171,8 +179,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <summary>
     /// Execute the main script.
     /// </summary>
-    /// <param name="state">Not used.</param>
-    private void RunScript(object? state)
+    private async Task RunScriptAsync()
     {
         /* Script to use. */
         var script = _active;
@@ -190,9 +197,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         try
         {
             /* Now we can synchronously execute the script. */
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-            script.ExecuteAsync().Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+            await script.ExecuteAsync();
 
             /* Check for cancel. */
             _cancel.Token.ThrowIfCancellationRequested();
@@ -213,7 +218,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         try
         {
             /* Make sure child processes will terminate as soon as possible. */
-            _cancel.Cancel();
+            await _cancel.CancelAsync();
 
             _done = true;
 
@@ -231,7 +236,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
                 .Touch();
 
             /* Customize. */
-            OnScriptDone(script, null);
+            await OnScriptDoneAsync(script, null);
         }
         catch (Exception e)
         {
@@ -248,9 +253,7 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     /// <summary>
     /// 
     /// </summary>
-    protected virtual void OnScriptDone(IScriptInstance script, IScript? parent)
-    {
-    }
+    protected virtual Task OnScriptDoneAsync(IScriptInstance script, IScript? parent) => Task.CompletedTask;
 
     /// <inheritdoc/>
     public object? FinishScriptAndGetResult(string jobId)
@@ -293,8 +296,8 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
         Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
     /// <inheritdoc/>
-    public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
-        => StartChildAsync<TResult>(request, _active, options, 0);
+    public Task<TResult> RunAsync<TResult, TScript>(TScript request, StartScriptOptions? options = null) where TScript : StartScript, IStartGenericScript
+        => StartChildAsync<TResult, TScript>(request, _active, options, 0);
 
     /// <summary>
     /// Finish using this instance.
@@ -434,12 +437,8 @@ public partial class ScriptEngine(IServiceProvider _rootProvider, IScriptParser 
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public void BeginGroup(string key)
-    {
-    }
+    public void BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
     /// <inheritdoc/>
-    public void EndGroup(object? result)
-    {
-    }
+    public void EndGroup(object? result) => _groupManager.Finish(result);
 }

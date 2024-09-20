@@ -61,7 +61,7 @@ public class RunParallel : Block
       var leading = await Values.EvaluateAsync<double?>("LEADINGSCRIPT", context, false);
 
       /* Request configuration for all scripts - allow empty array elements. */
-      var configs = new List<StartScript>();
+      var configs = new List<StartGenericScript>();
 
       foreach (RunScript script in scripts)
         configs.Add(await script.ReadConfigurationAsync(context));
@@ -71,7 +71,7 @@ public class RunParallel : Block
 
       /* Create separate tasks for each script. */
       var options = new StartScriptOptions { ShouldStopNow = () => leadingDone };
-      var tasks = configs.Select(config => context.Engine.RunAsync<GenericResult>(config, options)).ToArray();
+      var tasks = configs.Select(config => context.Engine.RunAsync<GenericResult, StartGenericScript>(config, options)).ToArray();
 
       /* Wait for the leading task to finish. */
       if (leading is double)

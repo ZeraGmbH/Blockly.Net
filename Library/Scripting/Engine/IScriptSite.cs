@@ -1,4 +1,5 @@
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -61,7 +62,8 @@ public interface IScriptSite
     /// <param name="options">Detailed configuration.</param>
     /// <returns>Result of the script.</returns>
     /// <typeparam name="TResult">Type of the result.</typeparam>
-    Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null);
+    /// <typeparam name="TStart">Type of the script.</typeparam>
+    Task<TResult> RunAsync<TResult, TStart>(TStart request, StartScriptOptions? options = null) where TStart : StartScript, IStartGenericScript;
 
     /// <summary>
     /// 
@@ -84,7 +86,8 @@ public interface IScriptSite
     /// Start the execution of a new group.
     /// </summary>
     /// <param name="key">Unique identifier of the group.</param>
-    void BeginGroup(string key);
+    /// <param name="name">Optional name of the group.</param>
+    void BeginGroup(string key, string? name);
 
     /// <summary>
     /// End the execution of the current group.
