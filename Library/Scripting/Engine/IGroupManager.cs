@@ -27,6 +27,7 @@ public class GroupStatus
     /// <summary>
     /// All executions started before this group has been finished.
     /// </summary>
+    [NotNull, Required]
     public List<GroupStatus> Children { get; set; } = [];
 }
 
