@@ -65,7 +65,7 @@ public class ExecutionGroup : Block
         context.Engine.BeginGroup(Id, name);
 
         /* Execute the function to get the group result. */
-        var groupResult = await Values.EvaluateAsync("RESULT", context);
+        var groupResult = await Values.EvaluateAsync("RESULT", context, false);
 
         /* Finish the group. */
         context.Engine.EndGroup(groupResult);
