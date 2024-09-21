@@ -63,6 +63,11 @@ public partial class ScriptEngine(
     /// <inheritdoc />
     public CancellationToken Cancellation => _cancel.Token;
 
+    /// <summary>
+    /// Manages the pausing.
+    /// </summary>
+    private CancellationTokenSource _pause = new();
+
     /// <inheritdoc />
     public IScript? CurrentScript => _active;
 
@@ -108,14 +113,16 @@ public partial class ScriptEngine(
                 _inputResponse?.SetException(new OperationCanceledException());
 
                 _active = script;
-                _codeHash = null!;
                 _allProgress.Clear();
-                _groupManager.Clear();
+                _cancel = new();
+                _codeHash = null!;
                 _done = false;
+                _groupManager.Clear();
                 _inputRequest = null;
                 _inputResponse = null;
                 _lastProgress = null;
                 _lastProgressValue = null;
+                _pause = new();
 
                 _activeScope = _rootProvider.CreateScope();
 
@@ -128,8 +135,6 @@ public partial class ScriptEngine(
                 Logger.LogTrace("Script '{Name}' started as {JobId}.", request.Name, script.JobId);
 
                 /* Process the script on a separate thread. */
-                _cancel = new();
-
                 Task.Factory.StartNew(RunScriptAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
 
                 /* Inform all. */
@@ -159,12 +164,27 @@ public partial class ScriptEngine(
     protected virtual Task OnPrepareStartAsync() => Task.CompletedTask;
 
     /// <inheritdoc/>
+    public void Pause()
+    {
+        using (Lock.Wait())
+        {
+            if (_active == null)
+                throw new InvalidOperationException("no active script");
+
+            /* Report the result. */
+            Logger.LogTrace("User paused script {JobId}", _active.JobId);
+
+            _pause.Cancel();
+        }
+    }
+
+    /// <inheritdoc/>
     public void Cancel(string jobId)
     {
         using (Lock.Wait())
         {
             if (_active == null || _active.JobId != jobId)
-                throw new ArgumentException("not the sctive script", nameof(jobId));
+                throw new ArgumentException("not the active script", nameof(jobId));
 
             /* Report the result. */
             Logger.LogTrace("User cancelled script {JobId}", jobId);
@@ -382,7 +402,13 @@ public partial class ScriptEngine(
     public bool BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
     /// <inheritdoc/>
-    public void EndGroup(GroupResult result) => _groupManager.Finish(result);
+    public void EndGroup(GroupResult result)
+    {
+        _groupManager.Finish(result);
+
+        /* Interrupt right now. */
+        if (_pause.IsCancellationRequested) throw new ScriptPausedException();
+    }
 
     /// <inheritdoc/>
     public List<object?>? CreateFlatResultFromGroups() => _groupManager.CreateFlatResults();
