@@ -81,4 +81,47 @@ public class GroupingTests : TestEnvironment
 
         Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
     }
+
+    [Test]
+    public async Task Can_Retrieve_Hash_Of_Script_Async()
+    {
+        /* Termination helper. */
+        var done = new TaskCompletionSource();
+
+        HashSet<string> hash = [];
+        ScriptGroupStatus status = null!;
+
+        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) =>
+        {
+            /* See if script is done. */
+            if (method != ScriptEngineNotifyMethods.Error && method != ScriptEngineNotifyMethods.Done)
+                return;
+
+            var info = (ScriptInformationWithGroupStatus)arg!;
+
+            status = info.GroupStatus;
+            hash.Add(status.CodeHash);
+
+            done.SetResult();
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Run Groups", ScriptId = AddScript("SCRIPT", Script1) }, "");
+
+        /* Wait for the script to finish. */
+        await done.Task;
+
+        /* Validate hash. */
+        Assert.That(hash.Single(), Is.EqualTo("7F-E8-59-D1-49-02-DC-9D-72-64-76-C9-69-14-E3-AB-B0-E8-24-98-2E-96-A0-32-2F-EF-56-B5-1B-BA-B1-E4"));
+
+        /* Validate status. */
+        Assert.That(status, Is.Not.Null);
+        Assert.That(status.GroupStatus, Has.Count.EqualTo(2));
+        Assert.That(status.GroupStatus[0].Key, Is.EqualTo("Outer"));
+        Assert.That(status.GroupStatus[1].Key, Is.EqualTo("Inner"));
+
+        /* Check the result. */
+        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+
+        Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
+    }
 }
