@@ -13,15 +13,33 @@ public class GroupingTests : TestEnvironment
         <xml xmlns=""https://developers.google.com/blockly/xml"">
         <block type=""execute_group"" id=""Outer"">
             <value name=""RESULT"">                
-                <block type=""text"" id=""Outer.Result"">
-                    <field name=""TEXT"">1</field>
+                <block type=""group_execution_result"" id=""Outer.Result"">
+                    <value name=""Result"">                
+                        <block type=""text"" id=""Outer.Result.Value"">
+                            <field name=""TEXT"">1</field>
+                        </block>
+                    </value>
+                    <value name=""Type"">                
+                        <block type=""group_execution_result_type"" id=""Outer.Result.Value.Type"">
+                            <field name=""VALUE"">Success</field>
+                        </block>
+                    </value>
                 </block>
             </value>
             <next>
                 <block type=""execute_group"" id=""Inner"">
                     <value name=""RESULT"">                
-                        <block type=""text"" id=""Inner.Result"">
-                            <field name=""TEXT"">2</field>
+                        <block type=""group_execution_result"" id=""Inner.Result"">
+                            <value name=""Result"">                
+                                <block type=""text"" id=""Inner.Result.Value"">
+                                    <field name=""TEXT"">2</field>
+                                </block>
+                            </value>
+                            <value name=""Type"">                
+                                <block type=""group_execution_result_type"" id=""Inner.Result.Value.Type"">
+                                    <field name=""VALUE"">Failed</field>
+                                </block>
+                            </value>
                         </block>
                     </value>
                 </block>
@@ -61,6 +79,6 @@ public class GroupingTests : TestEnvironment
         /* Check the result. */
         var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
 
-        Assert.That(result.Result, Is.Null);
+        Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
     }
 }

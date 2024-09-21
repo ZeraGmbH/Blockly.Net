@@ -1,35 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
 namespace BlocklyNet.Scripting.Engine;
-
-/// <summary>
-/// Result of a finished execution group.
-/// </summary>
-public class GroupStatus
-{
-    /// <summary>
-    /// Unique identifier of the group.
-    /// </summary>
-    [NotNull, Required]
-    public string Key { get; set; } = null!;
-
-    /// <summary>
-    /// Optional name of the group.
-    /// </summary>
-    public string? Name { get; set; }
-
-    /// <summary>
-    /// Result of the execution.
-    /// </summary>
-    public object? Result { get; set; }
-
-    /// <summary>
-    /// All executions started before this group has been finished.
-    /// </summary>
-    [NotNull, Required]
-    public List<GroupStatus> Children { get; set; } = [];
-}
 
 /// <summary>
 /// Interface to manage groups.
@@ -46,13 +15,15 @@ public interface IGroupManager
     /// </summary>
     /// <param name="id">Unique identifer of the group.</param>
     /// <param name="name">Optional name of the group.</param>
-    void Start(string id, string? name);
+    /// <returns>Set if the execution started, unset if the result from
+    /// a previous execution has been reuses.</returns>
+    bool Start(string id, string? name);
 
     /// <summary>
     /// Finish a group of execution.
     /// </summary>
     /// <param name="result">Result of the execution group.</param>
-    void Finish(object? result);
+    void Finish(GroupResult result);
 
     /// <summary>
     /// Create a nested group manager.
@@ -66,4 +37,10 @@ public interface IGroupManager
     /// </summary>
     /// <returns>List of all group execution results.</returns>
     List<GroupStatus> Serialize();
+
+    /// <summary>
+    /// Generate a result from the groups.
+    /// </summary>
+    /// <returns>List of results if any are present.</returns>
+    List<object?>? CreateFlatResults();
 }

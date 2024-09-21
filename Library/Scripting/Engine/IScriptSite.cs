@@ -85,10 +85,12 @@ public interface IScriptSite
     /// </summary>
     /// <param name="key">Unique identifier of the group.</param>
     /// <param name="name">Optional name of the group.</param>
-    void BeginGroup(string key, string? name);
+    /// <returns>Set if the execution started, unset if the result from
+    /// a previous execution has been reuses.</returns>
+    bool BeginGroup(string key, string? name);
 
     /// <summary>
     /// End the execution of the current group.
     /// </summary>
-    void EndGroup(object? result);
+    void EndGroup(GroupResult result);
 }

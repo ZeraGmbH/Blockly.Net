@@ -1,5 +1,7 @@
 
 
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Nodes;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
@@ -31,9 +33,9 @@ public abstract class Parser
 
       public Task<object?> RunAsync(IScriptSite engine) => _workspace.EvaluateAsync(new Context(engine));
 
-      public async Task<object?> EvaluateAsync(Dictionary<string, object?> presets, IScriptSite engine)
+      public async Task<object?> EvaluateAsync(Dictionary<string, object?> presets, IScriptSite site)
       {
-        var ctx = new Context(engine);
+        var ctx = new Context(site);
 
         foreach (var preset in presets)
           ctx.Variables.Add(preset);
@@ -47,16 +49,26 @@ public abstract class Parser
           /* Planned abort, hopefully result is already set. */
         }
 
-        return ctx.Variables.TryGetValue("result", out var result) ? result : null;
+        /* If script provides a result always use this. */
+        if (ctx.Variables.TryGetValue("result", out var result) && result != null) return result;
+
+        /* If this is the root script see if group execution results are available. */
+        if (site is IScriptEngine engine) return engine.CreateFlatResultFromGroups();
+
+        /* No result at all. */
+        return null;
       }
     }
 
     public IParsedScript Parse(string scriptAsText)
     {
+      Workspace workspace;
       Parser parser = _xml ? _xmlParser : _jsonParser;
 
       lock (parser)
-        return new ParsedScript(parser.Parse(scriptAsText));
+        workspace = parser.Parse(scriptAsText);
+
+      return new ParsedScript(workspace);
     }
   }
 

@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Parsing;
 using BlocklyNet.User;
@@ -77,11 +79,13 @@ public partial class ScriptEngine(
     /// </summary>
     public IScriptParser Parser { get; } = parser;
 
+    private string _codeHash = null!;
+
     /// <summary>
     /// Get the current status of the group execution information.
     /// </summary>
     /// <returns>Group execution status.</returns>
-    protected List<GroupStatus> SerializeGroupStatus() => _groupManager.Serialize();
+    protected ScriptGroupStatus SerializeGroupStatus() => new() { CodeHash = _codeHash, GroupStatus = _groupManager.Serialize() };
 
     /// <inheritdoc/>
     public async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
@@ -104,6 +108,7 @@ public partial class ScriptEngine(
                 _inputResponse?.SetException(new OperationCanceledException());
 
                 _active = script;
+                _codeHash = null!;
                 _allProgress.Clear();
                 _groupManager.Clear();
                 _done = false;
@@ -297,8 +302,12 @@ public partial class ScriptEngine(
     }
 
     /// <inheritdoc/>
-    public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets) =>
-        Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
+    public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets)
+    {
+        _codeHash = BitConverter.ToString(SHA256.HashData(Encoding.UTF8.GetBytes(scriptAsXml)));
+
+        return Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
+    }
 
     /// <inheritdoc/>
     public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
@@ -370,8 +379,11 @@ public partial class ScriptEngine(
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public void BeginGroup(string key, string? name) => _groupManager.Start(key, name);
+    public bool BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
     /// <inheritdoc/>
-    public void EndGroup(object? result) => _groupManager.Finish(result);
+    public void EndGroup(GroupResult result) => _groupManager.Finish(result);
+
+    /// <inheritdoc/>
+    public List<object?>? CreateFlatResultFromGroups() => _groupManager.CreateFlatResults();
 }

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.VisualBasic;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -7,12 +8,6 @@ namespace BlocklyNet.Scripting.Engine;
 /// </summary>
 public class GroupManager : IGroupManager
 {
-    /// <summary>
-    /// The parent group manager if we are nested.
-    /// </summary>
-    /*private*/
-    public GroupManager? _parent = null;
-
     /// <summary>
     /// For nested groups the status to serialize to.
     /// </summary>
@@ -48,7 +43,7 @@ public class GroupManager : IGroupManager
     public IGroupManager CreateNested(string scriptId, string name)
     {
         var asGroup = new GroupStatus { Key = scriptId, Name = name };
-        var child = new GroupManager { _parent = this, _parentStatus = asGroup };
+        var child = new GroupManager { _parentStatus = asGroup };
 
         lock (_groups)
         {
@@ -61,29 +56,30 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public void Finish(object? result)
+    public void Finish(GroupResult result)
     {
+        /* Get the active one and set the result - fire some exception if none is found. */
         lock (_groups)
-        {
-            /* Get the active one - fire some exception if none is found. */
-            var active = _active.Pop();
-
-            /* Attach result. */
-            active.Result = result;
-
-            /* Build a tree. */
-            if (_active.TryPeek(out var parent))
-                parent.Children.Add(active);
-            else
-                _groups.Add(active);
-        }
+            _active.Pop().SetResult(result);
     }
 
     /// <inheritdoc/>
-    public void Start(string id, string? name)
+    public bool Start(string id, string? name)
     {
+        var group = new GroupStatus { Key = id, Name = name };
+
         lock (_groups)
-            _active.Push(new() { Key = id, Name = name });
+        {
+            /* Build a tree. */
+            if (_active.TryPeek(out var parent))
+                parent.Children.Add(group);
+            else
+                _groups.Add(group);
+
+            _active.Push(group);
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -98,5 +94,38 @@ public class GroupManager : IGroupManager
             /* Just report what we collected - make sure that we clone inside the lock. */
             return JsonSerializer.Deserialize<List<GroupStatus>>(JsonSerializer.Serialize(_groups, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
         }
+    }
+
+    /// <inheritdoc/>
+    public List<object?>? CreateFlatResults()
+    {
+        /* Execution groups are not used. */
+        lock (_groups)
+            if (_groups.Count < 1)
+                return null;
+
+        /* Construct list - actually it may be empty but this is different from not using groups at all. */
+        var results = new List<object?>();
+
+        /* Make sure nested scripts have anything expanded. */
+        Action<GroupStatus> copyToResults = null!;
+
+        copyToResults = (group) =>
+        {
+            /* Children first. */
+            group.Children.ForEach(copyToResults);
+
+            /* Self last. */
+            var result = group.GetResult();
+
+            /* Only add results for finished groups. */
+            if (result != null && result.Type != GroupResultType.Invalid)
+                results.Add(result.Result);
+        };
+
+        /* Process all top level groups. */
+        Serialize().ForEach(copyToResults);
+
+        return results;
     }
 }
