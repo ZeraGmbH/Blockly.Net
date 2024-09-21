@@ -75,10 +75,10 @@ public partial class ScriptEngine
             _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public void BeginGroup(string key, string? name) => _groupManager.Start(key, name);
+        public bool BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
         /// <inheritdoc/>
-        public void EndGroup(object? result) => _groupManager.Finish(result);
+        public void EndGroup(GroupResult result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)

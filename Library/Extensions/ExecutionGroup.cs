@@ -1,5 +1,6 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
+using BlocklyNet.Scripting.Engine;
 
 namespace BlocklyNet.Extensions;
 
@@ -32,7 +33,8 @@ namespace BlocklyNet.Extensions;
             },
             {
                 ""type"": ""input_value"",
-                ""name"": ""RESULT""
+                ""name"": ""RESULT"",
+                ""check"": ""group_execution_result""
             }
         ],
         ""previousStatement"": null,
@@ -62,13 +64,14 @@ public class ExecutionGroup : Block
         /* Register the group. */
         var name = await Values.EvaluateAsync<string?>("NAME", context, false);
 
-        context.Engine.BeginGroup(Id, name);
+        if (context.Engine.BeginGroup(Id, name))
+        {
+            /* Execute the function to get the group result. */
+            var groupResult = await Values.EvaluateAsync<GroupResult>("RESULT", context);
 
-        /* Execute the function to get the group result. */
-        var groupResult = await Values.EvaluateAsync("RESULT", context, false);
-
-        /* Finish the group. */
-        context.Engine.EndGroup(groupResult);
+            /* Finish the group. */
+            context.Engine.EndGroup(groupResult);
+        }
 
         /* Continue with execution. */
         return await base.EvaluateAsync(context);

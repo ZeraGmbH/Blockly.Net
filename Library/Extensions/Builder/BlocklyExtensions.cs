@@ -1,6 +1,7 @@
 using BlocklyNet.Core;
 using BlocklyNet.Core.Blocks;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Engine;
 using System.Reflection;
 using System.Text.Json.Nodes;
 
@@ -228,8 +229,10 @@ public static class BlocklyExtensions
         var builder = BlockBuilder.Create(parser, models);
 
         /* Add library extensions: enumerations, any order. */
+        builder.AddEnum<GroupResultType>("group_execution_result_type", "Result of the Exceution");
 
         /* Add library extensions: models, leaves first up to root. */
+        builder.AddModel<GroupResult>("group_execution_result", "Result of a group execution");
 
         /* Add library extensions: blocks, any order. */
         builder.AddBlock<CreateRunScriptParameter>();
