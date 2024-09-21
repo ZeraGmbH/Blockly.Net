@@ -60,7 +60,7 @@ public class GroupManager : IGroupManager
     {
         /* Get the active one and set the result - fire some exception if none is found. */
         lock (_groups)
-            _active.Pop().SetResult(result);
+            _active.Pop().SetResult(new() { Type = result.Type, Result = result.Result });
     }
 
     /// <inheritdoc/>

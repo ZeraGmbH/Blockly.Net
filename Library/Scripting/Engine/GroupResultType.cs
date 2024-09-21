@@ -18,7 +18,7 @@ public enum GroupResultType
     /// Group execution finished successfull.
     /// </summary>
 
-    Success = 1,
+    Succeeded = 1,
 
     /// <summary>
     /// Group execution failed with some error.

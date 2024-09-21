@@ -21,7 +21,7 @@ public class GroupingTests : TestEnvironment
                     </value>
                     <value name=""Type"">                
                         <block type=""group_execution_result_type"" id=""Outer.Result.Value.Type"">
-                            <field name=""VALUE"">Success</field>
+                            <field name=""VALUE"">Succeeded</field>
                         </block>
                     </value>
                 </block>
@@ -111,13 +111,17 @@ public class GroupingTests : TestEnvironment
         await done.Task;
 
         /* Validate hash. */
-        Assert.That(hash.Single(), Is.EqualTo("7F-E8-59-D1-49-02-DC-9D-72-64-76-C9-69-14-E3-AB-B0-E8-24-98-2E-96-A0-32-2F-EF-56-B5-1B-BA-B1-E4"));
+        Assert.That(hash.Single(), Is.EqualTo("E4-B0-3E-B6-CF-2E-10-C5-33-C5-C4-E7-DF-CA-2A-8D-84-3D-E7-AE-BC-5D-98-E5-A3-9E-FC-F4-C1-97-3B-B5"));
 
         /* Validate status. */
         Assert.That(status, Is.Not.Null);
         Assert.That(status.GroupStatus, Has.Count.EqualTo(2));
-        Assert.That(status.GroupStatus[0].Key, Is.EqualTo("Outer"));
-        Assert.That(status.GroupStatus[1].Key, Is.EqualTo("Inner"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(status.GroupStatus[0].Key, Is.EqualTo("Outer"));
+            Assert.That(status.GroupStatus[1].Key, Is.EqualTo("Inner"));
+        });
 
         /* Check the result. */
         var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
