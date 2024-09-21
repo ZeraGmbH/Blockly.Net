@@ -1,5 +1,7 @@
 
 
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Nodes;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
@@ -60,10 +62,13 @@ public abstract class Parser
 
     public IParsedScript Parse(string scriptAsText)
     {
+      Workspace workspace;
       Parser parser = _xml ? _xmlParser : _jsonParser;
 
       lock (parser)
-        return new ParsedScript(parser.Parse(scriptAsText));
+        workspace = parser.Parse(scriptAsText);
+
+      return new ParsedScript(workspace);
     }
   }
 

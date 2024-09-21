@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.Logging;
@@ -71,8 +73,8 @@ public partial class ScriptEngine
         public IScript? MainScript => _engine.MainScript;
 
         /// <inheritdoc/>
-        public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets) =>
-            _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
+        public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets)
+            => _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
         public bool BeginGroup(string key, string? name) => _groupManager.Start(key, name);

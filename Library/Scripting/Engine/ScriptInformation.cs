@@ -41,5 +41,5 @@ public class ScriptInformationWithGroupStatus : ScriptInformation
     /// Information on the execution group status.
     /// </summary>
     [NotNull, Required]
-    public List<GroupStatus> GroupStatus { get; set; } = [];
+    public ScriptGroupStatus GroupStatus { get; set; } = null!;
 }
