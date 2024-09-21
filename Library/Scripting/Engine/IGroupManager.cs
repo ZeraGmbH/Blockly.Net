@@ -8,7 +8,7 @@ public interface IGroupManager
     /// <summary>
     /// Reset internal state.
     /// </summary>
-    void Clear();
+    void Reset(ScriptGroupRepeat? previous);
 
     /// <summary>
     /// Start a new group of execution.

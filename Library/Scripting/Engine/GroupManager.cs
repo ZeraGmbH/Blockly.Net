@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.VisualBasic;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -29,7 +28,7 @@ public class GroupManager : IGroupManager
     private readonly List<GroupManager> _scripts = [];
 
     /// <inheritdoc/>
-    public void Clear()
+    public void Reset(ScriptGroupRepeat? previous)
     {
         lock (_groups)
         {

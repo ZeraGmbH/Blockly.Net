@@ -7,7 +7,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// Result of a finished execution group.
 /// </summary>
-public class GroupStatus
+public class GroupStatus<TChild> where TChild : GroupStatus<TChild>
 {
     /// <summary>
     /// Unique identifier of the group.
@@ -29,7 +29,7 @@ public class GroupStatus
     /// All executions started before this group has been finished.
     /// </summary>
     [NotNull, Required]
-    public List<GroupStatus> Children { get; set; } = [];
+    public List<TChild> Children { get; set; } = [];
 
     /// <summary>
     /// Save result of a group in a serialized form.
@@ -45,3 +45,8 @@ public class GroupStatus
     /// <returns>Recostructed result.</returns>
     public GroupResult? GetResult() => JsonSerializer.Deserialize<GroupResult>(Result ?? "null", JsonUtils.JsonSettings);
 }
+
+/// <summary>
+/// Status information.
+/// </summary>
+public class GroupStatus : GroupStatus<GroupStatus> { }

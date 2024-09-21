@@ -1,6 +1,4 @@
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.Logging;

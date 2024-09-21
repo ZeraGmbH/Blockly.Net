@@ -32,7 +32,7 @@ public class GroupManagerTests
         Manager.Start("1", "n1");
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
-        Manager.Clear();
+        Manager.Reset(null);
 
         Assert.Multiple(() =>
         {

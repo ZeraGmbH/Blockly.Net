@@ -6,7 +6,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// Describes the script group execution status.
 /// </summary>
-public class ScriptGroupStatus
+public class ScriptGroupStatus<TStatus> where TStatus : GroupStatus<TStatus>
 {
     /// <summary>
     /// SHA256 hash of the script code executed.
@@ -18,5 +18,10 @@ public class ScriptGroupStatus
     /// All the individual executed groups.
     /// </summary>
     [Required, NotNull]
-    public List<GroupStatus> GroupStatus { get; set; } = [];
+    public List<TStatus> GroupStatus { get; set; } = [];
 }
+
+/// <summary>
+/// 
+/// </summary>
+public class ScriptGroupStatus : ScriptGroupStatus<GroupStatus> { }
