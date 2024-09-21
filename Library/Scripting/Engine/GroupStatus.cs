@@ -10,6 +10,12 @@ namespace BlocklyNet.Scripting.Engine;
 public class GroupStatus<TChild> where TChild : GroupStatus<TChild>
 {
     /// <summary>
+    /// Set to indicate that this is no a real group but a separate script.
+    /// </summary>
+    [NotNull, Required]
+    public bool IsScript { get; set; }
+
+    /// <summary>
     /// Unique identifier of the group.
     /// </summary>
     [NotNull, Required]

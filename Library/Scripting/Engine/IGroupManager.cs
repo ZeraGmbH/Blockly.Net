@@ -3,13 +3,8 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// Interface to manage groups.
 /// </summary>
-public interface IGroupManager
+public interface ISiteGroupManager
 {
-    /// <summary>
-    /// Reset internal state.
-    /// </summary>
-    void Reset(ScriptGroupRepeat? previous);
-
     /// <summary>
     /// Start a new group of execution.
     /// </summary>
@@ -31,6 +26,17 @@ public interface IGroupManager
     /// <param name="scriptId">Unique identifier of the script.</param>
     /// <param name="name">Name of the Script.</param>
     IGroupManager CreateNested(string scriptId, string name);
+}
+
+/// <summary>
+/// Interface to manage groups.
+/// </summary>
+public interface IGroupManager : ISiteGroupManager
+{
+    /// <summary>
+    /// Reset internal state.
+    /// </summary>
+    void Reset(IEnumerable<GroupRepeat>? previous);
 
     /// <summary>
     /// Convert to protocol structure.

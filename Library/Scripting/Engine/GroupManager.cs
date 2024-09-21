@@ -28,31 +28,18 @@ public class GroupManager : IGroupManager
     private readonly List<GroupManager> _scripts = [];
 
     /// <inheritdoc/>
-    public void Reset(ScriptGroupRepeat? previous)
+    public void Reset(IEnumerable<GroupRepeat>? previous)
     {
         lock (_groups)
         {
             _active.Clear();
-            _scripts.Clear();
             _groups.Clear();
+            _scripts.Clear();
         }
     }
 
     /// <inheritdoc/>
-    public IGroupManager CreateNested(string scriptId, string name)
-    {
-        var asGroup = new GroupStatus { Key = scriptId, Name = name };
-        var child = new GroupManager { _parentStatus = asGroup };
-
-        lock (_groups)
-        {
-            _scripts.Add(child);
-
-            _groups.Add(asGroup);
-        }
-
-        return child;
-    }
+    public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, true).Item2;
 
     /// <inheritdoc/>
     public void Finish(GroupResult result)
@@ -63,22 +50,38 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public bool Start(string id, string? name)
+    public bool Start(string id, string? name) => CreateGroup(id, name, false).Item1;
+
+    private Tuple<bool, IGroupManager> CreateGroup(string id, string? name, bool nested)
     {
-        var group = new GroupStatus { Key = id, Name = name };
+        /* Maybe a nested group manager must be created. */
+        GroupManager manager = null!;
+
+        /* The new group. */
+        var group = new GroupStatus { Key = id, Name = name, IsScript = nested };
 
         lock (_groups)
         {
+            /* Create a nested group management instance. */
+            if (nested)
+            {
+                manager = new GroupManager { _parentStatus = group };
+
+                _scripts.Add(manager);
+            }
+
             /* Build a tree. */
             if (_active.TryPeek(out var parent))
                 parent.Children.Add(group);
             else
                 _groups.Add(group);
 
-            _active.Push(group);
+            /* Do a real start requiring some finish later on - not for nested scripts. */
+            if (!nested)
+                _active.Push(group);
         }
 
-        return true;
+        return Tuple.Create(true, (IGroupManager)manager);
     }
 
     /// <inheritdoc/>

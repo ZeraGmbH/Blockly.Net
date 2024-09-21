@@ -14,7 +14,7 @@ public partial class ScriptEngine
     /// <param name="parent">Parent script.</param>
     /// <param name="depth">Nestring depth of the script, at least 1.</param>
     /// <param name="_groupManager">Group management for this nested script only.</param>
-    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth, IGroupManager _groupManager) : IScriptSite
+    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth, ISiteGroupManager _groupManager) : IScriptSite
     {
         /// <inheritdoc/>
         public IScriptEngine Engine => _engine;

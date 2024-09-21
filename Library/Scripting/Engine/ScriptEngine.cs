@@ -117,7 +117,7 @@ public partial class ScriptEngine(
                 _cancel = new();
                 _codeHash = null!;
                 _done = false;
-                _groupManager.Reset(options?.GroupResults);
+                _groupManager.Reset(options?.GroupResults?.GroupStatus);
                 _inputRequest = null;
                 _inputResponse = null;
                 _lastProgress = null;
