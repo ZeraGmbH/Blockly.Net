@@ -50,6 +50,7 @@ public partial class ScriptEngine
 
             /* Remember for reconnect. */
             _lastProgress = nextProgress;
+            _lastProgress.GroupStatus = SerializeGroupStatus();
 
             context?
                 .SendAsync(ScriptEngineNotifyMethods.Progress, _lastProgress)
