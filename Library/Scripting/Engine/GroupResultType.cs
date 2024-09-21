@@ -9,9 +9,10 @@ namespace BlocklyNet.Scripting.Engine;
 public enum GroupResultType
 {
     /// <summary>
-    /// Group started execution but did not yet finish.
+    /// Some enumeration default - should never ever been seen but better
+    /// be safe than sorry.
     /// </summary>
-    Running = 0,
+    Invalid = 0,
 
     /// <summary>
     /// Group execution finished successfull.

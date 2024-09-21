@@ -374,4 +374,7 @@ public partial class ScriptEngine(
 
     /// <inheritdoc/>
     public void EndGroup(GroupResult result) => _groupManager.Finish(result);
+
+    /// <inheritdoc/>
+    public List<object?>? CreateFlatResultFromGroups() => _groupManager.CreateFlatResults();
 }

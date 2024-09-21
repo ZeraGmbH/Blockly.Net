@@ -35,6 +35,8 @@ public class GroupStatus
     /// Save result of a group in a serialized form.
     /// </summary>
     /// <param name="result">Result to remember.</param>
+    /// <remarks>Without any external manipulation of JsonUtils.JsonSettings all
+    /// type informations will be lost.</remarks>
     public void SetResult(GroupResult result) => Result = JsonSerializer.Serialize(result, JsonUtils.JsonSettings);
 
     /// <summary>

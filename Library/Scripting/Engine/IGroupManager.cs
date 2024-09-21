@@ -37,4 +37,10 @@ public interface IGroupManager
     /// </summary>
     /// <returns>List of all group execution results.</returns>
     List<GroupStatus> Serialize();
+
+    /// <summary>
+    /// Generate a result from the groups.
+    /// </summary>
+    /// <returns>List of results if any are present.</returns>
+    List<object?>? CreateFlatResults();
 }

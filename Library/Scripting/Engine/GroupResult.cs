@@ -12,7 +12,7 @@ public class GroupResult
     /// Execution state of the group.
     /// </summary>
     [NotNull, Required]
-    public GroupResultType Type { get; set; } = GroupResultType.Running;
+    public GroupResultType Type { get; set; } = GroupResultType.Invalid;
 
     /// <summary>
     /// Result of the execution - available whenever the type is not running.

@@ -44,4 +44,10 @@ public interface IScriptEngine
     /// </summary>
     /// <param name="client">The new client.</param>
     void Reconnect(IScriptEngineNotifySink client);
+
+    /// <summary>
+    /// Use the group manager to create flat result list.
+    /// </summary>
+    /// <returns>Unset if no groups are used.</returns>
+    List<object?>? CreateFlatResultFromGroups();
 }

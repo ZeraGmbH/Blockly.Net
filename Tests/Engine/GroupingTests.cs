@@ -79,6 +79,6 @@ public class GroupingTests : TestEnvironment
         /* Check the result. */
         var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
 
-        Assert.That(result.Result, Is.Null);
+        Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
     }
 }
