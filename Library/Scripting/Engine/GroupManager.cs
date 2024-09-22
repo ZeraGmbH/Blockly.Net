@@ -10,10 +10,15 @@ public class GroupManager : IGroupManager
     /// <summary>
     /// Helper to access previous execution data.
     /// </summary>
-    /// <param name="groups">The list of known group status from a previous run.</param>
+    /// <param name="_groups">The list of known group status from a previous run.</param>
     /// <param name="parent">The helper of the parent group information.</param>
-    private class Previous(List<GroupRepeat> groups, Previous? parent = null)
+    private class Previous(List<GroupRepeat> _groups, Previous? parent = null)
     {
+        /// <summary>
+        /// Initial data.
+        /// </summary>
+        public readonly List<GroupRepeat> Groups = _groups;
+
         /// <summary>
         /// Current group data to inspect.
         /// </summary>
@@ -23,13 +28,13 @@ public class GroupManager : IGroupManager
         /// Report the current group and advance to the next.
         /// </summary>
         /// <returns>Unset if no data is available.</returns>
-        public GroupRepeat? GetAndAdvance() => _index >= groups.Count ? null : groups[_index++];
+        public GroupRepeat? GetAndAdvance() => _index >= Groups.Count ? null : Groups[_index++];
 
         /// <summary>
         /// Create a new helper based on the current group.
         /// </summary>
         /// <returns>New helper on the nested group data.</returns>
-        public Previous? Push() => _index >= groups.Count ? null : new(groups[_index].Children, this);
+        public Previous? Push() => _index >= Groups.Count ? null : new(Groups[_index].Children, this);
 
         /// <summary>
         /// Go back to the parent helper.
@@ -154,8 +159,23 @@ public class GroupManager : IGroupManager
         }
     }
 
+    /// <summary>
+    /// Expand a list of group execution information with previously known data.
+    /// </summary>
+    /// <param name="groups">List of groups which can be update.</param>
+    /// <param name="previous">All previous group informations.</param>
+    private static void MergePrevious(List<GroupStatus> groups, List<GroupRepeat> previous)
+    {
+        for (var i = 0; i < groups.Count; i++)
+            if (i < previous.Count)
+                MergePrevious(groups[i].Children, previous[i].Children);
+
+        for (var i = groups.Count; i < previous.Count; i++)
+            groups.Add(previous[i].ToStatus());
+    }
+
     /// <inheritdoc/>
-    public List<GroupStatus> Serialize()
+    public List<GroupStatus> Serialize(bool includeRepeat = false)
     {
         lock (_groups)
         {
@@ -164,7 +184,11 @@ public class GroupManager : IGroupManager
                 nested._parentStatus!.Children = nested.Serialize();
 
             /* Just report what we collected - make sure that we clone inside the lock. */
-            return JsonSerializer.Deserialize<List<GroupStatus>>(JsonSerializer.Serialize(_groups, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
+            var groups = JsonSerializer.Deserialize<List<GroupStatus>>(JsonSerializer.Serialize(_groups, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
+
+            MergePrevious(groups, _previous?.Groups ?? []);
+
+            return groups;
         }
     }
 
@@ -196,7 +220,7 @@ public class GroupManager : IGroupManager
         };
 
         /* Process all top level groups. */
-        Serialize().ForEach(copyToResults);
+        Serialize(true).ForEach(copyToResults);
 
         return results;
     }

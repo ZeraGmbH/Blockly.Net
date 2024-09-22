@@ -40,7 +40,7 @@ public partial class ScriptEngine
     protected virtual ScriptDone CreateDoneNotification(IScriptInstance script)
         => new()
         {
-            GroupStatus = SerializeGroupStatus(),
+            GroupStatus = SerializeGroupStatus(true),
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
@@ -57,7 +57,7 @@ public partial class ScriptEngine
         => new()
         {
             ErrorMessage = error.Message,
-            GroupStatus = SerializeGroupStatus(),
+            GroupStatus = SerializeGroupStatus(true),
             JobId = script.JobId,
             ModelType = script.GetRequest().ModelType,
             Name = script.GetRequest().Name,
@@ -72,7 +72,7 @@ public partial class ScriptEngine
     protected virtual ScriptFinished CreateFinishNotification(IScriptInstance script)
             => new()
             {
-                GroupStatus = SerializeGroupStatus(),
+                GroupStatus = SerializeGroupStatus(true),
                 JobId = script.JobId,
                 ModelType = script.GetRequest().ModelType,
                 Name = script.GetRequest().Name,

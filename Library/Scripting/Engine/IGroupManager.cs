@@ -41,8 +41,9 @@ public interface IGroupManager : ISiteGroupManager
     /// <summary>
     /// Convert to protocol structure.
     /// </summary>
+    /// <param name="includeRepeat">Include repetition information for all groups not executed.</param>
     /// <returns>List of all group execution results.</returns>
-    List<GroupStatus> Serialize();
+    List<GroupStatus> Serialize(bool includeRepeat = false);
 
     /// <summary>
     /// Generate a result from the groups.

@@ -449,4 +449,45 @@ public class GroupManagerTests
         });
     }
 
+    [Test]
+    public void Can_Merge_Repeat_Information()
+    {
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+
+        Assert.That(Manager.Start("2", "n2"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+
+        var groups = Manager.Serialize();
+
+        var repeat0 = MakeRepeat(groups[0], GroupRepeatType.Again);
+
+        repeat0.Children[0].Repeat = GroupRepeatType.Skip;
+
+        Manager.Reset([
+            repeat0,
+            MakeRepeat(groups[1], GroupRepeatType.Skip),
+        ]);
+
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+
+        Assert.That(Manager.Start("2", "n2"), Is.False);
+
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        var results = Manager.CreateFlatResults();
+
+        Assert.That(results, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(((JsonElement)results[0]!).ToJsonScalar(), Is.EqualTo(2));
+            Assert.That(((JsonElement)results[1]!).ToJsonScalar(), Is.EqualTo(1));
+            Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
+        });
+    }
 }
