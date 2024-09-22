@@ -15,7 +15,7 @@ public class GroupExecutionTests : TestEnvironment
         var block = new ExecutionGroup
         {
             Id = "A",
-            Values = { new() { Name = "RESULT", Block = new AnyValueBlock(new GroupResult { Result = "1", Type = GroupResultType.Success }) } },
+            Values = { new() { Name = "RESULT", Block = new AnyValueBlock(new GroupResult { Result = "1", Type = GroupResultType.Succeeded }) } },
             Next = new ExecutionGroup
             {
                 Id = "B",

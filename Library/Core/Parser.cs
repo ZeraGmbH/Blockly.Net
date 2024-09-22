@@ -1,7 +1,3 @@
-
-
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json.Nodes;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;

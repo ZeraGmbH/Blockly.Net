@@ -29,6 +29,11 @@ public interface IScriptSite
     CancellationToken Cancellation { get; }
 
     /// <summary>
+    /// Request to pause the script on the next execution group end.
+    /// </summary>
+    void Pause();
+
+    /// <summary>
     /// Report the currently running script.
     /// </summary>
     IScript? CurrentScript { get; }
