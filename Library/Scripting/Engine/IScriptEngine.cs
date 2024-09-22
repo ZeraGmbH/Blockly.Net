@@ -22,6 +22,12 @@ public interface IScriptEngine
     void Cancel(string jobId);
 
     /// <summary>
+    /// Request to pause the script on the next execution group end.
+    /// </summary>
+    /// <param name="jobId"></param>
+    void Pause(string jobId);
+
+    /// <summary>
     /// Get the script result and forget about the execution.
     /// </summary>
     /// <param name="jobId">The already finished script.</param>
