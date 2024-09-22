@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using System.Text.Json;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -7,6 +8,37 @@ namespace BlocklyNet.Scripting.Engine;
 /// </summary>
 public class GroupManager : IGroupManager
 {
+    /// <summary>
+    /// Helper to access previous execution data.
+    /// </summary>
+    /// <param name="groups">The list of known group status from a previous run.</param>
+    /// <param name="parent">The helper of the parent group information.</param>
+    private class Previous(List<GroupRepeat> groups, Previous? parent = null)
+    {
+        /// <summary>
+        /// Current group data to inspect.
+        /// </summary>
+        private int _index = 0;
+
+        /// <summary>
+        /// Report the current group and advance to the next.
+        /// </summary>
+        /// <returns>Unset if no data is available.</returns>
+        public GroupRepeat? GetAndAdvance() => _index >= groups.Count ? null : groups[_index++];
+
+        /// <summary>
+        /// Create a new helper based on the current group.
+        /// </summary>
+        /// <returns>New helper on the nested group data.</returns>
+        public Previous? Push() => _index >= groups.Count ? null : new(groups[_index].Children, this);
+
+        /// <summary>
+        /// Go back to the parent helper.
+        /// </summary>
+        /// <returns>Unset if we are the root.</returns>
+        public Previous? Pop() => parent;
+    }
+
     /// <summary>
     /// For nested groups the status to serialize to.
     /// </summary>
@@ -27,6 +59,11 @@ public class GroupManager : IGroupManager
     /// </summary>
     private readonly List<GroupManager> _scripts = [];
 
+    /// <summary>
+    /// Information on the results of a previous execution.
+    /// </summary>
+    private Previous? _previous;
+
     /// <inheritdoc/>
     public void Reset(IEnumerable<GroupRepeat>? previous)
     {
@@ -35,19 +72,13 @@ public class GroupManager : IGroupManager
             _active.Clear();
             _groups.Clear();
             _scripts.Clear();
+
+            _previous = new([.. previous ?? []]);
         }
     }
 
     /// <inheritdoc/>
     public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, true).Item2;
-
-    /// <inheritdoc/>
-    public void Finish(GroupResult result)
-    {
-        /* Get the active one and set the result - fire some exception if none is found. */
-        lock (_groups)
-            _active.Pop().SetResult(new() { Type = result.Type, Result = result.Result });
-    }
 
     /// <inheritdoc/>
     public bool Start(string id, string? name) => CreateGroup(id, name, false).Item1;
@@ -62,10 +93,19 @@ public class GroupManager : IGroupManager
 
         lock (_groups)
         {
+            /* New previous group information helper. */
+            var previous = _previous?.Push();
+
+            /* Get current information for inspection. */
+            var current = _previous?.GetAndAdvance();
+
+            if (current == null || current.IsScript != nested || current.Key != id)
+                _previous = null;
+
             /* Create a nested group management instance. */
             if (nested)
             {
-                manager = new GroupManager { _parentStatus = group };
+                manager = new GroupManager { _parentStatus = group, _previous = previous };
 
                 _scripts.Add(manager);
             }
@@ -78,10 +118,41 @@ public class GroupManager : IGroupManager
 
             /* Do a real start requiring some finish later on - not for nested scripts. */
             if (!nested)
+            {
+                /* Check for auto-finish. */
+                var result = current?.GetResult();
+
+                if (result != null && current!.Repeat == GroupRepeatType.Skip)
+                {
+                    /* Simulate execution. */
+                    group.SetResult(new() { Type = result.Type, Result = result.Result });
+
+                    group.Children.AddRange(current.Children.Select(g => g.ToStatus()));
+
+                    /* Caller can abort nested proceessing. */
+                    return Tuple.Create(false, (IGroupManager)manager);
+                }
+
+                /* Full process. */
+                if (_previous != null) _previous = previous;
+
                 _active.Push(group);
+            }
         }
 
         return Tuple.Create(true, (IGroupManager)manager);
+    }
+
+    /// <inheritdoc/>
+    public void Finish(GroupResult result)
+    {
+        /* Get the active one and set the result - fire some exception if none is found. */
+        lock (_groups)
+        {
+            _active.Pop().SetResult(new() { Type = result.Type, Result = result.Result });
+
+            _previous = _previous?.Pop();
+        }
     }
 
     /// <inheritdoc/>

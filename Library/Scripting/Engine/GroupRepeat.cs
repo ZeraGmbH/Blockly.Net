@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace BlocklyNet.Scripting.Engine;
 
 /// <summary>
@@ -9,4 +11,11 @@ public class GroupRepeat : GroupStatus<GroupRepeat>
     /// How to execute the group.
     /// </summary>
     public GroupRepeatType Repeat { get; set; }
+
+    /// <summary>
+    /// Convert to a regulat status.
+    /// </summary>
+    /// <returns>Regular status.</returns>
+    public GroupStatus ToStatus()
+        => JsonSerializer.Deserialize<GroupStatus>(JsonSerializer.Serialize(this, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
 }

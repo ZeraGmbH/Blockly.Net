@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using BlocklyNet;
 using BlocklyNet.Scripting.Engine;
@@ -8,6 +9,15 @@ namespace BlocklyNetTests.Engine;
 [TestFixture]
 public class GroupManagerTests
 {
+    private static GroupRepeat MakeRepeat(GroupStatus status, GroupRepeatType type)
+    {
+        var repeat = JsonSerializer.Deserialize<GroupRepeat>(JsonSerializer.Serialize(status, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
+
+        repeat.Repeat = type;
+
+        return repeat;
+    }
+
     private IGroupManager Manager = null!;
 
     [SetUp]
@@ -29,7 +39,7 @@ public class GroupManagerTests
     [Test]
     public void Group_Manager_Can_Be_Reset()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         Manager.Reset(null);
@@ -44,7 +54,7 @@ public class GroupManagerTests
     [Test]
     public void Bad_EndGroup_Will_Throw_Exception()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         Assert.Throws<InvalidOperationException>(() => Manager.Finish(new() { Type = GroupResultType.Failed }));
@@ -53,13 +63,13 @@ public class GroupManagerTests
     [Test]
     public void Can_Manage_Three_Groups_In_Sequence()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
-        Manager.Start("2", "n2");
+        Assert.That(Manager.Start("2", "n2"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Failed });
 
-        Manager.Start("3", "n3");
+        Assert.That(Manager.Start("3", "n3"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         var groups = Manager.Serialize();
@@ -86,14 +96,14 @@ public class GroupManagerTests
     [Test]
     public void Can_Manage_Three_NestedGroups()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
 
-        Manager.Start("2", "n2");
+        Assert.That(Manager.Start("2", "n2"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
-        Manager.Start("3", "n3");
+        Assert.That(Manager.Start("3", "n3"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         var groups = Manager.Serialize();
@@ -121,7 +131,7 @@ public class GroupManagerTests
     [Test]
     public void Can_Have_Nested_Script()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         var nested = Manager.CreateNested("ID", "NAME");
@@ -132,7 +142,7 @@ public class GroupManagerTests
         nested.Start("3", "n3");
         nested.Finish(new() { Type = GroupResultType.Succeeded });
 
-        Manager.Start("4", "n4");
+        Assert.That(Manager.Start("4", "n4"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded });
 
         var groups = Manager.Serialize();
@@ -166,7 +176,7 @@ public class GroupManagerTests
     [Test]
     public void Can_Flatten_Result_To_Array()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
         var nested = Manager.CreateNested("ID", "NAME");
@@ -177,7 +187,7 @@ public class GroupManagerTests
         nested.Start("3", "n3");
         nested.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
-        Manager.Start("4", "n4");
+        Assert.That(Manager.Start("4", "n4"), Is.True);
         Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 4 });
 
         var results = Manager.CreateFlatResults();
@@ -196,9 +206,9 @@ public class GroupManagerTests
     [Test]
     public void Can_Retrieve_Status_On_Unfinished_Groups()
     {
-        Manager.Start("1", "n1");
+        Assert.That(Manager.Start("1", "n1"), Is.True);
 
-        Manager.Start("2", "n2");
+        Assert.That(Manager.Start("2", "n2"), Is.True);
 
         var groups = Manager.Serialize();
 
@@ -226,5 +236,124 @@ public class GroupManagerTests
 
         Assert.That(results, Has.Count.EqualTo(1));
         Assert.That(results[0], Is.Null);
+    }
+
+    [Test]
+    public void Can_Restart_Sequence()
+    {
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        Assert.That(Manager.Start("2", "n2"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+
+        var groups = Manager.Serialize();
+
+        Manager.Reset([
+            MakeRepeat(groups[0], GroupRepeatType.Skip),
+            MakeRepeat(groups[1], GroupRepeatType.Again),
+            MakeRepeat(groups[2], GroupRepeatType.Skip),
+        ]);
+
+        Assert.That(Manager.Start("1", "n1"), Is.False);
+
+        Assert.That(Manager.Start("2", "n2"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 4 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.False);
+
+        var results = Manager.CreateFlatResults();
+
+        Assert.That(results, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(((JsonElement)results[0]!).ToJsonScalar(), Is.EqualTo(1));
+            Assert.That(((JsonElement)results[1]!).ToJsonScalar(), Is.EqualTo(4));
+            Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public void Can_Restart_Sequence_With_Nesting()
+    {
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+
+        Assert.That(Manager.Start("2", "n2"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+
+        var groups = Manager.Serialize();
+
+        Manager.Reset([
+            MakeRepeat(groups[0], GroupRepeatType.Skip),
+            MakeRepeat(groups[1], GroupRepeatType.Skip),
+        ]);
+
+        Assert.That(Manager.Start("1", "n1"), Is.False);
+
+        Assert.That(Manager.Start("3", "n3"), Is.False);
+
+        var results = Manager.CreateFlatResults();
+
+        Assert.That(results, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(((JsonElement)results[0]!).ToJsonScalar(), Is.EqualTo(2));
+            Assert.That(((JsonElement)results[1]!).ToJsonScalar(), Is.EqualTo(1));
+            Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public void Can_Restart_Sequence_With_Nested_Skip()
+    {
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+
+        Assert.That(Manager.Start("2", "n2"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+
+        var groups = Manager.Serialize();
+
+        var repeat0 = MakeRepeat(groups[0], GroupRepeatType.Again);
+
+        repeat0.Children[0].Repeat = GroupRepeatType.Skip;
+
+        Manager.Reset([
+            repeat0,
+            MakeRepeat(groups[1], GroupRepeatType.Skip),
+        ]);
+
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+
+        Assert.That(Manager.Start("2", "n2"), Is.False);
+
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.False);
+
+        var results = Manager.CreateFlatResults();
+
+        Assert.That(results, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(((JsonElement)results[0]!).ToJsonScalar(), Is.EqualTo(2));
+            Assert.That(((JsonElement)results[1]!).ToJsonScalar(), Is.EqualTo(1));
+            Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
+        });
     }
 }
