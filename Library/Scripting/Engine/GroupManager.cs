@@ -1,4 +1,3 @@
-using System.Net.Mail;
 using System.Text.Json;
 
 namespace BlocklyNet.Scripting.Engine;

@@ -1,4 +1,3 @@
-using System.Net;
 using System.Text.Json;
 using BlocklyNet;
 using BlocklyNet.Scripting.Engine;
@@ -356,4 +355,98 @@ public class GroupManagerTests
             Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
         });
     }
+
+    [Test]
+    public void Can_Restart_Sequence_With_Script()
+    {
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        var nested = Manager.CreateNested("ID", "script");
+
+        Assert.That(nested.Start("2", "n2"), Is.True);
+        nested.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+
+        var groups = Manager.Serialize();
+
+        var script = MakeRepeat(groups[1], GroupRepeatType.Unset);
+
+        script.Children[0].Repeat = GroupRepeatType.Skip;
+
+        Manager.Reset([
+            MakeRepeat(groups[0], GroupRepeatType.Skip),
+            script,
+            MakeRepeat(groups[2], GroupRepeatType.Skip),
+        ]);
+
+        Assert.That(Manager.Start("1", "n1"), Is.False);
+
+        nested = Manager.CreateNested("ID", "script");
+
+        Assert.That(nested.Start("2", "n2"), Is.False);
+
+        Assert.That(Manager.Start("3", "n3"), Is.False);
+
+        var results = Manager.CreateFlatResults();
+
+        Assert.That(results, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(((JsonElement)results[0]!).ToJsonScalar(), Is.EqualTo(1));
+            Assert.That(((JsonElement)results[1]!).ToJsonScalar(), Is.EqualTo(2));
+            Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public void Can_Restart_Sequence_With_Script_Nested()
+    {
+        Assert.That(Manager.Start("1", "n1"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+
+        var nested = Manager.CreateNested("ID", "script");
+
+        Assert.That(nested.Start("2", "n2"), Is.True);
+        nested.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.True);
+        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+
+        var groups = Manager.Serialize();
+
+        var script = MakeRepeat(groups[1], GroupRepeatType.Unset);
+
+        script.Children[0].Repeat = GroupRepeatType.Again;
+
+        Manager.Reset([
+            MakeRepeat(groups[0], GroupRepeatType.Skip),
+            script,
+            MakeRepeat(groups[2], GroupRepeatType.Skip),
+        ]);
+
+        Assert.That(Manager.Start("1", "n1"), Is.False);
+
+        nested = Manager.CreateNested("ID", "script");
+
+        Assert.That(nested.Start("2", "n2"), Is.True);
+        nested.Finish(new() { Type = GroupResultType.Failed, Result = 4 });
+
+        Assert.That(Manager.Start("3", "n3"), Is.False);
+
+        var results = Manager.CreateFlatResults();
+
+        Assert.That(results, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(((JsonElement)results[0]!).ToJsonScalar(), Is.EqualTo(1));
+            Assert.That(((JsonElement)results[1]!).ToJsonScalar(), Is.EqualTo(4));
+            Assert.That(((JsonElement)results[2]!).ToJsonScalar(), Is.EqualTo(3));
+        });
+    }
+
 }
