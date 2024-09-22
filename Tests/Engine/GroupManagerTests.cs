@@ -8,7 +8,7 @@ namespace BlocklyNetTests.Engine;
 [TestFixture]
 public class GroupManagerTests
 {
-    private static GroupRepeat MakeRepeat(GroupStatus status, GroupRepeatType type)
+    public static GroupRepeat MakeRepeat(GroupStatus status, GroupRepeatType type)
     {
         var repeat = JsonSerializer.Deserialize<GroupRepeat>(JsonSerializer.Serialize(status, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
 

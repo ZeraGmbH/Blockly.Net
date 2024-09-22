@@ -165,15 +165,15 @@ public partial class ScriptEngine(
     protected virtual Task OnPrepareStartAsync() => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public void Pause()
+    public void Pause(string jobId)
     {
         using (Lock.Wait())
         {
-            if (_active == null)
-                throw new InvalidOperationException("no active script");
+            if (_active == null || _active.JobId != jobId)
+                throw new ArgumentException("not the active script", nameof(jobId));
 
             /* Report the result. */
-            Logger.LogTrace("User paused script {JobId}", _active.JobId);
+            Logger.LogTrace("User paused script {JobId}", jobId);
 
             _pause.Cancel();
         }

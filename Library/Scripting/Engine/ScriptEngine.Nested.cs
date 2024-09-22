@@ -65,9 +65,6 @@ public partial class ScriptEngine
         public CancellationToken Cancellation => _engine.Cancellation;
 
         /// <inheritdoc/>
-        public void Pause() => _engine.Pause();
-
-        /// <inheritdoc/>
         public IScript? CurrentScript { get; private set; }
 
         /// <inheritdoc/>

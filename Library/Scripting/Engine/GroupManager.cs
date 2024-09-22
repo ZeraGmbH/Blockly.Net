@@ -186,7 +186,8 @@ public class GroupManager : IGroupManager
             /* Just report what we collected - make sure that we clone inside the lock. */
             var groups = JsonSerializer.Deserialize<List<GroupStatus>>(JsonSerializer.Serialize(_groups, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
 
-            MergePrevious(groups, _previous?.Groups ?? []);
+            if (includeRepeat)
+                MergePrevious(groups, _previous?.Groups ?? []);
 
             return groups;
         }
