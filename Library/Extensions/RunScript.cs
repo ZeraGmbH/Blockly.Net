@@ -1,6 +1,7 @@
 using System.Collections;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
+using BlocklyNet.Scripting;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,7 +66,7 @@ public class RunScript : Block
   /// </summary>
   /// <param name="context"></param>
   /// <returns></returns>
-  public async Task<StartGenericScript> ReadConfigurationAsync(Context context)
+  public async Task<StartScript> ReadConfigurationAsync(Context context)
   {
     /* Find the script by its name - character casing is ignored. */
     var store = context.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>();
@@ -86,7 +87,7 @@ public class RunScript : Block
       foreach (RunScriptParameter parameter in copies)
         config.Presets.Add(new() { Key = parameter.VariableName, Value = parameter.Value });
 
-    return (StartGenericScript)config;
+    return (StartScript)config;
   }
 
   /// <inheritdoc/>
