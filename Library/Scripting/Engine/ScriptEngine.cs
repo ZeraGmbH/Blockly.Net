@@ -91,7 +91,12 @@ public partial class ScriptEngine(
     /// </summary>
     /// <returns>Group execution status.</returns>
     protected ScriptGroupStatus SerializeGroupStatus(bool includeRepeat = false)
-        => new() { CodeHash = _codeHash, GroupStatus = _groupManager.Serialize(includeRepeat) };
+        => new()
+        {
+            CodeHash = _codeHash,
+            GroupStatus = _groupManager.Serialize(includeRepeat),
+            HasBeenPaused = _pause.IsCancellationRequested,
+        };
 
     /// <inheritdoc/>
     public async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
