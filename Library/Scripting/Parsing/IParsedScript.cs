@@ -1,3 +1,4 @@
+using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Engine;
 
 namespace BlocklyNet.Scripting.Parsing;
@@ -21,4 +22,9 @@ public interface IParsedScript
     /// <param name="engine"></param>
     /// <returns></returns>
     Task<object?> RunAsync(IScriptSite engine);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    Task<int> GetGroupTreeAsync();
 }

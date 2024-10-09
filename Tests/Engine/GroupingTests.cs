@@ -14,6 +14,7 @@ public class GroupingTests : TestEnvironment
     private const string Script1 = @"
         <xml xmlns=""https://developers.google.com/blockly/xml"">
         <block type=""execute_group"" id=""Outer"">
+            <field name=""NAME"">Outer</field>
             <value name=""RESULT"">                
                 <block type=""group_execution_result"" id=""Outer.Result"">
                     <value name=""Result"">                
@@ -30,6 +31,7 @@ public class GroupingTests : TestEnvironment
             </value>
             <next>
                 <block type=""execute_group"" id=""Inner"">
+                    <field name=""NAME"">Inner</field>
                     <value name=""RESULT"">                
                         <block type=""group_execution_result"" id=""Inner.Result"">
                             <value name=""Result"">                
@@ -73,11 +75,6 @@ public class GroupingTests : TestEnvironment
         <block type=""execute_group"" id=""X~V-HnS3^/Kt4H)%BuoZ"" x=""175"" y=""125"">
             <field name=""NAME"">Name of the group</field>
             <field name=""RESULT"">Result</field>
-            <value name=""NAME"">
-            <shadow type=""text"" id="")mP+6-^uv8_i),OEqe9D"">
-                <field name=""TEXT"">One</field>
-            </shadow>
-            </value>
             <value name=""RESULT"">
             <block type=""group_execution_result"" id=""/g~|rqb5t7yYK*.98O0l"">
                 <field name=""Type"">Type</field>
@@ -98,11 +95,6 @@ public class GroupingTests : TestEnvironment
             <block type=""execute_group"" id=""30_ieh}RB`Iwu:eV,AFx"">
                 <field name=""NAME"">Name of the group</field>
                 <field name=""RESULT"">Result</field>
-                <value name=""NAME"">
-                <shadow type=""text"" id=""LnuH/Yav4A{vUQ^_SQwq"">
-                    <field name=""TEXT"">Two</field>
-                </shadow>
-                </value>
                 <value name=""RESULT"">
                 <block type=""group_execution_result"" id=""H%`$2;N6A@6aQulC[jwC"">
                     <field name=""Type"">Type</field>
@@ -123,11 +115,6 @@ public class GroupingTests : TestEnvironment
                 <block type=""execute_group"" id=""+DafGPJZI0?7`j%,9a/1"">
                     <field name=""NAME"">Name of the group</field>
                     <field name=""RESULT"">Result</field>
-                    <value name=""NAME"">
-                    <shadow type=""text"" id=""X?anNKQpX0Do1mszr1!6"">
-                        <field name=""TEXT"">Three</field>
-                    </shadow>
-                    </value>
                     <value name=""RESULT"">
                     <block type=""group_execution_result"" id=""6w,g%%98{3QEFOD@,dWw"">
                         <field name=""Type"">Type</field>
@@ -215,7 +202,7 @@ public class GroupingTests : TestEnvironment
         await done.Task;
 
         /* Validate hash. */
-        Assert.That(hash.Single(), Is.EqualTo("E4-B0-3E-B6-CF-2E-10-C5-33-C5-C4-E7-DF-CA-2A-8D-84-3D-E7-AE-BC-5D-98-E5-A3-9E-FC-F4-C1-97-3B-B5"));
+        Assert.That(hash.Single(), Is.EqualTo("EB-EC-09-A4-23-68-07-03-59-59-08-25-83-D3-3A-1A-7B-E0-5F-8E-2B-2E-B7-FA-8A-84-FB-BA-19-28-D7-06"));
 
         /* Validate status. */
         Assert.That(status, Is.Not.Null);

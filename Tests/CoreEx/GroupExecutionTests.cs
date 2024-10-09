@@ -15,10 +15,12 @@ public class GroupExecutionTests : TestEnvironment
         var block = new ExecutionGroup
         {
             Id = "A",
+            Fields = { new() { Name = "NAME", Value = "A1" } },
             Values = { new() { Name = "RESULT", Block = new AnyValueBlock(new GroupResult { Result = "1", Type = GroupResultType.Succeeded }) } },
             Next = new ExecutionGroup
             {
                 Id = "B",
+                Fields = { new() { Name = "NAME", Value = "B2" } },
                 Values = { new() { Name = "RESULT", Block = new AnyValueBlock(new GroupResult { Result = "2", Type = GroupResultType.Failed }) } }
             }
         };
@@ -27,8 +29,8 @@ public class GroupExecutionTests : TestEnvironment
 
         await block.EvaluateAsync(new Context(Site.Object));
 
-        Site.Verify(s => s.BeginGroup("A", null), Times.Once);
-        Site.Verify(s => s.BeginGroup("B", null), Times.Once);
+        Site.Verify(s => s.BeginGroup("A", "A1"), Times.Once);
+        Site.Verify(s => s.BeginGroup("B", "B2"), Times.Once);
         Site.Verify(s => s.EndGroup(It.IsAny<GroupResult>()), Times.Exactly(2));
         Site.Verify(s => s.SingleStepAsync(It.IsAny<Block>()), Times.Exactly(2));
         Site.VerifyGet(s => s.Cancellation, Times.Exactly(6));
