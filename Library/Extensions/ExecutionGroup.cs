@@ -16,15 +16,14 @@ namespace BlocklyNet.Extensions;
             {
                 ""type"": ""input_dummy""
             },
-             {
-                ""type"": ""field_label_serializable"",
+            {
+                ""type"": ""field_input"",
                 ""name"": ""NAME"",
-                ""text"": ""Name of the group""
+                ""text"": ""Name of the Group""
             },
             {
-                ""type"": ""input_value"",
-                ""name"": ""NAME"",
-                ""check"": ""String""
+                ""type"": ""input_dummy"",
+                ""name"": ""NAME""
             },
             {
                 ""type"": ""field_label_serializable"",
@@ -43,18 +42,7 @@ namespace BlocklyNet.Extensions;
         ""tooltip"": ""Execute something as a group."",
         ""helpUrl"": """"
     }",
-    @"{
-        ""inputs"": {
-            ""NAME"": {
-                ""shadow"": {
-                    ""type"": ""text"",
-                    ""fields"": {
-                        ""TEXT"": """"
-                    }
-                }
-            }
-        }
-    }"
+    ""
 )]
 public class ExecutionGroup : Block
 {
@@ -62,7 +50,7 @@ public class ExecutionGroup : Block
     public override async Task<object?> EvaluateAsync(Context context)
     {
         /* Register the group. */
-        var name = await Values.EvaluateAsync<string?>("NAME", context, false);
+        var name = Fields["NAME"];
 
         if (context.Engine.BeginGroup(Id, name))
         {

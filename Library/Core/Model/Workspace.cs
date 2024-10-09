@@ -1,4 +1,6 @@
 using BlocklyNet.Core.Blocks.Text;
+using BlocklyNet.Extensions;
+using BlocklyNet.Scripting.Engine;
 
 namespace BlocklyNet.Core.Model;
 
@@ -46,6 +48,46 @@ public class Workspace : IFragment
       }
 
     return returnValue;
+  }
+
+  private void InspectBlockChain(Block? block)
+  {
+    for (; block != null; block = block.Next)
+    {
+      System.Diagnostics.Debug.WriteLine(block.Type);
+
+      if (block is ExecutionGroup group)
+      {
+        System.Diagnostics.Debug.WriteLine(group.Fields["NAME"]);
+
+        InspectBlockChain(group.Values.Get("RESULT")?.Block);
+      }
+
+      foreach (var statement in block.Statements)
+        InspectBlockChain(statement.Block);
+    }
+  }
+
+  /// <summary>
+  /// Get the hierarchy of groups based on a static analysis of
+  /// the script.
+  /// </summary>
+  /// <returns>The group information tree.</returns>
+  public async Task<int> GetGroupTreeAsync()
+  {
+    /* Use a dummy site. */
+    var context = new Context((IScriptSite)null!);
+
+    /* Find all functions and generate the block list. */
+    foreach (var block in Blocks.OfType<ProceduresDef>())
+      await block.EvaluateAsync(context);
+
+    /* Inspect all blocks. */
+    foreach (var block in Blocks)
+      if (block is not ProceduresDef)
+        InspectBlockChain(block);
+
+    return 0;
   }
 }
 
