@@ -188,6 +188,6 @@ public class GroupAnalyserTests : TestEnvironment
 
         var tree = await script.GetGroupTreeAsync();
 
-        Assert.That(tree, Is.EqualTo(0));
+        Assert.That(tree, Has.Count.EqualTo(3));
     }
 }

@@ -50,21 +50,22 @@ public class Workspace : IFragment
     return returnValue;
   }
 
-  private void InspectBlockChain(Block? block)
+  private void InspectBlockChain(Block? block, List<GroupInfo> groups)
   {
     for (; block != null; block = block.Next)
     {
-      System.Diagnostics.Debug.WriteLine(block.Type);
+      GroupInfo? info = null;
 
       if (block is ExecutionGroup group)
-      {
-        System.Diagnostics.Debug.WriteLine(group.Fields["NAME"]);
+        groups.Add(info = new GroupInfo { Id = block.Id, Name = group.Fields["NAME"] });
 
-        InspectBlockChain(group.Values.Get("RESULT")?.Block);
-      }
+      var list = info?.Children ?? groups;
+
+      foreach (var value in block.Values)
+        InspectBlockChain(value.Block, list);
 
       foreach (var statement in block.Statements)
-        InspectBlockChain(statement.Block);
+        InspectBlockChain(statement.Block, list);
     }
   }
 
@@ -73,8 +74,11 @@ public class Workspace : IFragment
   /// the script.
   /// </summary>
   /// <returns>The group information tree.</returns>
-  public async Task<int> GetGroupTreeAsync()
+  public async Task<List<GroupInfo>> GetGroupTreeAsync()
   {
+    /* Resulting list. */
+    var groups = new List<GroupInfo>();
+
     /* Use a dummy site. */
     var context = new Context((IScriptSite)null!);
 
@@ -85,9 +89,9 @@ public class Workspace : IFragment
     /* Inspect all blocks. */
     foreach (var block in Blocks)
       if (block is not ProceduresDef)
-        InspectBlockChain(block);
+        InspectBlockChain(block, groups);
 
-    return 0;
+    return groups;
   }
 }
 

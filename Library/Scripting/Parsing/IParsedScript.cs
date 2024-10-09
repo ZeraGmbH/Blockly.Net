@@ -26,5 +26,5 @@ public interface IParsedScript
     /// <summary>
     /// 
     /// </summary>
-    Task<int> GetGroupTreeAsync();
+    Task<List<GroupInfo>> GetGroupTreeAsync();
 }

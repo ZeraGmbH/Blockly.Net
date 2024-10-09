@@ -58,7 +58,7 @@ public abstract class Parser
       }
 
       /// <inheritdoc/>
-      public Task<int> GetGroupTreeAsync() => _workspace.GetGroupTreeAsync();
+      public Task<List<GroupInfo>> GetGroupTreeAsync() => _workspace.GetGroupTreeAsync();
     }
 
     public IParsedScript Parse(string scriptAsText)
