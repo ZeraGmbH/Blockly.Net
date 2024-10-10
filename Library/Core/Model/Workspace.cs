@@ -1,3 +1,4 @@
+using BlocklyNet.Core.Blocks;
 using BlocklyNet.Core.Blocks.Text;
 using BlocklyNet.Extensions;
 using BlocklyNet.Scripting.Engine;
@@ -50,22 +51,44 @@ public class Workspace : IFragment
     return returnValue;
   }
 
-  private void InspectBlockChain(Block? block, List<GroupInfo> groups)
+  private void InspectBlockChain(Block? block, List<GroupInfo> groups, Context context, HashSet<string> activeFunctions)
   {
     for (; block != null; block = block.Next)
     {
-      GroupInfo? info = null;
+      var call = block is ProceduresCallNoReturn procedure ? procedure
+        : block is ProceduresCallReturn function ? function
+        : null;
 
-      if (block is ExecutionGroup group)
-        groups.Add(info = new GroupInfo { Id = block.Id, Name = group.Fields["NAME"] });
+      if (call != null)
+      {
+        var name = call.Mutations.GetValue("name");
 
-      var list = info?.Children ?? groups;
+        if (!context.Functions.TryGetValue(name, out var def)) continue;
 
-      foreach (var value in block.Values)
-        InspectBlockChain(value.Block, list);
+        if (!activeFunctions.Add(name)) continue;
 
-      foreach (var statement in block.Statements)
-        InspectBlockChain(statement.Block, list);
+        foreach (var value in block.Values)
+          InspectBlockChain(value.Block, groups, context, activeFunctions);
+
+        InspectBlockChain(((Statement)def).Block, groups, context, activeFunctions);
+
+        activeFunctions.Remove(name);
+      }
+      else
+      {
+        GroupInfo? info = null;
+
+        if (block is ExecutionGroup group)
+          groups.Add(info = new GroupInfo { Id = block.Id, Name = group.Fields["NAME"] });
+
+        var list = info?.Children ?? groups;
+
+        foreach (var value in block.Values)
+          InspectBlockChain(value.Block, list, context, activeFunctions);
+
+        foreach (var statement in block.Statements)
+          InspectBlockChain(statement.Block, list, context, activeFunctions);
+      }
     }
   }
 
@@ -89,7 +112,7 @@ public class Workspace : IFragment
     /* Inspect all blocks. */
     foreach (var block in Blocks)
       if (block is not ProceduresDef)
-        InspectBlockChain(block, groups);
+        InspectBlockChain(block, groups, context, []);
 
     return groups;
   }

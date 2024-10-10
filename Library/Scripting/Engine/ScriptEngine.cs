@@ -418,4 +418,7 @@ public partial class ScriptEngine(
 
     /// <inheritdoc/>
     public List<object?>? CreateFlatResultFromGroups() => _groupManager.CreateFlatResults();
+
+    /// <inheritdoc/>
+    public Task<List<GroupInfo>> GetGroupsForScriptAsync(string code) => Parser.Parse(code).GetGroupTreeAsync();
 }

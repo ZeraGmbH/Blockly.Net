@@ -56,4 +56,12 @@ public interface IScriptEngine
     /// </summary>
     /// <returns>Unset if no groups are used.</returns>
     List<object?>? CreateFlatResultFromGroups();
+
+    /// <summary>
+    /// Analyse the script code in fitting string representation
+    /// and report all information on the group structure.
+    /// </summary>
+    /// <param name="code">Some script.</param>
+    /// <returns>Group structure of the script.</returns>
+    Task<List<GroupInfo>> GetGroupsForScriptAsync(string code);
 }
