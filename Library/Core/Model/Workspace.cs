@@ -1,3 +1,4 @@
+using BlocklyNet.Core.Blocks;
 using BlocklyNet.Core.Blocks.Text;
 using BlocklyNet.Extensions;
 using BlocklyNet.Scripting.Engine;
@@ -50,21 +51,44 @@ public class Workspace : IFragment
     return returnValue;
   }
 
-  private void InspectBlockChain(Block? block)
+  private void InspectBlockChain(Block? block, List<GroupInfo> groups, Context context, HashSet<string> activeFunctions)
   {
     for (; block != null; block = block.Next)
     {
-      System.Diagnostics.Debug.WriteLine(block.Type);
+      var call = block is ProceduresCallNoReturn procedure ? procedure
+        : block is ProceduresCallReturn function ? function
+        : null;
 
-      if (block is ExecutionGroup group)
+      if (call != null)
       {
-        System.Diagnostics.Debug.WriteLine(group.Fields["NAME"]);
+        var name = call.Mutations.GetValue("name");
 
-        InspectBlockChain(group.Values.Get("RESULT")?.Block);
+        if (!context.Functions.TryGetValue(name, out var def)) continue;
+
+        if (!activeFunctions.Add(name)) continue;
+
+        foreach (var value in block.Values)
+          InspectBlockChain(value.Block, groups, context, activeFunctions);
+
+        InspectBlockChain(((Statement)def).Block, groups, context, activeFunctions);
+
+        activeFunctions.Remove(name);
       }
+      else
+      {
+        GroupInfo? info = null;
 
-      foreach (var statement in block.Statements)
-        InspectBlockChain(statement.Block);
+        if (block is ExecutionGroup group)
+          groups.Add(info = new GroupInfo { Id = block.Id, Name = group.Fields["NAME"] });
+
+        var list = info?.Children ?? groups;
+
+        foreach (var value in block.Values)
+          InspectBlockChain(value.Block, list, context, activeFunctions);
+
+        foreach (var statement in block.Statements)
+          InspectBlockChain(statement.Block, list, context, activeFunctions);
+      }
     }
   }
 
@@ -73,8 +97,11 @@ public class Workspace : IFragment
   /// the script.
   /// </summary>
   /// <returns>The group information tree.</returns>
-  public async Task<int> GetGroupTreeAsync()
+  public async Task<List<GroupInfo>> GetGroupTreeAsync()
   {
+    /* Resulting list. */
+    var groups = new List<GroupInfo>();
+
     /* Use a dummy site. */
     var context = new Context((IScriptSite)null!);
 
@@ -85,9 +112,9 @@ public class Workspace : IFragment
     /* Inspect all blocks. */
     foreach (var block in Blocks)
       if (block is not ProceduresDef)
-        InspectBlockChain(block);
+        InspectBlockChain(block, groups, context, []);
 
-    return 0;
+    return groups;
   }
 }
 

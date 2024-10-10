@@ -1,3 +1,5 @@
+using BlocklyNet.Scripting.Parsing;
+
 namespace BlocklyNet.Scripting.Engine;
 
 /// <summary>

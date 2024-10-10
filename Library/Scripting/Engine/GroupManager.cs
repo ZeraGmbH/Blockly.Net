@@ -1,4 +1,5 @@
 using System.Text.Json;
+using BlocklyNet.Scripting.Parsing;
 
 namespace BlocklyNet.Scripting.Engine;
 

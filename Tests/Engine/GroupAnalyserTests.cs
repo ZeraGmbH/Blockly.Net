@@ -1,4 +1,3 @@
-using BlocklyNet.Core.Model;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.Engine;
@@ -188,6 +187,43 @@ public class GroupAnalyserTests : TestEnvironment
 
         var tree = await script.GetGroupTreeAsync();
 
-        Assert.That(tree, Is.EqualTo(0));
+        Assert.That(tree, Has.Count.EqualTo(3));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tree[0].Id, Is.EqualTo("T%p8jx/o/QA6HegV]o:9"));
+            Assert.That(tree[0].Name, Is.EqualTo("Start it all"));
+            Assert.That(tree[0].Children, Has.Count.EqualTo(0));
+
+            Assert.That(tree[1].Id, Is.EqualTo("At1{sV=Jj]8Y[J_$[i,O"));
+            Assert.That(tree[1].Name, Is.EqualTo("Functions"));
+            Assert.That(tree[1].Children, Has.Count.EqualTo(3));
+
+            Assert.That(tree[2].Id, Is.EqualTo("vYHa5_xGpuCY%H,,KX)n"));
+            Assert.That(tree[2].Name, Is.EqualTo("End it all"));
+            Assert.That(tree[2].Children, Has.Count.EqualTo(0));
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tree[1].Children[0].Id, Is.EqualTo("U,FO=1c.LrZ(F-[qo~[6"));
+            Assert.That(tree[1].Children[0].Name, Is.EqualTo("Outer Func Start"));
+            Assert.That(tree[1].Children[0].Children, Has.Count.EqualTo(0));
+
+            Assert.That(tree[1].Children[1].Id, Is.EqualTo("/;||8fSyn^ZAEqSsJ@$F"));
+            Assert.That(tree[1].Children[1].Name, Is.EqualTo("Call Inner"));
+            Assert.That(tree[1].Children[1].Children, Has.Count.EqualTo(1));
+
+            Assert.That(tree[1].Children[2].Id, Is.EqualTo("v.+aqR]pxyFqch3fONn^"));
+            Assert.That(tree[1].Children[2].Name, Is.EqualTo("Outer Func End"));
+            Assert.That(tree[1].Children[2].Children, Has.Count.EqualTo(0));
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tree[1].Children[1].Children[0].Id, Is.EqualTo("LQmghgu`16o;h6W:MY__"));
+            Assert.That(tree[1].Children[1].Children[0].Name, Is.EqualTo("Inner Func"));
+            Assert.That(tree[1].Children[1].Children[0].Children, Has.Count.EqualTo(0));
+        });
     }
 }
