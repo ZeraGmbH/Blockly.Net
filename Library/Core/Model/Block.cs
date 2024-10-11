@@ -12,6 +12,11 @@ public abstract class Block : IFragment
     public string Id { get; set; } = null!;
 
     /// <summary>
+    /// Unset to exclude this block from execution.
+    /// </summary>
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>
     /// All fields (constant values) of the block.
     /// </summary>
     public Fields Fields { get; } = new();
@@ -62,8 +67,10 @@ public abstract class Block : IFragment
             throw new ScriptStoppedEarlyException();
 
         /* Run the next block if we are not forcefully exiting a loop. */
-        if (Next != null && context.EscapeMode == EscapeMode.None)
-            return await Next.EvaluateAsync(context);
+        if (context.EscapeMode == EscapeMode.None)
+            for (var next = Next; next != null; next = next.Next)
+                if (next.Enabled)
+                    return await next.EvaluateAsync(context);
 
         return null;
     }

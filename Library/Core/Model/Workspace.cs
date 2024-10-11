@@ -29,18 +29,19 @@ public class Workspace : IFragment
     var functions = new List<Block>();
 
     foreach (var block in Blocks.OfType<ProceduresDef>())
-    {
-      /* Create the function itself and remember it. */
-      context.Cancellation.ThrowIfCancellationRequested();
+      if (block.Enabled)
+      {
+        /* Create the function itself and remember it. */
+        context.Cancellation.ThrowIfCancellationRequested();
 
-      await block.EvaluateAsync(context);
+        await block.EvaluateAsync(context);
 
-      functions.Add(block);
-    }
+        functions.Add(block);
+      }
 
     /* Process any block which is not a function. */
     foreach (var block in Blocks)
-      if (!functions.Contains(block))
+      if (!functions.Contains(block) && block.Enabled)
       {
         /* Remember the result and report the last result afterwards. */
         context.Cancellation.ThrowIfCancellationRequested();
@@ -107,7 +108,8 @@ public class Workspace : IFragment
 
     /* Find all functions and generate the block list. */
     foreach (var block in Blocks.OfType<ProceduresDef>())
-      await block.EvaluateAsync(context);
+      if (block.Enabled)
+        await block.EvaluateAsync(context);
 
     /* Inspect all blocks. */
     foreach (var block in Blocks)

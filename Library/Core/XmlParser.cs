@@ -68,16 +68,16 @@ public class XmlParser : Parser<XmlParser>
 
   private Block? ParseBlock(XmlNode node)
   {
-    if (bool.Parse(node.GetAttribute("disabled") ?? "false"))
-      return null;
-
     var type = node.GetAttribute("type");
+
     if (!blocks.ContainsKey(type))
       throw new ApplicationException($"block type not registered: '{type}'");
+
     var block = blocks[type]();
 
-    block.Type = type;
+    block.Enabled = node.GetAttribute("disabled-reasons") == null;
     block.Id = node.GetAttribute("id");
+    block.Type = type;
 
     foreach (XmlNode childNode in node.ChildNodes)
     {
