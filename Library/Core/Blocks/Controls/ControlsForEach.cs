@@ -24,13 +24,16 @@ public class ControlsForEach : Block
     {
       context.Cancellation.ThrowIfCancellationRequested();
 
-      if (context.Variables.ContainsKey(variableName))
-        context.Variables[variableName] = item;
-      else
-        context.Variables.Add(variableName, item);
+      context.Variables[variableName] = item;
 
       await statement.EvaluateAsync(context);
+
+      if (context.EscapeMode == EscapeMode.Break) break;
+
+      context.EscapeMode = EscapeMode.None;
     }
+
+    context.EscapeMode = EscapeMode.None;
 
     return await base.EvaluateAsync(context);
   }
