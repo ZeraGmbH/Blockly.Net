@@ -242,6 +242,7 @@ public static class BlocklyExtensions
         builder.AddBlock<HttpRequest>();
         builder.AddBlock<Now>();
         builder.AddBlock<ParseJson>();
+        builder.AddBlock<ParseNumber>();
         builder.AddBlock<ReadFromModel>();
         builder.AddBlock<RequestUserInput>();
         builder.AddBlock<RunParallel>();
