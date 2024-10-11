@@ -28,8 +28,14 @@ public class ControlsFor : Block
 
       await statement!.EvaluateAsync(context);
 
+      if (context.EscapeMode == EscapeMode.Break) break;
+
+      context.EscapeMode = EscapeMode.None;
+
       context.Variables[variableName] = (double)context.Variables[variableName]! + byValue;
     }
+
+    context.EscapeMode = EscapeMode.None;
 
     return await base.EvaluateAsync(context);
   }
