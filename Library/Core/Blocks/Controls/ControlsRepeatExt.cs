@@ -24,19 +24,14 @@ public class ControlsRepeatExt : Block
 
       await statement.EvaluateAsync(context);
 
-      try
-      {
-        /* See if a break of the loop is requested. */
-        if (context.EscapeMode == EscapeMode.Break) break;
-      }
-      finally
-      {
-        /* Either a continue is requested or the inner block is executed normally. */
-        context.EscapeMode = EscapeMode.None;
-      }
+      /* See if a break of the loop is requested. */
+      if (context.EscapeMode == EscapeMode.Break) break;
+
+      /* Either a continue is requested or the inner block is executed normally. */
+      context.EscapeMode = EscapeMode.None;
     }
 
-    /* For safety reasons reset the break mode - should not really be neccessary! */
+    /* Reset the break mode - just in case. */
     context.EscapeMode = EscapeMode.None;
 
     /* Continue with the next block. */

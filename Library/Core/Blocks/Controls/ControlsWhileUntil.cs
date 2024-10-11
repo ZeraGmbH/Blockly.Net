@@ -1,5 +1,3 @@
-
-
 using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Controls;
@@ -12,36 +10,43 @@ public class ControlsWhileUntil : Block
   /// <inheritdoc/>
   public override async Task<object?> EvaluateAsync(Context context)
   {
-    var mode = Fields["MODE"];
     var value = Values.TryGet("BOOL");
+    var statement = Statements.TryGet("DO");
 
-    if (!Statements.Has("DO") || null == value)
+    if (statement == null || null == value)
       return await base.EvaluateAsync(context);
 
-    var statement = Statements["DO"];
-
-    if (mode == "WHILE")
+    var execStatementAndTestForBreak = async () =>
     {
-      while ((bool)(await value.EvaluateAsync(context))!)
-      {
-        context.Cancellation.ThrowIfCancellationRequested();
+      context.Cancellation.ThrowIfCancellationRequested();
 
-        if (context.EscapeMode == EscapeMode.Break)
-        {
-          context.EscapeMode = EscapeMode.None;
-          break;
-        }
+      await statement.EvaluateAsync(context);
 
-        await statement.EvaluateAsync(context);
-      }
+      if (context.EscapeMode == EscapeMode.Break) return true;
+
+      context.EscapeMode = EscapeMode.None;
+
+      return false;
+    };
+
+    switch (Fields["MODE"])
+    {
+      case "WHILE":
+        while ((bool)(await value.EvaluateAsync(context))!)
+          if (await execStatementAndTestForBreak())
+            break;
+
+        break;
+      case "UNTIL":
+        do
+          if (await execStatementAndTestForBreak())
+            break;
+        while (!(bool)(await value.EvaluateAsync(context))!);
+
+        break;
     }
-    else
-      while (!(bool)(await value.EvaluateAsync(context))!)
-      {
-        context.Cancellation.ThrowIfCancellationRequested();
 
-        await statement.EvaluateAsync(context);
-      }
+    context.EscapeMode = EscapeMode.None;
 
     return await base.EvaluateAsync(context);
   }
