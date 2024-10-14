@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using BlocklyNet.Core.Blocks;
 using BlocklyNet.Core.Blocks.Lists;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
@@ -67,7 +68,8 @@ public class ReadFromModel : Block
     /// <inheritdoc/>
     public override async Task<object?> EvaluateAsync(Context context)
     {
-        var data = context.Variables[Fields["VAR"]];
+        var varName = Fields["VAR"];
+        var data = context.Variables.TryGetValue(varName, out var local) ? local : context.GetRootContext().Variables[varName];
         var path = await Values.EvaluateAsync<string>("PATH", context) ?? "";
         var rawIndexes = await Values.EvaluateAsync<IEnumerable>("INDEXES", context, false);
         var indexes = rawIndexes?.Cast<object>().ToArray() ?? [];
