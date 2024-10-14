@@ -61,10 +61,7 @@ public class RunParallel : Block
       var leading = await Values.EvaluateAsync<double?>("LEADINGSCRIPT", context, false);
 
       /* Request configuration for all scripts - allow empty array elements. */
-      var configs = new List<StartScript>();
-
-      foreach (RunScript script in scripts)
-        configs.Add(await script.ReadConfigurationAsync(context));
+      var configs = scripts.Cast<StartScript>().ToList();
 
       /* Lifetime control. */
       var leadingDone = false;

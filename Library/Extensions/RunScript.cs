@@ -84,7 +84,7 @@ public class RunScript : Block
   /// </summary>
   /// <param name="context"></param>
   /// <returns></returns>
-  public async Task<StartScript> ReadConfigurationAsync(Context context)
+  private async Task<StartScript> ReadConfigurationAsync(Context context)
   {
     /* Find the script by its name - character casing is ignored. */
     var store = context.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>();
@@ -111,16 +111,19 @@ public class RunScript : Block
   /// <inheritdoc/>
   public override async Task<object?> EvaluateAsync(Context context)
   {
+    /* Convert the configuration. */
+    var config = await ReadConfigurationAsync(context);
+
     /* We are prepared to be run in parallel to other scripts. */
-    if (context.ParallelMode > 0) return this;
+    if (context.ParallelMode > 0) return config;
 
     /* Or we are hust building. */
     var buildOnly = await Values.EvaluateAsync<bool?>("BUILDONLY", context, true);
 
-    if (buildOnly == true) return this;
+    if (buildOnly == true) return config;
 
     /* Run the script and report the result - in a new isolated environment. */
-    var result = await context.Engine.RunAsync<GenericResult>(await ReadConfigurationAsync(context));
+    var result = await context.Engine.RunAsync<GenericResult>(config);
 
     return result.Result;
   }
