@@ -15,7 +15,7 @@ namespace BlocklyNet.Extensions;
   "run_script_by_name",
   "Scripts",
   @"{
-      ""message0"": ""RunScript %1 %2 %3 %4 %5"",
+      ""message0"": ""RunScript %1 %2 %3 %4 %5 %6 %7"",
       ""args0"": [
           {
             ""type"": ""input_dummy""
@@ -39,6 +39,16 @@ namespace BlocklyNet.Extensions;
             ""type"": ""input_value"",
             ""name"": ""ARGS"",
             ""check"": [""Array(run_script_parameter)"", ""Array""]
+          },
+          {
+              ""type"": ""field_label_serializable"",
+              ""name"": ""BUILDONLY"",
+              ""text"": ""Do not execute""
+          },
+          {
+            ""type"": ""input_value"",
+            ""name"": ""BUILDONLY"",
+            ""check"": ""Boolean""
           }
       ],
       ""output"": null,
@@ -53,6 +63,14 @@ namespace BlocklyNet.Extensions;
           ""type"": ""text"",
           ""fields"": {
             ""TEXT"": """"
+          }
+        }
+      },
+      ""BUILDONLY"": {
+        ""shadow"": {
+          ""type"": ""logic_boolean"",
+          ""fields"": {
+            ""BOOL"": ""FALSE""
           }
         }
       }
@@ -95,6 +113,11 @@ public class RunScript : Block
   {
     /* We are prepared to be run in parallel to other scripts. */
     if (context.ParallelMode > 0) return this;
+
+    /* Or we are hust building. */
+    var buildOnly = await Values.EvaluateAsync<bool?>("BUILDONLY", context, true);
+
+    if (buildOnly == true) return this;
 
     /* Run the script and report the result - in a new isolated environment. */
     var result = await context.Engine.RunAsync<GenericResult>(await ReadConfigurationAsync(context));
