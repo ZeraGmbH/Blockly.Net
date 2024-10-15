@@ -118,7 +118,7 @@ public class RunScript : Block
     if (context.ParallelMode > 0) return config;
 
     /* Or we are hust building. */
-    var buildOnly = await Values.EvaluateAsync<bool?>("BUILDONLY", context, true);
+    var buildOnly = await Values.EvaluateAsync<bool?>("BUILDONLY", context, false);
 
     if (buildOnly == true) return config;
 
