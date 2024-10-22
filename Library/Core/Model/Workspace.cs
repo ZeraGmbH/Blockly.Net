@@ -1,4 +1,5 @@
 using BlocklyNet.Core.Blocks;
+using BlocklyNet.Core.Blocks.Procedures;
 using BlocklyNet.Core.Blocks.Text;
 using BlocklyNet.Extensions;
 using BlocklyNet.Scripting.Engine;

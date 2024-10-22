@@ -2,7 +2,7 @@
 
 using BlocklyNet.Core.Model;
 
-namespace BlocklyNet.Core.Blocks.Text;
+namespace BlocklyNet.Core.Blocks.Procedures;
 
 /// <summary>
 /// 
@@ -38,6 +38,13 @@ public class ProceduresCallReturn : ProceduresCallNoReturn
 
     context.Cancellation.ThrowIfCancellationRequested();
 
-    return await statement.EvaluateAsync(funcContext);
+    try
+    {
+      return await statement.EvaluateAsync(funcContext);
+    }
+    catch (ReturnProcedureIfException e)
+    {
+      return e.Value;
+    }
   }
 }

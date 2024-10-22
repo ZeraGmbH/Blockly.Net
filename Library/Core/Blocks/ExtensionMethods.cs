@@ -4,6 +4,7 @@ using BlocklyNet.Core.Blocks.Controls;
 using BlocklyNet.Core.Blocks.Lists;
 using BlocklyNet.Core.Blocks.Logic;
 using BlocklyNet.Core.Blocks.Math;
+using BlocklyNet.Core.Blocks.Procedures;
 using BlocklyNet.Core.Blocks.Text;
 using BlocklyNet.Core.Blocks.Variables;
 using BlocklyNet.Core.Model;
