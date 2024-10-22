@@ -4,7 +4,7 @@ namespace BlocklyNet.Core.Model;
 /// Used by the return-if block to propagate the result
 /// through all nested layers including try-catch-finally.
 /// </summary>
-public class ReturnProcedureIfException(object? value) : Exception
+internal class ReturnProcedureIfException(object? value) : Exception
 {
     /// <summary>
     /// Return value of the procedure.
