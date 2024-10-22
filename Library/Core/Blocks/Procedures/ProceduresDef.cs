@@ -1,6 +1,6 @@
 using BlocklyNet.Core.Model;
 
-namespace BlocklyNet.Core.Blocks.Text;
+namespace BlocklyNet.Core.Blocks.Procedures;
 
 /// <summary>
 /// Block defining a function. */

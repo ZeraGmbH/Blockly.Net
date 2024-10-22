@@ -1,8 +1,6 @@
-
-
 using BlocklyNet.Core.Model;
 
-namespace BlocklyNet.Core.Blocks.Text;
+namespace BlocklyNet.Core.Blocks.Procedures;
 
 /// <summary>
 /// 
@@ -12,10 +10,8 @@ public class ProceduresIfReturn : Block
   /// <inheritdoc/>
   public override async Task<object?> EvaluateAsync(Context context)
   {
-    var condition = await Values.EvaluateAsync<bool>("CONDITION", context);
-
-    if (condition)
-      return await Values.EvaluateAsync("VALUE", context);
+    if (await Values.EvaluateAsync<bool>("CONDITION", context))
+      throw new ReturnProcedureIfException(await Values.EvaluateAsync("VALUE", context));
 
     return await base.EvaluateAsync(context);
   }

@@ -48,6 +48,10 @@ public class TryCatchFinally : Block
 
             if (exec != null) await exec.EvaluateAsync(context);
         }
+        catch (ReturnProcedureIfException)
+        {
+            throw;
+        }
         catch (Exception)
         {
             /* Fetch the block to run. */
