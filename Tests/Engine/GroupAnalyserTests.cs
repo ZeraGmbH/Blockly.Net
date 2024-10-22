@@ -180,6 +180,43 @@ public class GroupAnalyserTests : TestEnvironment
         </xml>
     ";
 
+
+    const string Script2 = @"
+        <xml xmlns=""https://developers.google.com/blockly/xml"">
+        <block type=""execute_group"" id=""$N4[N:y*-|LG8?xtLXMu"" x=""225"" y=""225"">
+            <field name=""NAME"">The Group</field>
+            <field name=""RESULT"">Result</field>
+            <value name=""RESULT"">
+            <block type=""group_execution_result"" id=""T,]-L=XZgTOZK4Aeoy/`"">
+                <field name=""Type"">Type</field>
+                <field name=""Result"">Result</field>
+                <value name=""Type"">
+                <shadow type=""group_execution_result_type"" id=""`[g?Bd-dF@[uJa#JDp/."">
+                    <field name=""VALUE"">Invalid</field>
+                </shadow>
+                </value>
+                <value name=""Result"">
+                <block type=""run_script_by_name"" id=""k(B]](gUE5d/Bo1Pm5dT"">
+                    <field name=""NAME"">Display name</field>
+                    <field name=""ARGS"">Parameters</field>
+                    <field name=""BUILDONLY"">Do not execute</field>
+                    <value name=""NAME"">
+                    <shadow type=""text"" id=""EX$bL_^+*(XTwpjPv9?e"">
+                        <field name=""TEXT"">The Script</field>
+                    </shadow>
+                    </value>
+                    <value name=""BUILDONLY"">
+                    <shadow type=""logic_boolean"" id=""8zY+c}~!C+gWh3tW[gYa"">
+                        <field name=""BOOL"">FALSE</field>
+                    </shadow>
+                    </value>
+                </block>
+                </value>
+            </block>
+            </value>
+        </block>
+        </xml>";
+
     [Test]
     public async Task Can_Retrieve_Group_Structure_With_Functions_Async()
     {
@@ -225,5 +262,25 @@ public class GroupAnalyserTests : TestEnvironment
             Assert.That(tree[1].Children[1].Children[0].Name, Is.EqualTo("Inner Func"));
             Assert.That(tree[1].Children[1].Children[0].Children, Has.Count.EqualTo(0));
         });
+    }
+
+    [Test]
+    public async Task Can_Detect_Script_Names_Async()
+    {
+        var script = Engine.Parser.Parse(Script2);
+
+        var tree = await script.GetGroupTreeAsync();
+
+        Assert.That(tree, Has.Count.EqualTo(1));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tree[0].Id, Is.EqualTo("$N4[N:y*-|LG8?xtLXMu"));
+            Assert.That(tree[0].Name, Is.EqualTo("The Group"));
+            Assert.That(tree[0].Children, Has.Count.EqualTo(0));
+            Assert.That(tree[0].Scripts, Has.Count.EqualTo(1));
+        });
+
+        Assert.That(tree[0].Scripts[0], Is.EqualTo("The Script"));
     }
 }
