@@ -53,7 +53,7 @@ public class Workspace : IFragment
     return returnValue;
   }
 
-  private void InspectBlockChain(Block? block, List<GroupInfo> groups, Context context, HashSet<string> activeFunctions)
+  private void InspectBlockChain(Block? block, GroupInfo scope, Context context, HashSet<string> activeFunctions)
   {
     for (; block != null; block = block.Next)
     {
@@ -63,6 +63,7 @@ public class Workspace : IFragment
 
       if (call != null)
       {
+        // Some procedure call.
         var name = call.Mutations.GetValue("name");
 
         if (!context.Functions.TryGetValue(name, out var def)) continue;
@@ -70,27 +71,49 @@ public class Workspace : IFragment
         if (!activeFunctions.Add(name)) continue;
 
         foreach (var value in block.Values)
-          InspectBlockChain(value.Block, groups, context, activeFunctions);
+          InspectBlockChain(value.Block, scope, context, activeFunctions);
 
-        InspectBlockChain(((Statement)def).Block, groups, context, activeFunctions);
+        InspectBlockChain(((Statement)def).Block, scope, context, activeFunctions);
 
         activeFunctions.Remove(name);
       }
-      else
+      else if (block is RunScript script)
       {
-        GroupInfo? info = null;
+        // Some script call - or at least the preparation for it.
+        var name = script.Values.TryGet("NAME");
 
-        if (block is ExecutionGroup group)
-          groups.Add(info = new GroupInfo { Id = block.Id, Name = group.Fields["NAME"] });
-
-        var list = info?.Children ?? groups;
-
-        foreach (var value in block.Values)
-          InspectBlockChain(value.Block, list, context, activeFunctions);
-
-        foreach (var statement in block.Statements)
-          InspectBlockChain(statement.Block, list, context, activeFunctions);
+        if (name?.Block is TextBlock text)
+          scope.Scripts.Add(text.Fields["TEXT"]);
       }
+      {
+        // Regular block - maybe a nested group execution.
+        var info = block is ExecutionGroup group
+          ? new GroupInfo { Id = block.Id, Name = group.Fields["NAME"] }
+          : scope;
+
+        if (info != scope)
+          scope.Children.Add(info);
+
+        // Inspect all values.
+        foreach (var value in block.Values)
+          InspectBlockChain(value.Block, info, context, activeFunctions);
+
+        // Inspect all statements.
+        foreach (var statement in block.Statements)
+          InspectBlockChain(statement.Block, info, context, activeFunctions);
+      }
+    }
+  }
+
+  private static void RemoveScriptNameDuplicates(IEnumerable<GroupInfo> groups)
+  {
+    foreach (var group in groups)
+    {
+      // Make sure that each name is referenced only once.
+      group.Scripts = [.. group.Scripts.ToHashSet()];
+
+      // Recurse to full tree.
+      RemoveScriptNameDuplicates(group.Children);
     }
   }
 
@@ -102,7 +125,7 @@ public class Workspace : IFragment
   public async Task<List<GroupInfo>> GetGroupTreeAsync()
   {
     /* Resulting list. */
-    var groups = new List<GroupInfo>();
+    var scope = new GroupInfo();
 
     /* Use a dummy site. */
     var context = new Context((IScriptSite)null!);
@@ -115,9 +138,11 @@ public class Workspace : IFragment
     /* Inspect all blocks. */
     foreach (var block in Blocks)
       if (block is not ProceduresDef)
-        InspectBlockChain(block, groups, context, []);
+        InspectBlockChain(block, scope, context, []);
 
-    return groups;
+    RemoveScriptNameDuplicates(scope.Children);
+
+    return scope.Children;
   }
 }
 
