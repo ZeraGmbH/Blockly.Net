@@ -7,11 +7,13 @@ namespace BlocklyNet.Extensions.Builder;
 /// </summary>
 public class ScriptModels : IScriptModels
 {
-    class ScriptModelInfo(string name, Type type) : IScriptModelInfo
+    class ScriptModelInfo(string name, Type type, string? category) : IScriptModelInfo
     {
         public string Name { get; } = name;
 
         public Type Type { get; } = type;
+
+        public string? Category { get; } = category;
     }
 
     /// <inheritdoc/>
@@ -20,12 +22,18 @@ public class ScriptModels : IScriptModels
     /// <inheritdoc/>
     public ConcurrentDictionary<string, IScriptModelInfo> Enums { get; } = [];
 
-    private static void Set(ConcurrentDictionary<string, IScriptModelInfo> map, string key, Type type, string name) =>
-        map.AddOrUpdate(key, (k) => new ScriptModelInfo(name, type), (k, p) => new ScriptModelInfo(name, type));
+    private static void Set(ConcurrentDictionary<string, IScriptModelInfo> map, string key, Type type, string name, string? category)
+    {
+        // Information to provide.
+        var item = new ScriptModelInfo(name, type, category);
+
+        // Use the newest one - actually should never happen.
+        map.AddOrUpdate(key, (k) => item, (k, p) => item);
+    }
 
     /// <inheritdoc/>
-    public void SetEnum<T>(string key, string name) where T : Enum => Set(Enums, key, typeof(T), name);
+    public void SetEnum<T>(string key, string name, string? category) where T : Enum => Set(Enums, key, typeof(T), name, category);
 
     /// <inheritdoc/>
-    public void SetModel(Type t, string key, string name) => Set(Models, key, t, name);
+    public void SetModel(Type t, string key, string name, string? category) => Set(Models, key, t, name, category);
 }

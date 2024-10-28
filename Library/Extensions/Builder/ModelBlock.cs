@@ -118,11 +118,12 @@ public class ModelBlock<T> : Block where T : class, new()
     /// See if some type is supported by the generic model generator.
     /// </summary>
     /// <param name="type">Some type of a property of the model.</param>
+    /// <param name="category">Toolbox category to use.</param>
     /// <param name="models">All other known models.</param>
     /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
     /// <param name="propertyName">Name of the related property.</param>
     /// <returns>Set if the type is supported.</returns>
-    private static bool TestSupported(Type type, ModelCache models, Func<Type, string, string, bool> modelFactory, string propertyName)
+    private static bool TestSupported(Type type, string? category, ModelCache models, Func<Type, string, string, string?, bool> modelFactory, string propertyName)
     {
         // Enums are always good.
         if (type.IsEnum && models.Contains(type)) return true;
@@ -133,7 +134,7 @@ public class ModelBlock<T> : Block where T : class, new()
         // Already known other model.
         if (models.Contains(type)) return true;
 
-        return modelFactory(type, $"{_key}_{propertyName}", _name);
+        return modelFactory(type, $"{_key}_{propertyName}", _name, category);
     }
 
     /// <summary>
@@ -158,9 +159,10 @@ public class ModelBlock<T> : Block where T : class, new()
     /// </summary>
     /// <param name="key">Block key of the model.</param>
     /// <param name="name">Display name of the model.</param>
+    /// <param name="category">Toolbox category to use.</param>
     /// <param name="models">Other models already registered.</param>
     /// <param name="modelFactory">Callback to create models on the fly, e.g. dictionaries.</param>
-    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, ModelCache models, Func<Type, string, string, bool> modelFactory)
+    public static Tuple<JsonObject, JsonObject> Initialize(string key, string name, string? category, ModelCache models, Func<Type, string, string, string?, bool> modelFactory)
     {
         _key = key;
         _name = name;
@@ -178,7 +180,7 @@ public class ModelBlock<T> : Block where T : class, new()
                     /* Value type must be supported. */
                     var valueType = typeof(T).GetGenericArguments()[1];
 
-                    if (TestSupported(TestArray(valueType) ?? valueType, models, modelFactory, "Value"))
+                    if (TestSupported(TestArray(valueType) ?? valueType, category, models, modelFactory, "Value"))
                         _props = Enum
                             .GetValues(keyType)
                             .Cast<object>()
@@ -192,7 +194,7 @@ public class ModelBlock<T> : Block where T : class, new()
                     .GetProperties()
                     .Where(p => p.Name != nameof(List<object>.Capacity))
                     .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
-                    .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
+                    .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
                     .Select(p => new PropertyInformation(p))
                     .ToArray();
 
@@ -200,7 +202,7 @@ public class ModelBlock<T> : Block where T : class, new()
         _props ??= typeof(T)
                 .GetProperties()
                 .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
-                .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, models, modelFactory, p.Name))
+                .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
                 .Select(p => new PropertyInformation(p))
                 .ToArray();
 

@@ -19,5 +19,10 @@ public class ScriptEngineModelInfo
     /// </summary>
     [NotNull, Required]
     public required string Type { get; set; }
+
+    /// <summary>
+    /// Optional toolbox category of the model.
+    /// </summary>
+    public required string? Category { get; set; }
 }
 

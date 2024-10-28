@@ -14,4 +14,9 @@ public interface IScriptModelInfo
     /// .NET type of the model.
     /// </summary>
     Type Type { get; }
+
+    /// <summary>
+    /// Optional toolbox category.
+    /// </summary>
+    string? Category { get; }
 }
