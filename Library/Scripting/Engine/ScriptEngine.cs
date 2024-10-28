@@ -185,6 +185,9 @@ public partial class ScriptEngine(
     }
 
     /// <inheritdoc/>
+    public bool MustPause => _pause.IsCancellationRequested;
+
+    /// <inheritdoc/>
     public void Cancel(string jobId)
     {
         using (Lock.Wait())

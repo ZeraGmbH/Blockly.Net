@@ -29,6 +29,11 @@ public interface IScriptSite
     CancellationToken Cancellation { get; }
 
     /// <summary>
+    /// Set if the user has requested the script to pause.
+    /// </summary>
+    bool MustPause { get; }
+
+    /// <summary>
     /// Report the currently running script.
     /// </summary>
     IScript? CurrentScript { get; }
