@@ -119,7 +119,7 @@ public static class BlocklyExtensions
 
                     /* Register the block and toolbox definition in the parser. */
                     _parser.ModelDefinitions.Add(blockDefinition);
-                    _parser.ToolboxEntries.Add(Tuple.Create("*", toolboxEntry));
+                    _parser.ToolboxEntries.Add(Tuple.Create(string.IsNullOrEmpty(category) ? "*" : category, toolboxEntry));
 
                     /* Add the related block to the parser. */
                     _parser.AddBlock<ModelBlock<TModel>>(key);
@@ -211,7 +211,7 @@ public static class BlocklyExtensions
 
                 /* Register the block and toolbox definition in the parser. */
                 _parser.ModelDefinitions.Add(blockDefinition);
-                _parser.ToolboxEntries.Add(Tuple.Create("Enum", toolboxEntry));
+                _parser.ToolboxEntries.Add(Tuple.Create(string.IsNullOrEmpty(category) ? "Enum" : category, toolboxEntry));
 
                 /* Add the related block to the parser. */
                 _parser.AddBlock<EnumBlock<T>>(key);
