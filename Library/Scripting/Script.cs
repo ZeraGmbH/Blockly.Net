@@ -1,3 +1,4 @@
+using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Engine;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -73,7 +74,14 @@ public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScri
     /// <summary>
     /// Test for cancel.
     /// </summary>
-    protected void CheckCancel() => Engine.Cancellation.ThrowIfCancellationRequested();
+    protected void CheckCancel()
+    {
+        // Brute force cancel.
+        Engine.Cancellation.ThrowIfCancellationRequested();
+
+        // More soft pause.
+        if (Engine.MustPause) throw new ScriptPausedException();
+    }
 
     /// <summary>
     /// Access a runtime service.
