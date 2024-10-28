@@ -35,6 +35,7 @@ public class GroupExecutionTests : TestEnvironment
         Site.Verify(s => s.SingleStepAsync(It.IsAny<Block>()), Times.Exactly(2));
         Site.VerifyGet(s => s.Cancellation, Times.Exactly(6));
         Site.VerifyGet(s => s.CurrentScript, Times.Exactly(2));
+        Site.VerifyGet(s => s.MustPause, Times.Exactly(2));
 
         Site.VerifyNoOtherCalls();
     }

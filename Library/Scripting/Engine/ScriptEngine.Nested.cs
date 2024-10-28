@@ -65,6 +65,9 @@ public partial class ScriptEngine
         public CancellationToken Cancellation => _engine.Cancellation;
 
         /// <inheritdoc/>
+        public bool MustPause => _engine.MustPause;
+
+        /// <inheritdoc/>
         public IScript? CurrentScript { get; private set; }
 
         /// <inheritdoc/>
@@ -78,13 +81,7 @@ public partial class ScriptEngine
         public bool BeginGroup(string key, string? name) => _groupManager.Start(key, name);
 
         /// <inheritdoc/>
-        public void EndGroup(GroupResult result)
-        {
-            _groupManager.Finish(result);
-
-            /* Respect pause request now. */
-            if (_engine._pause.IsCancellationRequested) throw new ScriptPausedException();
-        }
+        public void EndGroup(GroupResult result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
