@@ -59,7 +59,7 @@ public class GroupManager : IGroupManager
         get
         {
             lock (_groups)
-                return _groups[index];
+                return _active.TryPeek(out var parent) ? parent.Children[index] : _groups[index];
         }
     }
 
