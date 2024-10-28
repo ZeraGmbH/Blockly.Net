@@ -84,6 +84,9 @@ public partial class ScriptEngine
         public void EndGroup(GroupResult result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
+        public GroupStatus GetGroupStatus(int index) => _groupManager[index];
+
+        /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
             => _engine.StartChildAsync<TResult>(request, CurrentScript, options, depth);
 

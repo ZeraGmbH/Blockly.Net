@@ -53,6 +53,16 @@ public class GroupManager : IGroupManager
     /// </summary>
     private readonly List<GroupStatus> _groups = [];
 
+    /// <inheritdoc/>
+    public GroupStatus this[int index]
+    {
+        get
+        {
+            lock (_groups)
+                return _groups[index];
+        }
+    }
+
     /// <summary>
     /// Group hierarchy of unfinished groups.
     /// </summary>

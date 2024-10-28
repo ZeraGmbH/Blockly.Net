@@ -26,6 +26,13 @@ public interface ISiteGroupManager
     /// <param name="scriptId">Unique identifier of the script.</param>
     /// <param name="name">Name of the Script.</param>
     IGroupManager CreateNested(string scriptId, string name);
+
+    /// <summary>
+    /// Get the groups status for some group.
+    /// </summary>
+    /// <param name="index">Zero-base index of the group.</param>
+    /// <returns>Information on the group execution.</returns>
+    GroupStatus this[int index] { get; }
 }
 
 /// <summary>
