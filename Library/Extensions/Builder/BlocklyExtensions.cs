@@ -54,8 +54,9 @@ public static class BlocklyExtensions
         /// Add a self describing block class to the parser.
         /// </summary>
         /// <param name="registerAs">Set if this block should be handled like a model.</param>
+        /// <param name="category">Toolbox category to use.</param>
         /// <typeparam name="TBlock">Type of the block.</typeparam>
-        public void AddBlock<TBlock>(Type? registerAs = null) where TBlock : Block, new()
+        public void AddBlock<TBlock>(Type? registerAs = null, string? category = null) where TBlock : Block, new()
         {
             /* Attribute indicator is required. */
             var blockAttribute = typeof(TBlock).GetCustomAttributes<CustomBlockAttribute>().Single();
@@ -100,7 +101,7 @@ public static class BlocklyExtensions
             if (registerAs.IsValueType) _models.Add(typeof(Nullable<>).MakeGenericType(registerAs), key);
 
             /* Register. */
-            models.SetModel(registerAs, key, part0 ?? key);
+            models.SetModel(registerAs, key, part0 ?? key, category);
         }
 
         /// <summary>
@@ -109,11 +110,12 @@ public static class BlocklyExtensions
         /// <typeparam name="TModel">Model type.</typeparam>
         /// <param name="key">Block key for the model.</param>
         /// <param name="name">Display name for the model.</param>
-        public void AddModel<TModel>(string key, string name) where TModel : class, new()
+        /// <param name="category">Toolbox category to use.</param>
+        public void AddModel<TModel>(string key, string name, string? category = null) where TModel : class, new()
             => _models.Add<TModel>(key, () =>
                 {
                     /* Initialize the generic model generator. */
-                    var (blockDefinition, toolboxEntry) = ModelBlock<TModel>.Initialize(key, name, _models, CreateScratchModel);
+                    var (blockDefinition, toolboxEntry) = ModelBlock<TModel>.Initialize(key, name, category, _models, CreateScratchModel);
 
                     /* Register the block and toolbox definition in the parser. */
                     _parser.ModelDefinitions.Add(blockDefinition);
@@ -123,7 +125,7 @@ public static class BlocklyExtensions
                     _parser.AddBlock<ModelBlock<TModel>>(key);
 
                     /* Register. */
-                    models.SetModel<TModel>(key, name);
+                    models.SetModel<TModel>(key, name, category);
                 });
 
         /// <summary>
@@ -132,8 +134,9 @@ public static class BlocklyExtensions
         /// <param name="type">Type to create a model for.</param>
         /// <param name="key">Blockly key of the potentially created model.</param>
         /// <param name="name">Name of the parent model.</param>
+        /// <param name="category">Toolbox category to use.</param>
         /// <returns>Set if a model has been created.</returns>
-        private bool CreateScratchDictionary(Type type, string key, string name)
+        private bool CreateScratchDictionary(Type type, string key, string name, string? category)
         {
             /* Key must be a known enumeration. */
             var keyType = type.GetGenericArguments()[0];
@@ -144,7 +147,7 @@ public static class BlocklyExtensions
             var addModelMethod = GetType().GetMethod("AddModel")!;
             var addModel = addModelMethod.MakeGenericMethod(type);
 
-            addModel.Invoke(this, [key, $"{name} {key.Split("_").Last()}"]);
+            addModel.Invoke(this, [key, $"{name} {key.Split("_").Last()}", category]);
 
             /* Did it. */
             return true;
@@ -156,14 +159,15 @@ public static class BlocklyExtensions
         /// <param name="type">Type to create a model for.</param>
         /// <param name="key">Blockly key of the potentially created model.</param>
         /// <param name="name">Name of the parent model.</param>
+        /// <param name="category">Toolbox category to use.</param>
         /// <returns>Set if a model has been created.</returns>
-        private bool CreateScratchList(Type type, string key, string name)
+        private bool CreateScratchList(Type type, string key, string name, string? category)
         {
             /* Create the model. */
             var addModelMethod = GetType().GetMethod("AddModel")!;
             var addModel = addModelMethod.MakeGenericMethod(type);
 
-            addModel.Invoke(this, [key, $"{name} {key.Split("_").Last()}"]);
+            addModel.Invoke(this, [key, $"{name} {key.Split("_").Last()}", category]);
 
             /* Did it. */
             return true;
@@ -175,18 +179,19 @@ public static class BlocklyExtensions
         /// <param name="type">Type to create a model for.</param>
         /// <param name="key">Blockly key of the potentially created model.</param>
         /// <param name="name">Name of the parent model.</param>
+        /// <param name="category">Toolbox category to use.</param>
         /// <returns>Set if a model has been created.</returns>
-        private bool CreateScratchModel(Type type, string key, string name)
+        private bool CreateScratchModel(Type type, string key, string name, string? category)
         {
             if (!type.IsGenericType) return false;
 
             var generic = type.GetGenericTypeDefinition();
 
             /* See if the type is a dictionary. */
-            if (generic == typeof(Dictionary<,>)) return CreateScratchDictionary(type, key, name);
+            if (generic == typeof(Dictionary<,>)) return CreateScratchDictionary(type, key, name, category);
 
             /* See if the type is a list. */
-            if (generic == typeof(List<>)) return CreateScratchList(type, key, name);
+            if (generic == typeof(List<>)) return CreateScratchList(type, key, name, category);
 
             return false;
         }
@@ -197,7 +202,8 @@ public static class BlocklyExtensions
         /// <typeparam name="T">Enumeration type.</typeparam>
         /// <param name="key">Block key for the enumeration.</param>
         /// <param name="name">Display name for the enumeration.</param>
-        public void AddEnum<T>(string key, string name) where T : Enum
+        /// <param name="category">Toolbox category to put the enumeration in.</param>
+        public void AddEnum<T>(string key, string name, string? category = null) where T : Enum
             => _models.Add<T>(key, () =>
             {
                 /* Initialize the generic model generator. */
@@ -211,7 +217,7 @@ public static class BlocklyExtensions
                 _parser.AddBlock<EnumBlock<T>>(key);
 
                 /* Register. */
-                models.SetEnum<T>(key, name);
+                models.SetEnum<T>(key, name, category);
             });
     }
 

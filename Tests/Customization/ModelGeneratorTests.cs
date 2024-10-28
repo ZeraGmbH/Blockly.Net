@@ -80,7 +80,7 @@ public class ModelGeneratorTests
 
         models.Add<InnerRef>("inner");
 
-        var outer = ModelBlock<OuterRef>.Initialize("outer", "OUTER", models, (type, key, name) => false);
+        var outer = ModelBlock<OuterRef>.Initialize("outer", "OUTER", null, models, (type, key, name, category) => false);
 
         var blockJson = JsonSerializer.Serialize(outer.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(outer.Item2, JsonUtils.JsonSettings);
@@ -100,7 +100,7 @@ public class ModelGeneratorTests
         models.Add<EnumModel>("enum_model");
 
         var emodel = EnumBlock<EnumModel>.Initialize("enum_model", "ENUMMODEL");
-        var model = ModelBlock<EnumRef>.Initialize("enum", "ENUM", models, (type, key, name) => false);
+        var model = ModelBlock<EnumRef>.Initialize("enum", "ENUM", null, models, (type, key, name, category) => false);
 
         var blockJson = JsonSerializer.Serialize(model.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(model.Item2, JsonUtils.JsonSettings);
@@ -119,7 +119,7 @@ public class ModelGeneratorTests
 
         models.Add<InnerRef>("inner");
 
-        var outer = ModelBlock<ArrayRef>.Initialize("array", "ARRAY", models, (type, key, name) => false);
+        var outer = ModelBlock<ArrayRef>.Initialize("array", "ARRAY", null, models, (type, key, name, category) => false);
 
         var blockJson = JsonSerializer.Serialize(outer.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(outer.Item2, JsonUtils.JsonSettings);
@@ -134,7 +134,7 @@ public class ModelGeneratorTests
     [Test]
     public async Task Can_Create_Blockly_Model_Dynamically_Async()
     {
-        var definitions = ModelBlock<TestModel>.Initialize("K-2", "N-3", new ModelCache(), (type, key, name) => false);
+        var definitions = ModelBlock<TestModel>.Initialize("K-2", "N-3", null, new ModelCache(), (type, key, name, category) => false);
         var blockJson = JsonSerializer.Serialize(definitions.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(definitions.Item2, JsonUtils.JsonSettings);
 
@@ -182,7 +182,7 @@ public class ModelGeneratorTests
 
         models.Add<ObjectValue>("withObject");
 
-        var outer = ModelBlock<ObjectValue>.Initialize("obj", "OBJ", models, (type, key, name) => false);
+        var outer = ModelBlock<ObjectValue>.Initialize("obj", "OBJ", null, models, (type, key, name, category) => false);
 
         var blockJson = JsonSerializer.Serialize(outer.Item1, JsonUtils.JsonSettings);
         var toolJson = JsonSerializer.Serialize(outer.Item2, JsonUtils.JsonSettings);

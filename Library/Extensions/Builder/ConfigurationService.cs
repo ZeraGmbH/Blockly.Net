@@ -80,14 +80,14 @@ public class ConfigurationService : IConfigurationService
     public IEnumerable<ScriptEngineModelInfo> ModelNames =>
         _models
             .Models
-            .Select(e => new ScriptEngineModelInfo { Name = e.Value.Name, Type = e.Key })
+            .Select(e => new ScriptEngineModelInfo { Name = e.Value.Name, Type = e.Key, Category = e.Value.Category })
             .OrderBy(i => i.Name, StringComparer.InvariantCultureIgnoreCase);
 
     /// <inheritdoc/>
     public IEnumerable<ScriptEngineModelInfo> EnumerationNames =>
         _models
             .Enums
-            .Select(e => new ScriptEngineModelInfo { Name = e.Value.Name, Type = e.Key })
+            .Select(e => new ScriptEngineModelInfo { Name = e.Value.Name, Type = e.Key, Category = e.Value.Category })
             .OrderBy(i => i.Name, StringComparer.InvariantCultureIgnoreCase);
 }
 

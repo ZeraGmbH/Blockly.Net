@@ -78,7 +78,7 @@ public class ModelAndEnumTests : TestEnvironment
             builder.AddEnum<SampleEnum>("sample_enum", "My example enumeration");
 
             /* Intentionally wrong dependency order. */
-            builder.AddModel<ListDictClass>("list_and_dictionary", "Complex list with dictionary");
+            builder.AddModel<ListDictClass>("list_and_dictionary", "Complex list with dictionary", "WithDict");
             builder.AddModel<ListListClass>("nested_list", "List in list");
             builder.AddModel<OuterClass>("outer_class", "The outer model");
             builder.AddModel<InnerClass>("inner_class", "The inner model");
@@ -116,8 +116,15 @@ public class ModelAndEnumTests : TestEnvironment
         var provider = GetService<IConfigurationService>();
         var models = provider.ModelNames.ToDictionary(e => e.Name);
 
-        Assert.That(models["The inner model"].Type, Is.EqualTo("inner_class"));
-        Assert.That(models["The outer model"].Type, Is.EqualTo("outer_class"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(models["The inner model"].Type, Is.EqualTo("inner_class"));
+            Assert.That(models["The outer model"].Type, Is.EqualTo("outer_class"));
+
+            Assert.That(models["Complex list with dictionary"].Category, Is.EqualTo("WithDict"));
+            Assert.That(models["Complex list with dictionary TheList"].Category, Is.EqualTo("WithDict"));
+        });
+
     }
 
     /// <summary>

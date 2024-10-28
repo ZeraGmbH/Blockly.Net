@@ -23,7 +23,8 @@ public interface IScriptModels
     /// <param name="modelType">.NET model type.</param>
     /// <param name="key">Blockly model type.</param>
     /// <param name="name">Display name of the model.</param>
-    void SetModel(Type modelType, string key, string name);
+    /// <param name="category">Category to use for the model.</param>
+    void SetModel(Type modelType, string key, string name, string? category);
 
     /// <summary>
     /// Remember a enumeration block.
@@ -31,7 +32,8 @@ public interface IScriptModels
     /// <typeparam name="T">.NET enumeration type.</typeparam>
     /// <param name="key">Blockly model type.</param>
     /// <param name="name">Display name of the enumeration.</param>
-    void SetEnum<T>(string key, string name) where T : Enum;
+    /// <param name="category">Category to use for the model.</param>
+    void SetEnum<T>(string key, string name, string? category) where T : Enum;
 }
 
 /// <summary>
@@ -46,5 +48,7 @@ public static class IScriptModelsExtensions
     /// <param name="models">Interface to extend.</param>
     /// <param name="key">Blockly model type.</param>
     /// <param name="name">Display name of the model.</param>
-    public static void SetModel<T>(this IScriptModels models, string key, string name) where T : class => models.SetModel(typeof(T), key, name);
+    /// <param name="category">Category to use for the model.</param>
+    public static void SetModel<T>(this IScriptModels models, string key, string name, string? category) where T : class
+        => models.SetModel(typeof(T), key, name, category);
 }

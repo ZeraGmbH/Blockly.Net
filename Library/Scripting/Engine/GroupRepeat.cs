@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -10,6 +12,7 @@ public class GroupRepeat : GroupStatus<GroupRepeat>
     /// <summary>
     /// How to execute the group.
     /// </summary>
+    [NotNull, Required]
     public GroupRepeatType Repeat { get; set; }
 
     /// <summary>
