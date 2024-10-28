@@ -420,6 +420,9 @@ public partial class ScriptEngine(
     }
 
     /// <inheritdoc/>
+    public GroupStatus GetGroupStatus(int index) => _groupManager[index];
+
+    /// <inheritdoc/>
     public List<object?>? CreateFlatResultFromGroups() => _groupManager.CreateFlatResults();
 
     /// <inheritdoc/>

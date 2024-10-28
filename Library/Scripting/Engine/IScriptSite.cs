@@ -98,4 +98,11 @@ public interface IScriptSite
     /// End the execution of the current group.
     /// </summary>
     void EndGroup(GroupResult result);
+
+    /// <summary>
+    /// Report the status of a single group execution.
+    /// </summary>
+    /// <param name="index">Zero-based index of the group.</param>
+    /// <returns>Information on the group.</returns>
+    GroupStatus GetGroupStatus(int index);
 }

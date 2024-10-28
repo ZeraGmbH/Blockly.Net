@@ -239,12 +239,14 @@ public static class BlocklyExtensions
 
         /* Add library extensions: models, leaves first up to root. */
         builder.AddModel<GroupResult>("group_execution_result", "Result of a group execution");
+        builder.AddModel<GroupStatus>("group_execution_status", "Status of a group execution");
 
         /* Add library extensions: blocks, any order. */
         builder.AddBlock<CreateRunScriptParameter>();
         builder.AddBlock<Delay>();
         builder.AddBlock<ExecutionGroup>();
         builder.AddBlock<ExtractProperty>();
+        builder.AddBlock<GetGroupStatus>();
         builder.AddBlock<HttpRequest>();
         builder.AddBlock<Now>();
         builder.AddBlock<ParseJson>();
