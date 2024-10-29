@@ -8,7 +8,7 @@ namespace BlocklyNet.Extensions;
 /// </summary>
 [CustomBlock(
     "get_group_execution_status",
-    "",
+    "ExecutionGroups",
     @"{
         ""message0"": ""GetGroupStatus %1 %2 %3"",
         ""args0"": [
