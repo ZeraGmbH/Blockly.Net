@@ -1,6 +1,7 @@
 using BlocklyNet.Core;
 using BlocklyNet.Core.Blocks;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Extensions.Models.Xml;
 using BlocklyNet.Scripting.Engine;
 using System.Reflection;
 using System.Text.Json.Nodes;
@@ -259,6 +260,13 @@ public static class BlocklyExtensions
         builder.AddBlock<Throw>();
         builder.AddBlock<TryCatchFinally>();
         builder.AddBlock<UpdateModelProperty>();
+
+        /* Around XML. */
+        builder.AddModel<XmlAttribute>("xml_attribute", "XML DOM Attribute", "XML");
+        builder.AddModel<XmlNode>("xml_node", "XML DOM Node", "XML");
+        builder.AddModel<XmlFile>("xml_file", "XML DOM", "XML");
+        builder.AddBlock<CreateXmlDocument>();
+        builder.AddBlock<QueryXmlDocument>();
 
         /* Add custom definitions. */
         custom?.Invoke(builder);
