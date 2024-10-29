@@ -9,7 +9,7 @@ namespace BlocklyNet.Extensions;
 /// </summary>
 [CustomBlock(
     "execute_group",
-    "",
+    "ExecutionGroups",
     @"{
         ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6"",
         ""args0"": [

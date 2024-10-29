@@ -235,11 +235,11 @@ public static class BlocklyExtensions
         var builder = BlockBuilder.Create(parser, models);
 
         /* Add library extensions: enumerations, any order. */
-        builder.AddEnum<GroupResultType>("group_execution_result_type", "Result of the Exceution");
+        builder.AddEnum<GroupResultType>("group_execution_result_type", "Result of the Exceution", "ExecutionGroups");
 
         /* Add library extensions: models, leaves first up to root. */
-        builder.AddModel<GroupResult>("group_execution_result", "Result of a group execution");
-        builder.AddModel<GroupStatusCommon>("group_execution_status", "Status of a group execution");
+        builder.AddModel<GroupResult>("group_execution_result", "Result of a group execution", "ExecutionGroups");
+        builder.AddModel<GroupStatusCommon>("group_execution_status", "Status of a group execution", "ExecutionGroups");
 
         /* Add library extensions: blocks, any order. */
         builder.AddBlock<CreateRunScriptParameter>();
