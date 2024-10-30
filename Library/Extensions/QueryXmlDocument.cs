@@ -18,13 +18,13 @@ namespace BlocklyNet.Extensions;
             },
             {
                 ""type"": ""field_label_serializable"",
-                ""name"": ""FILE"",
+                ""name"": ""SOURCE"",
                 ""text"": ""XML File""
             },
             {
                 ""type"": ""input_value"",
-                ""name"": ""FILE"",
-                ""check"": ""xml_file""
+                ""name"": ""SOURCE"",
+                ""check"": [""xml_file"", ""xml_node""]
             },
             {
                 ""type"": ""field_label_serializable"",
@@ -60,9 +60,15 @@ public class QueryXmlDocument : Block
     /// <inheritdoc/>
     public override async Task<object?> EvaluateAsync(Context context)
     {
-        var file = await Values.EvaluateAsync<XmlFile>("FILE", context);
+        var source = await Values.EvaluateAsync("SOURCE", context);
         var query = await Values.EvaluateAsync<string>("XPATH", context);
 
-        return file.Query(query);
+        if (source is XmlFile document)
+            return document.Query(query);
+
+        if (source is XmlNode node)
+            return node.Query(query);
+
+        throw new ArgumentException("not an XML node", "SOURCE");
     }
 }

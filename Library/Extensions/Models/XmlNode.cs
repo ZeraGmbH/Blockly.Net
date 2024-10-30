@@ -9,11 +9,18 @@ namespace BlocklyNet.Extensions.Models.Xml;
 public class XmlNode()
 {
     /// <summary>
+    /// Attached node.
+    /// </summary>
+    private readonly System.Xml.XmlNode _Node = null!;
+
+    /// <summary>
     /// Create a new node representation.
     /// </summary>
     /// <param name="node">The underlying node.</param>
     public XmlNode(System.Xml.XmlNode node) : this()
     {
+        _Node = node;
+
         Content = node.InnerText;
         LocalName = node.LocalName;
         Name = node.Name;
@@ -53,4 +60,26 @@ public class XmlNode()
     /// </summary>
     [Required]
     public string Content { get; set; } = null!;
+
+    /// <summary>
+    /// Lookup child nodes.
+    /// </summary>
+    /// <param name="xpath">XPath query string.</param>
+    /// <returns>List of nodes found.</returns>
+    public List<XmlNode> Query(string xpath)
+    {
+        var nodes = new List<XmlNode>();
+        var list = _Node.SelectNodes(xpath);
+
+        if (list != null)
+            for (var i = 0; i < list.Count; i++)
+            {
+                var node = list[i];
+
+                if (node != null)
+                    nodes.Add(new(node));
+            }
+
+        return nodes;
+    }
 }
