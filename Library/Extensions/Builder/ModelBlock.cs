@@ -339,9 +339,10 @@ public class ModelBlock<T> : Block where T : class, new()
         /* Generate the toolbox entry in JSON format. */
         return new JsonObject
         {
+            ["_kind"] = "model",
+            ["_name"] = _name,
             ["inputs"] = inputs,
             ["kind"] = "block",
-            ["_name"] = _name,
             ["type"] = _key,
         };
     }

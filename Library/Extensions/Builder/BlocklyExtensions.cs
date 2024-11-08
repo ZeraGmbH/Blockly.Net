@@ -87,8 +87,9 @@ public static class BlocklyExtensions
             var message0 = (string)blockJson["message0"]!;
             var part0 = message0?.Split(" ").FirstOrDefault(key);
 
-            toolbox["kind"] = "block";
+            toolbox["_kind"] = registerAs != null ? "model" : "block";
             toolbox["_name"] = part0;
+            toolbox["kind"] = "block";
             toolbox["type"] = key;
 
             _parser.ToolboxEntries.Add(Tuple.Create(blockAttribute.Category, toolbox));
