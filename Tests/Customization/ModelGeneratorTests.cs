@@ -88,7 +88,7 @@ public class ModelGeneratorTests
         Assert.Multiple(() =>
         {
             Assert.That(blockJson, Has.Length.EqualTo(372));
-            Assert.That(toolJson, Has.Length.EqualTo(132));
+            Assert.That(toolJson, Has.Length.EqualTo(148));
         });
     }
 
@@ -108,7 +108,7 @@ public class ModelGeneratorTests
         Assert.Multiple(() =>
         {
             Assert.That(blockJson, Has.Length.EqualTo(358));
-            Assert.That(toolJson, Has.Length.EqualTo(189));
+            Assert.That(toolJson, Has.Length.EqualTo(205));
         });
     }
 
@@ -127,7 +127,7 @@ public class ModelGeneratorTests
         Assert.Multiple(() =>
         {
             Assert.That(blockJson, Has.Length.EqualTo(397));
-            Assert.That(toolJson, Has.Length.EqualTo(59));
+            Assert.That(toolJson, Has.Length.EqualTo(75));
         });
     }
 
@@ -141,7 +141,7 @@ public class ModelGeneratorTests
         Assert.Multiple(() =>
         {
             Assert.That(blockJson, Has.Length.EqualTo(1310));
-            Assert.That(toolJson, Has.Length.EqualTo(620));
+            Assert.That(toolJson, Has.Length.EqualTo(636));
         });
 
         var model = new ModelBlock<TestModel>();
@@ -190,7 +190,7 @@ public class ModelGeneratorTests
         Assert.Multiple(() =>
         {
             Assert.That(blockJson, Has.Length.EqualTo(642));
-            Assert.That(toolJson, Has.Length.EqualTo(55));
+            Assert.That(toolJson, Has.Length.EqualTo(71));
         });
     }
 }

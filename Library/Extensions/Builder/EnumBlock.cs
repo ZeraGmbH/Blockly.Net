@@ -79,8 +79,9 @@ public class EnumBlock<T> : Block where T : Enum
         /* Generate the toolbox entry in JSON format. */
         return new JsonObject
         {
-            ["kind"] = "block",
+            ["_kind"] = "enum",
             ["_name"] = _name,
+            ["kind"] = "block",
             ["type"] = _key,
         };
     }
