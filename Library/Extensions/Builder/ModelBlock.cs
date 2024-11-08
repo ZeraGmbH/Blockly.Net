@@ -93,6 +93,10 @@ public class ModelBlock<T> : Block where T : class, new()
         {typeof(long?), new("Number","math_number","NUM","0")},
         {typeof(int), new("Number","math_number","NUM","0")},
         {typeof(int?), new("Number","math_number","NUM","0")},
+        {typeof(uint), new("Number","math_number","NUM","0")},
+        {typeof(uint?), new("Number","math_number","NUM","0")},
+        {typeof(byte), new("Number","math_number","NUM","0")},
+        {typeof(byte?), new("Number","math_number","NUM","0")},
         /* String. */
         {typeof(string), new("String","text","TEXT","")},
         /* Object. */
