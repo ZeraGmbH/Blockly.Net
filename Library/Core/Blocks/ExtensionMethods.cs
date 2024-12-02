@@ -87,14 +87,15 @@ public static class Extensions
     parser.AddBlock<MathRandomInt>("math_random_int");
     parser.AddBlock<MathChange>("math_change");
 
-    parser.AddBlock<TextBlock>("text");
-    parser.AddBlock<TextLength>("text_length");
-    parser.AddBlock<TextIsEmpty>("text_isEmpty");
-    parser.AddBlock<TextTrim>("text_trim");
-    parser.AddBlock<TextCaseChange>("text_changeCase");
     parser.AddBlock<TextAppend>("text_append");
-    parser.AddBlock<TextJoin>("text_join");
+    parser.AddBlock<TextBlock>("text");
+    parser.AddBlock<TextCaseChange>("text_changeCase");
     parser.AddBlock<TextIndexOf>("text_indexOf");
+    parser.AddBlock<TextIsEmpty>("text_isEmpty");
+    parser.AddBlock<TextJoin>("text_join");
+    parser.AddBlock<TextLength>("text_length");
+    parser.AddBlock<TextSubstring>("text_getSubstring");
+    parser.AddBlock<TextTrim>("text_trim");
 
     parser.AddBlock<VariablesGet>("variables_get");
     parser.AddBlock<VariablesSet>("variables_set");
