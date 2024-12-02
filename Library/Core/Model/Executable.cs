@@ -25,12 +25,13 @@ public abstract class Executable : IFragment
         /* See if script should be terminated. */
         context.Cancellation.ThrowIfCancellationRequested();
 
-        /* If there is no block the result will always be null. */
-        if (Block == null)
-            return Task.FromResult((object?)null);
-
         /* Use the block to get the current value. */
-        return Block.EvaluateAsync(context);
+        for (var block = Block; block != null; block = block.Next)
+            if (block.Enabled)
+                return block.EvaluateAsync(context);
+
+        /* If there is no block the result will always be null. */
+        return Task.FromResult<object?>(null);
     }
 }
 

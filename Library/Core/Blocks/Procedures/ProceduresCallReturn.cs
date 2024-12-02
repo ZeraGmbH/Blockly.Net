@@ -16,10 +16,8 @@ public class ProceduresCallReturn : ProceduresCallNoReturn
 
     var name = Mutations.GetValue("name");
 
-    if (!context.Functions.ContainsKey(name))
+    if (!context.Functions.TryGetValue(name, out var statement))
       throw new MissingMethodException($"Method '{name}' not defined");
-
-    var statement = (IFragment)context.Functions[name];
 
     var funcContext = new Context(context);
 
