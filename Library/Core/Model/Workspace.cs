@@ -77,7 +77,7 @@ public class Workspace : IFragment
         foreach (var value in block.Values)
           InspectBlockChain(value.Block, scope, context, activeFunctions);
 
-        InspectBlockChain(((Statement)def).Block, scope, context, activeFunctions);
+        InspectBlockChain(def.Block, scope, context, activeFunctions);
 
         activeFunctions.Remove(name);
       }

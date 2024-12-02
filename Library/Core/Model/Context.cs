@@ -50,7 +50,7 @@ public class Context
     /// <summary>
     /// All functions available in this context.
     /// </summary>
-    public IDictionary<string, object> Functions { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, Statement> Functions { get; private set; } = new Dictionary<string, Statement>();
 
     /// <summary>
     /// How to leave loops.
