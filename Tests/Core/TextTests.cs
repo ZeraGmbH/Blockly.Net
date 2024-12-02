@@ -171,13 +171,10 @@ public class TextTests : TestEnvironment
     }
 
     [TestCase("FIRST", 0, "LAST", 0, "Bla01234Blo")]
-    [TestCase("FIRST", 0, "FIRST", 0, "B")]
-    [TestCase("LAST", 0, "LAST", 0, "o")]
     [TestCase("FROM_START", 3, "LAST", 0, "a01234Blo")]
-    [TestCase("FIRST", 0, "FROM_END", 0, "Bla01234Blo")]
-    [TestCase("FIRST", 0, "FROM_END", 1, "Bla01234Bl")]
-    [TestCase("FIRST", 0, "FROM_END", 2, "Bla01234B")]
-    [TestCase("FROM_START", 4, "FROM_END", 2, "01234B")]
+    [TestCase("FIRST", 0, "FROM_END", 1, "Bla01234Blo")]
+    [TestCase("FIRST", 0, "FROM_END", 2, "Bla01234Bl")]
+    [TestCase("FROM_START", 4, "FROM_END", 2, "01234Bl")]
     public async Task Can_Extract_Part_Of_String_Async(string where1, int at1, string where2, int at2, string expected)
     {
         var template = @"

@@ -1,5 +1,6 @@
 
 
+using System.Dynamic;
 using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Text;
@@ -16,24 +17,15 @@ public class TextSubstring : Block
     var from = Fields["WHERE1"];
     var to = Fields["WHERE2"];
 
-    var start = from switch
+    var getIndex = async (string where, string at) => where switch
     {
-      "FIRST" => 1,
+      "FIRST" => 0,
       "LAST" => value.Length,
-      "FROM_START" => (int)await Values.EvaluateAsync<double>("AT1", context),
-      "FROM_END" => value.Length - (int)await Values.EvaluateAsync<double>("AT1", context),
-      _ => throw new ArgumentException($"unknown choice {from}")
+      "FROM_START" => (int)await Values.EvaluateAsync<double>(at, context) - 1,
+      "FROM_END" => value.Length - ((int)await Values.EvaluateAsync<double>(at, context) - 1),
+      _ => throw new ArgumentException($"unknown choice {where}")
     };
 
-    var end = to switch
-    {
-      "FIRST" => 1,
-      "LAST" => value.Length,
-      "FROM_START" => (int)await Values.EvaluateAsync<double>("AT2", context),
-      "FROM_END" => value.Length - (int)await Values.EvaluateAsync<double>("AT2", context),
-      _ => throw new ArgumentException($"unknown choice {from}")
-    };
-
-    return value.Substring(start - 1, end - start + 1);
+    return value[await getIndex(from, "AT1")..await getIndex(to, "AT2")];
   }
 }
