@@ -92,18 +92,18 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, true).Item2;
+    public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, null, true).Item2;
 
     /// <inheritdoc/>
-    public bool Start(string id, string? name) => CreateGroup(id, name, false).Item1;
+    public bool Start(string id, string? name, string? details) => CreateGroup(id, name, details, false).Item1;
 
-    private Tuple<bool, IGroupManager> CreateGroup(string id, string? name, bool nested)
+    private Tuple<bool, IGroupManager> CreateGroup(string id, string? name, string? details, bool nested)
     {
         /* Maybe a nested group manager must be created. */
         GroupManager manager = null!;
 
         /* The new group. */
-        var group = new GroupStatus { Key = id, Name = name, IsScript = nested };
+        var group = new GroupStatus { Key = id, Name = name, IsScript = nested, Details = details };
 
         lock (_groups)
         {
