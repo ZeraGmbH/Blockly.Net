@@ -11,7 +11,7 @@ namespace BlocklyNet.Extensions;
     "execute_group",
     "ExecutionGroups",
     @"{
-        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6"",
+        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
@@ -24,6 +24,16 @@ namespace BlocklyNet.Extensions;
             {
                 ""type"": ""input_dummy"",
                 ""name"": ""NAME""
+            },
+            {
+                ""type"": ""field_label_serializable"",
+                ""name"": ""DETAILS"",
+                ""text"": ""Details""
+            },
+            {
+                ""type"": ""input_value"",
+                ""name"": ""DETAILS"",
+                ""check"": ""String""
             },
             {
                 ""type"": ""input_statement"",
@@ -56,7 +66,7 @@ public class ExecutionGroup : Block
         /* Register the group. */
         var name = Fields["NAME"];
 
-        if (context.Engine.BeginGroup(Id, name))
+        if (context.Engine.BeginGroup(Id, name, await Values.EvaluateAsync<string?>("DETAILS", context, false)))
         {
             /* Execute the statement if available - may calculate data needed to create a group result. */
             var statement = Statements.TryGet("DO");

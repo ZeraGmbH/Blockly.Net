@@ -27,6 +27,11 @@ public class GroupStatusCommon
     public string? Name { get; set; }
 
     /// <summary>
+    /// Optional details of the execution.
+    /// </summary>
+    public string? Details { get; set; }
+
+    /// <summary>
     /// Result of the execution.
     /// </summary>
     public string? Result { get; set; }

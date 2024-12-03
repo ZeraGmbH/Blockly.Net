@@ -25,12 +25,12 @@ public class GroupExecutionTests : TestEnvironment
             }
         };
 
-        Site.Setup(s => s.BeginGroup(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        Site.Setup(s => s.BeginGroup(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
         await block.EvaluateAsync(new Context(Site.Object));
 
-        Site.Verify(s => s.BeginGroup("A", "A1"), Times.Once);
-        Site.Verify(s => s.BeginGroup("B", "B2"), Times.Once);
+        Site.Verify(s => s.BeginGroup("A", "A1", null), Times.Once);
+        Site.Verify(s => s.BeginGroup("B", "B2", null), Times.Once);
         Site.Verify(s => s.EndGroup(It.IsAny<GroupResult>()), Times.Exactly(2));
         Site.Verify(s => s.SingleStepAsync(It.IsAny<Block>()), Times.Exactly(2));
         Site.VerifyGet(s => s.Cancellation, Times.Exactly(6));

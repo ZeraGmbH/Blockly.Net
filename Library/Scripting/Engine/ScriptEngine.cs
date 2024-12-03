@@ -408,7 +408,7 @@ public partial class ScriptEngine(
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public bool BeginGroup(string key, string? name) => _groupManager.Start(key, name);
+    public bool BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
 
     /// <inheritdoc/>
     public void EndGroup(GroupResult result)
