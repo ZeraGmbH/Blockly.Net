@@ -52,12 +52,25 @@ public class TryCatchFinally : Block
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            /* Fetch the block to run. */
-            var report = Statements.TryGet("CATCH");
+            /* Always remember. */
+            var lastException = context.LastException;
 
-            if (report != null) await report.EvaluateAsync(context);
+            context.LastException = e;
+
+            try
+            {
+                /* Fetch the block to run. */
+                var report = Statements.TryGet("CATCH");
+
+                if (report != null) await report.EvaluateAsync(context);
+            }
+            finally
+            {
+                /* Reset. */
+                context.LastException = lastException;
+            }
         }
         finally
         {
