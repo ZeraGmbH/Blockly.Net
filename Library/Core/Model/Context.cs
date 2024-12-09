@@ -23,6 +23,11 @@ public class Context
     public CancellationToken Cancellation => Engine.Cancellation;
 
     /// <summary>
+    /// Last exception observed - will not be reset.
+    /// </summary>
+    public Exception? LastException { get; set; }
+
+    /// <summary>
     /// Initialize a new context.
     /// </summary>
     /// <param name="engine">Script engine to use.</param>

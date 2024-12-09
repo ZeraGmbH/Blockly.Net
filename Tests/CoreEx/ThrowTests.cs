@@ -180,4 +180,37 @@ public class ThrowTests : TestEnvironment
 
         Assert.That(context.Variables["result"], Is.EqualTo(30));
     }
+
+    [Test]
+    public async Task TryCatchFinally_Try_Catch_Last_Error_Async()
+    {
+        var block = new TryCatchFinally
+        {
+            Statements = {
+            new()
+            {
+                Name = "TRY",
+                Block = new VariablesSet {
+                    Fields = { new () { Name = "VAR", Value = "result" } },
+                    Values = { new () { Name = "VALUE", Block = CreateNumberBlock("10") } },
+                    Next = new Throw { Values = { new () { Name="MESSAGE", Block = CreateStringBlock("bad") } } }
+                }
+            },
+            new()
+            {
+                Name = "CATCH",
+                Block = new VariablesSet {
+                    Fields = { new () { Name = "VAR", Value = "result" } },
+                    Values = { new () { Name = "VALUE", Block = new GetLastException() } },
+                }
+            },
+        },
+        };
+
+        var context = new Context(Site.Object);
+
+        await block.EvaluateAsync(context);
+
+        Assert.That(context.Variables["result"], Is.EqualTo("bad"));
+    }
 }

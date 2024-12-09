@@ -249,6 +249,7 @@ public static class BlocklyExtensions
         builder.AddBlock<ExecutionGroup>();
         builder.AddBlock<ExtractProperty>();
         builder.AddBlock<GetGroupStatus>();
+        builder.AddBlock<GetLastException>();
         builder.AddBlock<HttpRequest>();
         builder.AddBlock<Now>();
         builder.AddBlock<ParseJson>();
