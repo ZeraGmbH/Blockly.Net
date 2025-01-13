@@ -99,7 +99,7 @@ public partial class ScriptEngine(
         };
 
     /// <inheritdoc/>
-    public async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
+    public virtual async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
     {
         Logger.LogTrace("Script '{Name}' should be started for {Token}.", request.Name, userToken);
 
