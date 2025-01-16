@@ -1,3 +1,5 @@
+namespace BlocklyNet;
+
 /// <summary>
 /// Some implementation helpers.
 /// </summary>
