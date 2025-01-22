@@ -20,7 +20,7 @@ Simply a list of tuples with display name and progress counter for each level of
 
 ### [ScriptGroupStatus](ScriptGroupStatus.cs) GroupStatus
 
-Information on finished execution groups. This data can be used for restarting a script and keep specific results from the former run without recalculating it. The first entry describes the status and eventually result of the main script itself even if the script is not using execution groups.
+Information on finished execution groups if the script is using such. This data can be used for restarting a script and keep specific results from the former run without recalculating it.
 
 ## InputRequest [ScriptEngineNotifyMethods.InputRequest](UserInputRequest.cs)
 

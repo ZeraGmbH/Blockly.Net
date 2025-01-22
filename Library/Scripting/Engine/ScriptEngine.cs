@@ -192,8 +192,11 @@ public partial class ScriptEngine(
     {
         using (Lock.Wait())
         {
-            if (_active == null || _active.JobId != jobId)
-                throw new ArgumentException("not the active script", nameof(jobId));
+            /* Silent leave if script is already cancelled. */
+            if (_active == null) return;
+
+            /* Can only cancel the active script. */
+            if (_active.JobId != jobId) throw new ArgumentException("not the active script", nameof(jobId));
 
             /* Report the result. */
             Logger.LogTrace("User cancelled script {JobId}", jobId);
@@ -295,7 +298,7 @@ public partial class ScriptEngine(
     protected virtual Task OnScriptDoneAsync(IScriptInstance script, IScript? parent) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public object? FinishScriptAndGetResult(string jobId)
+    public object? FinishScriptAndGetResult(string jobId, bool keepActive = false)
     {
         using (Lock.Wait())
         {
@@ -303,29 +306,34 @@ public partial class ScriptEngine(
             var script = _active;
 
             if (script == null || script.JobId != jobId)
-                throw new ArgumentException("no the active script", nameof(jobId));
+                throw new ArgumentException("not the active script", nameof(jobId));
 
             if (!_done)
                 throw new ArgumentException("script not yet finished", nameof(jobId));
 
-            /* Reset active script - result can only be requested once. */
-            using (_activeScope) _activeScope = null;
+            /* Only report result - do not finish script. */
+            if (!keepActive)
+            {
+                /* Reset active script - result can only be requested once. */
+                using (_activeScope) _activeScope = null;
 
-            _active = null;
+                _active = null;
 
-            /* Report the result. */
-            Logger.LogTrace("Processing result for script {JobId}", jobId);
+                /* Report the result. */
+                Logger.LogTrace("Finish script {JobId}", jobId);
 
-            /* Inform all. */
-            context?
-                .SendAsync(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
-                .ContinueWith(
-                    t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
-                    CancellationToken.None,
-                    TaskContinuationOptions.NotOnRanToCompletion,
-                    TaskScheduler.Current)
-                .Touch();
+                /* Inform all. */
+                context?
+                    .SendAsync(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to report script result: {Exception}", t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
+            }
 
+            /* In either case report the latest result from the script. */
             return script.Result;
         }
     }
