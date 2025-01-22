@@ -23,6 +23,30 @@ public class ManualFinishTests : TestEnvironment
         </block>
         </xml>";
 
+    private const string Script2 = @"
+        <xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable>result</variable>
+        </variables>
+        <block type=""variables_set"">
+            <field name=""VAR"">result</field>
+            <value name=""VALUE"">
+                <block type=""text"">
+                    <field name=""TEXT"">READY</field>
+                </block>
+            </value>
+            <next>
+                <block type=""throw_exception"">
+                    <value name=""MESSAGE"">
+                        <block type=""text"">
+                            <field name=""TEXT"">AUTSCH</field>
+                        </block>
+                    </value>
+                </block>
+            </next>
+        </block>
+        </xml>";
+
     /// <inheritdoc/>
     protected override void OnSetup(IServiceCollection services)
     {
@@ -61,5 +85,36 @@ public class ManualFinishTests : TestEnvironment
         }
 
         Assert.Throws<ArgumentException>(() => Engine.FinishScriptAndGetResult(jobId));
+    }
+
+    [Test]
+    public async Task Error_Will_Not_Finish_Async()
+    {
+        /* Termination helper. */
+        var done = new TaskCompletionSource();
+
+        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) =>
+        {
+            /* See if script is done. */
+            if (method == ScriptEngineNotifyMethods.Done)
+                done.SetResult();
+            else if (method == ScriptEngineNotifyMethods.Error)
+                try
+                {
+                    Assert.That(((ScriptError)arg!).ErrorMessage, Is.EqualTo("AUTSCH"));
+                }
+                finally
+                {
+                    done.SetResult();
+                }
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Throw Exception", ScriptId = AddScript("SCRIPT", Script2) }, "");
+
+        /* Wait for the script to finish. */
+        await done.Task;
+
+        /* Check the result. */
+        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
     }
 }

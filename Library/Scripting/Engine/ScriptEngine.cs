@@ -50,6 +50,11 @@ public partial class ScriptEngine(
     /// </summary>
     private bool _done = false;
 
+    /// <summary>
+    /// Exception observed during execution - only valid when _done is set.
+    /// </summary>
+    private Exception? _error = null;
+
     /// <inheritdoc/>
     public IServiceProvider ServiceProvider => _activeScope?.ServiceProvider ?? _rootProvider;
 
@@ -123,6 +128,7 @@ public partial class ScriptEngine(
                 _cancel = new();
                 _codeHash = null!;
                 _done = false;
+                _error = null;
                 _groupManager.Reset(options?.GroupResults?.GroupStatus);
                 _inputRequest = null;
                 _inputResponse = null;
@@ -257,20 +263,22 @@ public partial class ScriptEngine(
 
             Logger.LogError("Failed to execute script {JobId}: {Exception}", script.JobId, error.Message);
         }
+
         try
         {
             /* Make sure child processes will terminate as soon as possible. */
             await _cancel.CancelAsync();
 
             _done = true;
+            _error = error;
 
             /* Customize. */
             await OnScriptDoneAsync(script, null);
 
             /* Forward the information on the now terminated script. */
-            var task = error == null
+            var task = _error == null
                 ? context?.SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
-                : context?.SendAsync(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, error));
+                : context?.SendAsync(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, _error));
 
             /* In case of any error just log - actually this could be quite a problem. */
             task?.ContinueWith(
@@ -283,12 +291,6 @@ public partial class ScriptEngine(
         catch (Exception e)
         {
             Logger.LogError("Failed to finish script: {Exception}", e.Message);
-        }
-        finally
-        {
-            /* In case of execution error forget the running job - elsewhere the script must be ended using GetResult(). */
-            if (error != null)
-                FinishScriptAndGetResult(script.JobId);
         }
     }
 
@@ -399,16 +401,26 @@ public partial class ScriptEngine(
                         TaskScheduler.Current)
                     .Touch();
 
-            /* Script is completed. */
+            /* Script is completed - with or without error. */
             if (_done)
-                client
-                    .SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(_active))
-                    .ContinueWith(
-                        t => Logger.LogError("Failed to finish script: {Exception}", t.Exception?.Message),
-                        CancellationToken.None,
-                        TaskContinuationOptions.NotOnRanToCompletion,
-                        TaskScheduler.Current)
-                    .Touch();
+                if (_error == null)
+                    client
+                        .SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(_active))
+                        .ContinueWith(
+                            t => Logger.LogError("Failed to report script done: {Exception}", t.Exception?.Message),
+                            CancellationToken.None,
+                            TaskContinuationOptions.NotOnRanToCompletion,
+                            TaskScheduler.Current)
+                        .Touch();
+                else
+                    client
+                        .SendAsync(ScriptEngineNotifyMethods.Error, CreateErrorNotification(_active, _error))
+                        .ContinueWith(
+                            t => Logger.LogError("Failed to report script faulted: {Exception}", t.Exception?.Message),
+                            CancellationToken.None,
+                            TaskContinuationOptions.NotOnRanToCompletion,
+                            TaskScheduler.Current)
+                        .Touch();
         }
     }
 

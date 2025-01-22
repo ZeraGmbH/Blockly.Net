@@ -32,9 +32,7 @@ In a poorly implemented script where multiple parallel nested scripts require us
 
 ## ScriptError [ScriptEngineNotifyMethods.Error](ScriptError.cs)
 
-This event indicates that the active script has been terminated due to an exception observed. The `ErrorMessage` field will contain the description of the exception as a single string.
-
-Exceptions during the execution of the script are considered fatal and the script will be terminated completely. During this process the finish event will be generated automatically. Therefore `Reconnect` will never generate error notifications.
+This event indicates that the active script has been terminated due to an exception observed. The `ErrorMessage` field will contain the description of the exception as a single string. The script is still considered active and must be manually terminated. `Reconnect` will report error events as well.
 
 ## ScriptDone [ScriptEngineNotifyMethods.Done](ScriptDone.cs)
 
