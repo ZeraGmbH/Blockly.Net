@@ -70,12 +70,12 @@ public partial class ScriptEngine
     /// <param name="script"></param>
     /// <returns></returns>
     protected virtual ScriptFinished CreateFinishNotification(IScriptInstance script)
-            => new()
-            {
-                GroupStatus = SerializeGroupStatus(true),
-                JobId = script.JobId,
-                ModelType = script.GetRequest().ModelType,
-                Name = script.GetRequest().Name,
-                ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
-            };
+        => new()
+        {
+            GroupStatus = SerializeGroupStatus(true),
+            JobId = script.JobId,
+            ModelType = script.GetRequest().ModelType,
+            Name = script.GetRequest().Name,
+            ScriptId = script.GetRequest() is IStartGenericScript generic ? generic.ScriptId : null,
+        };
 }

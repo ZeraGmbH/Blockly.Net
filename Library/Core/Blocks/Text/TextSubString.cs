@@ -1,6 +1,3 @@
-
-
-using System.Dynamic;
 using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Text;

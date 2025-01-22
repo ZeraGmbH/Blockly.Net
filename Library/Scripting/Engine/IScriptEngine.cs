@@ -31,8 +31,9 @@ public interface IScriptEngine
     /// Get the script result and forget about the execution.
     /// </summary>
     /// <param name="jobId">The already finished script.</param>
+    /// <param name="keepActive">Set to keep the script active.</param>
     /// <returns>Result of the script.</returns>
-    object? FinishScriptAndGetResult(string jobId);
+    object? FinishScriptAndGetResult(string jobId, bool keepActive = false);
 
     /// <summary>
     /// A client reports a requested value.
