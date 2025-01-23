@@ -115,7 +115,7 @@ public class UserInputTests : TestEnvironment
         await done.Task;
 
         /* Check the result. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That(result.Result, Is.TypeOf<MyModel>());
         Assert.That(((MyModel)result.Result).Data, Is.EqualTo("Test me!"));

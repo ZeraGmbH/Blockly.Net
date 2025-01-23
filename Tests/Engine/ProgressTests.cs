@@ -243,7 +243,7 @@ public class ProgressTests : TestEnvironment
         await done.Task;
 
         /* Check the time stamps generated. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
         var times = ((IEnumerable)result.Result).Cast<double>().Select(d => new DateTime((long)d)).ToArray();
 
         Assert.That((times[1] - times[0]).TotalMilliseconds, Is.GreaterThanOrEqualTo(90));
