@@ -78,10 +78,10 @@ public partial class ScriptEngine
             => _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public bool BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
+        public GroupStatus? BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
 
         /// <inheritdoc/>
-        public void EndGroup(GroupResult result) => _groupManager.Finish(result);
+        public GroupStatus EndGroup(GroupResult result) => _groupManager.Finish(result);
 
         /// <inheritdoc/>
         public GroupStatus GetGroupStatus(int index) => _groupManager[index];

@@ -1,6 +1,9 @@
+using System.Text.Json;
+using BlocklyNet.Core.Blocks.Variables;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Engine;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlocklyNet.Extensions;
 
@@ -11,7 +14,7 @@ namespace BlocklyNet.Extensions;
     "execute_group",
     "ExecutionGroups",
     @"{
-        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8"",
+        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
@@ -48,6 +51,29 @@ namespace BlocklyNet.Extensions;
                 ""type"": ""input_value"",
                 ""name"": ""RESULT"",
                 ""check"": ""group_execution_result""
+            },
+            {
+                ""type"": ""field_label_serializable"",
+                ""name"": ""STATUSVAR"",
+                ""text"": ""Save Status in""
+            },
+            {
+                ""type"": ""field_variable"",
+                ""name"": ""STATUSVAR"",
+                ""variable"": ""groupStatus""
+            },
+            {
+                ""type"": ""input_dummy""
+            },
+            {
+                ""type"": ""field_label_serializable"",
+                ""name"": ""RESULTVAR"",
+                ""text"": ""Save Result in""
+            },
+            {
+                ""type"": ""field_variable"",
+                ""name"": ""RESULTVAR"",
+                ""variable"": ""groupResult""
             }
         ],
         ""previousStatement"": null,
@@ -64,9 +90,9 @@ public class ExecutionGroup : Block
     public override async Task<object?> EvaluateAsync(Context context)
     {
         /* Register the group. */
-        var name = Fields["NAME"];
+        var groupResult = context.Engine.BeginGroup(Id, Fields["NAME"], await Values.EvaluateAsync<string?>("DETAILS", context, false));
 
-        if (context.Engine.BeginGroup(Id, name, await Values.EvaluateAsync<string?>("DETAILS", context, false)))
+        if (groupResult == null)
         {
             /* Execute the statement if available - may calculate data needed to create a group result. */
             var statement = Statements.TryGet("DO");
@@ -74,10 +100,36 @@ public class ExecutionGroup : Block
             if (statement != null) await statement.EvaluateAsync(context);
 
             /* Execute the function to get the group result. */
-            var groupResult = await Values.EvaluateAsync<GroupResult>("RESULT", context);
+            var result = await Values.EvaluateAsync<GroupResult>("RESULT", context);
 
             /* Finish the group. */
-            context.Engine.EndGroup(groupResult);
+            groupResult = context.Engine.EndGroup(result);
+        }
+
+        /* Set status. */
+        var statusVar = Fields.TryGet("STATUSVAR")?.Value;
+
+        if (!string.IsNullOrEmpty(statusVar)) VariablesSet.Set(context, statusVar, groupResult);
+
+        /* Set result. */
+        var resultVar = Fields.TryGet("RESULTVAR")?.Value;
+
+        if (!string.IsNullOrEmpty(resultVar))
+        {
+            /* Decode the result information - object? will become a JSON document. */
+            var rawResult = groupResult.GetResult()?.Result;
+
+            if (rawResult is JsonDocument doc && context.VariableTypes.TryGetValue(resultVar, out var resultType) && !string.IsNullOrEmpty(resultType))
+            {
+                /* Convert if this is a known type. */
+                var modelInfos = context.ServiceProvider.GetRequiredService<IScriptModels>();
+
+                if (modelInfos.Models.TryGetValue(resultType, out var typeInfo) || modelInfos.Enums.TryGetValue(resultType, out typeInfo))
+                    rawResult = JsonSerializer.Deserialize(doc, typeInfo.Type, JsonUtils.JsonSettings);
+            }
+
+            /* Write to indicated variable. */
+            VariablesSet.Set(context, resultVar, rawResult);
         }
 
         /* Continue with execution. */

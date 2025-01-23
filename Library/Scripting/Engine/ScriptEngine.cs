@@ -436,15 +436,17 @@ public partial class ScriptEngine(
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public bool BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
+    public GroupStatus? BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
 
     /// <inheritdoc/>
-    public void EndGroup(GroupResult result)
+    public GroupStatus EndGroup(GroupResult result)
     {
-        _groupManager.Finish(result);
+        var status = _groupManager.Finish(result);
 
         /* Interrupt right now. */
         if (_pause.IsCancellationRequested) throw new ScriptPausedException();
+
+        return status;
     }
 
     /// <inheritdoc/>

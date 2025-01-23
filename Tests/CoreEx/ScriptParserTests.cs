@@ -434,4 +434,30 @@ public class ScriptParserTests
             Assert.That(vars[5], Is.Null);
         });
     }
+
+    [Test]
+    public void Can_Provide_Variable_Types()
+    {
+        const string xml = @"
+            <xml xmlns=""https://developers.google.com/blockly/xml"">
+            <variables>
+                <variable type=""something"">result</variable>
+            </variables>
+            <block type=""variables_set"">
+                <field name=""VAR"">result</field>
+                <value name=""VALUE"">
+                    <block type=""text"">
+                        <field name=""TEXT"">WHAT</field>
+                    </block>
+                </value>
+            </block>
+            </xml>        
+        ";
+
+        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
+        var parsed = engine.Parser.Parse(xml);
+
+        Assert.That(parsed.GetVariableType("result"), Is.EqualTo("something"));
+        Assert.That(parsed.GetVariableType("dummy"), Is.Null);
+    }
 }

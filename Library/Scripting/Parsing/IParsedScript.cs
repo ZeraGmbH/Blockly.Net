@@ -26,4 +26,11 @@ public interface IParsedScript
     /// 
     /// </summary>
     Task<List<GroupInfo>> GetGroupTreeAsync();
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    string? GetVariableType(string name);
 }

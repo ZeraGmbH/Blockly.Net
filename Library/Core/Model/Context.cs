@@ -31,9 +31,11 @@ public class Context
     /// Initialize a new context.
     /// </summary>
     /// <param name="engine">Script engine to use.</param>
-    public Context(IScriptSite engine)
+    /// <param name="variableTypes">Type of all variables.</param>
+    public Context(IScriptSite engine, IDictionary<string, string>? variableTypes = null)
     {
         Engine = engine;
+        VariableTypes = variableTypes ?? new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -42,15 +44,21 @@ public class Context
     /// <param name="parent">Parent context to use.</param>
     public Context(Context parent)
     {
-        Parent = parent;
         Engine = parent.Engine;
         Functions = parent.Functions;
+        Parent = parent;
+        VariableTypes = parent.VariableTypes;
     }
 
     /// <summary>
     /// The values of all variables.
     /// </summary>
     public IDictionary<string, object?> Variables { get; } = new Dictionary<string, object?>();
+
+    /// <summary>
+    /// The types of all variables.
+    /// </summary>
+    public IDictionary<string, string> VariableTypes { get; private set; }
 
     /// <summary>
     /// All functions available in this context.

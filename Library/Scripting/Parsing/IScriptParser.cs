@@ -17,15 +17,15 @@ public interface IScriptParser
     /// <summary>
     /// 
     /// </summary>
-    public IEnumerable<JsonObject> BlockDefinitions { get; }
+    IEnumerable<JsonObject> BlockDefinitions { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    public IEnumerable<JsonObject> ModelDefinitions { get; }
+    IEnumerable<JsonObject> ModelDefinitions { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    public IEnumerable<Tuple<string, JsonObject>> ToolboxEntries { get; }
+    IEnumerable<Tuple<string, JsonObject>> ToolboxEntries { get; }
 }

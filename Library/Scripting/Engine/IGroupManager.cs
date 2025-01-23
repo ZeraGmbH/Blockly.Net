@@ -11,15 +11,15 @@ public interface ISiteGroupManager
     /// <param name="id">Unique identifer of the group.</param>
     /// <param name="name">Optional name of the group.</param>
     /// <param name="details">Optional detail information for the execution.</param>
-    /// <returns>Set if the execution started, unset if the result from
+    /// <returns>null if the execution started, set if the result from
     /// a previous execution has been reuses.</returns>
-    bool Start(string id, string? name, string? details);
+    GroupStatus? Start(string id, string? name, string? details);
 
     /// <summary>
     /// Finish a group of execution.
     /// </summary>
     /// <param name="result">Result of the execution group.</param>
-    void Finish(GroupResult result);
+    GroupStatus Finish(GroupResult result);
 
     /// <summary>
     /// Create a nested group manager.

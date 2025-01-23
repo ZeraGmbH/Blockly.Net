@@ -46,7 +46,7 @@ public abstract class Entities<T> : IEnumerable<T>
     /// </summary>
     /// <param name="key">Key of the item.</param>
     /// <returns>The item or null if the item is not known.</returns>
-    public T TryGet(string key) => _firstItemMap.TryGetValue(key, out var value) ? value : default!;
+    public T? TryGet(string key) => _firstItemMap.TryGetValue(key, out var value) ? value : default;
 
     /// <summary>
     /// Check if an item exists.

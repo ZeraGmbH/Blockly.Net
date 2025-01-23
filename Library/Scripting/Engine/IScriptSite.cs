@@ -91,14 +91,14 @@ public interface IScriptSite
     /// <param name="key">Unique identifier of the group.</param>
     /// <param name="name">Optional name of the group.</param>
     /// <param name="details">Optional details of the group executions.</param>
-    /// <returns>Set if the execution started, unset if the result from
+    /// <returns>null if the execution started, set if the result from
     /// a previous execution has been reuses.</returns>
-    bool BeginGroup(string key, string? name, string? details);
+    GroupStatus? BeginGroup(string key, string? name, string? details);
 
     /// <summary>
     /// End the execution of the current group.
     /// </summary>
-    void EndGroup(GroupResult result);
+    GroupStatus EndGroup(GroupResult result);
 
     /// <summary>
     /// Report the status of a single group execution.
