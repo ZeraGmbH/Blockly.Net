@@ -299,8 +299,13 @@ public partial class ScriptEngine(
     /// </summary>
     protected virtual Task OnScriptDoneAsync(IScriptInstance script, IScript? parent) => Task.CompletedTask;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    protected virtual Task OnEngineIdleAsync(IScriptInstance script) => Task.CompletedTask;
+
     /// <inheritdoc/>
-    public object? FinishScriptAndGetResult(string jobId, bool keepActive = false)
+    public async Task<object?> FinishScriptAndGetResultAsync(string jobId, bool keepActive = false)
     {
         using (Lock.Wait())
         {
@@ -316,6 +321,9 @@ public partial class ScriptEngine(
             /* Only report result - do not finish script. */
             if (!keepActive)
             {
+                /* Will now deactivate the script. */
+                await OnEngineIdleAsync(script);
+
                 /* Reset active script - result can only be requested once. */
                 using (_activeScope) _activeScope = null;
 

@@ -79,12 +79,12 @@ public class ManualFinishTests : TestEnvironment
         /* Check the result. */
         for (var i = 10; i-- > 0;)
         {
-            var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId, i != 0)!;
+            var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId, i != 0))!;
 
             Assert.That(result.Result, Is.EqualTo("READY"));
         }
 
-        Assert.Throws<ArgumentException>(() => Engine.FinishScriptAndGetResult(jobId));
+        Assert.ThrowsAsync<ArgumentException>(() => Engine.FinishScriptAndGetResultAsync(jobId));
     }
 
     [Test]
@@ -115,6 +115,6 @@ public class ManualFinishTests : TestEnvironment
         await done.Task;
 
         /* Check the result. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
     }
 }

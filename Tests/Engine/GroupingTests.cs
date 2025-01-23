@@ -168,7 +168,7 @@ public class GroupingTests : TestEnvironment
         await done.Task;
 
         /* Check the result. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
     }
@@ -215,7 +215,7 @@ public class GroupingTests : TestEnvironment
         });
 
         /* Check the result. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
     }
@@ -249,7 +249,7 @@ public class GroupingTests : TestEnvironment
         await done.Task;
 
         /* Check the result. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That(result, Is.Null);
         Assert.That(errorEvent, Is.Not.Null);
@@ -276,7 +276,7 @@ public class GroupingTests : TestEnvironment
 
         await done.Task;
 
-        result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That(errorEvent, Is.Null);
 

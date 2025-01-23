@@ -203,7 +203,7 @@ public class ParallelTests : TestEnvironment
         await done.Task;
 
         /* Check the time stamps generated. */
-        var result = (GenericResult)Engine.FinishScriptAndGetResult(jobId)!;
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
         var results = ((IEnumerable)result.Result).Cast<IEnumerable>().ToArray();
         var times1 = results[0].Cast<double>().Select(t => new DateTime((long)t)).ToArray();
         var times2 = results[1].Cast<double>().Select(t => new DateTime((long)t)).ToArray();
