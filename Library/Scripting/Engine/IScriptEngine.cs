@@ -19,8 +19,9 @@ public interface IScriptEngine
     /// <summary>
     /// Restart the currently running script.
     /// </summary>
+    /// <param name="jobId"></param>
     /// <param name="repeat">What to recover from a previous execution.</param>
-    Task<string> RestartAsync(IEnumerable<GroupRepeat> repeat);
+    Task<string> RestartAsync(string jobId, IEnumerable<GroupRepeat> repeat);
 
     /// <summary>
     /// Abort the currently running script.

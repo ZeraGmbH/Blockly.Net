@@ -179,7 +179,7 @@ public partial class ScriptEngine(
     }
 
     /// <inheritdoc/>
-    public virtual async Task<string> RestartAsync(IEnumerable<GroupRepeat>? repeat)
+    public virtual async Task<string> RestartAsync(string jobId, IEnumerable<GroupRepeat>? repeat)
     {
         Logger.LogTrace("Script should be restarted");
 
@@ -189,6 +189,10 @@ public partial class ScriptEngine(
             {
                 /* There must be some active script. */
                 var script = (Script?)_active ?? throw new InvalidOperationException("no script to restart.");
+
+                if (script.JobId != jobId) throw new ArgumentException("not the active script");
+
+                if (!_done) throw new InvalidOperationException("script must be finished to be restarte");
 
                 /* Generate a new job identifier and reset internal state. */
                 await script.ResetAsync();
