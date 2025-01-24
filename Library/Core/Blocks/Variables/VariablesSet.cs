@@ -9,25 +9,34 @@ namespace BlocklyNet.Core.Blocks.Variables;
 /// </summary>
 public class VariablesSet : Block
 {
-  /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="context"></param>
+  /// <param name="name"></param>
+  /// <param name="value"></param>
+  public static void Set(Context context, string name, object? value)
   {
     var variables = context.Variables;
-    var value = await Values.EvaluateAsync("VALUE", context);
-    var variableName = Fields["VAR"];
 
     // Fast-Solution
-    if (variables.ContainsKey(variableName))
-      variables[variableName] = value!;
+    if (variables.ContainsKey(name))
+      variables[name] = value!;
     else
     {
       var rootContext = context.GetRootContext();
 
-      if (rootContext.Variables.ContainsKey(variableName))
-        rootContext.Variables[variableName] = value!;
+      if (rootContext.Variables.ContainsKey(name))
+        rootContext.Variables[name] = value!;
       else
-        variables.Add(variableName, value!);
+        variables.Add(name, value!);
     }
+  }
+
+  /// <inheritdoc/>
+  public override async Task<object?> EvaluateAsync(Context context)
+  {
+    Set(context, Fields["VAR"], await Values.EvaluateAsync("VALUE", context));
 
     return await base.EvaluateAsync(context);
   }

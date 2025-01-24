@@ -26,7 +26,6 @@ public class ColorTests : TestEnvironment
             <block type=""colour_random""></block>
             </xml>");
 
-
         var output = (string)(await script.RunAsync(Site.Object))!;
 
         Assert.That(output, Has.Length.EqualTo(7));

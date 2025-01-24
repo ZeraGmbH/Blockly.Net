@@ -95,9 +95,9 @@ public class GroupManager : IGroupManager
     public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, null, true).Item2;
 
     /// <inheritdoc/>
-    public bool Start(string id, string? name, string? details) => CreateGroup(id, name, details, false).Item1;
+    public GroupStatus? Start(string id, string? name, string? details) => CreateGroup(id, name, details, false).Item1;
 
-    private Tuple<bool, IGroupManager> CreateGroup(string id, string? name, string? details, bool nested)
+    private Tuple<GroupStatus?, IGroupManager> CreateGroup(string id, string? name, string? details, bool nested)
     {
         /* Maybe a nested group manager must be created. */
         GroupManager manager = null!;
@@ -144,7 +144,7 @@ public class GroupManager : IGroupManager
                     group.Children.AddRange(current.Children.Select(g => g.ToStatus()));
 
                     /* Caller can abort nested proceessing. */
-                    return Tuple.Create(false, (IGroupManager)manager);
+                    return Tuple.Create<GroupStatus?, IGroupManager>(group, manager);
                 }
 
                 /* Full process. */
@@ -154,18 +154,22 @@ public class GroupManager : IGroupManager
             }
         }
 
-        return Tuple.Create(true, (IGroupManager)manager);
+        return Tuple.Create<GroupStatus?, IGroupManager>(null, manager);
     }
 
     /// <inheritdoc/>
-    public void Finish(GroupResult result)
+    public GroupStatus Finish(GroupResult result)
     {
         /* Get the active one and set the result - fire some exception if none is found. */
         lock (_groups)
         {
-            _active.Pop().SetResult(new() { Type = result.Type, Result = result.Result });
+            var status = _active.Pop();
+
+            status.SetResult(new() { Type = result.Type, Result = result.Result });
 
             _previous = _previous?.Pop();
+
+            return status;
         }
     }
 

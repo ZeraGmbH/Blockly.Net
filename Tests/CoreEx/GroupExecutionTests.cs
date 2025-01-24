@@ -25,7 +25,7 @@ public class GroupExecutionTests : TestEnvironment
             }
         };
 
-        Site.Setup(s => s.BeginGroup(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        Site.Setup(s => s.BeginGroup(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns((GroupStatus?)null);
 
         await block.EvaluateAsync(new Context(Site.Object));
 

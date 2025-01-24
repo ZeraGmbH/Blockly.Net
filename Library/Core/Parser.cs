@@ -28,12 +28,12 @@ public abstract class Parser
       private readonly Workspace _workspace = workspace;
 
       /// <inheritdoc/>
-      public Task<object?> RunAsync(IScriptSite engine) => _workspace.EvaluateAsync(new Context(engine));
+      public Task<object?> RunAsync(IScriptSite engine) => _workspace.EvaluateAsync(new Context(engine, _workspace.VariableTypes));
 
       /// <inheritdoc/>
       public async Task<object?> EvaluateAsync(Dictionary<string, object?> presets, IScriptSite site)
       {
-        var ctx = new Context(site);
+        var ctx = new Context(site, _workspace.VariableTypes);
 
         foreach (var preset in presets)
           ctx.Variables.Add(preset);
@@ -59,6 +59,9 @@ public abstract class Parser
 
       /// <inheritdoc/>
       public Task<List<GroupInfo>> GetGroupTreeAsync() => _workspace.GetGroupTreeAsync();
+
+      /// <inheritdoc/>
+      public string? GetVariableType(string name) => _workspace.VariableTypes.TryGetValue(name, out var type) ? type : null;
     }
 
     public IParsedScript Parse(string scriptAsText)

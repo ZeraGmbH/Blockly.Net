@@ -15,16 +15,18 @@ public class XmlParser : Parser<XmlParser>
   public override Workspace Parse(string xml, bool preserveWhitespace = false)
   {
     var xdoc = new XmlDocument { PreserveWhitespace = preserveWhitespace };
+
     xdoc.LoadXml(xml);
 
     var workspace = new Workspace();
+
     foreach (XmlNode node in xdoc.DocumentElement!.ChildNodes)
     {
       if (node.LocalName == "block" || node.LocalName == "shadow")
       {
         var block = ParseBlock(node);
-        if (null != block)
-          workspace.Blocks.Add(block);
+
+        if (block != null) workspace.Blocks.Add(block);
       }
       else
       {
@@ -38,18 +40,13 @@ public class XmlParser : Parser<XmlParser>
 
         foreach (XmlNode nodeChild in node.ChildNodes)
         {
-          if (nodeChild.LocalName != "variable" ||
-              string.IsNullOrWhiteSpace(nodeChild.InnerText))
+          if (nodeChild.LocalName != "variable" || string.IsNullOrWhiteSpace(nodeChild.InnerText))
             continue;
 
           // Generate variable members    
           var block = new GlobalVariablesSet();
 
-          var field = new Field
-          {
-            Name = "VAR",
-            Value = nodeChild.InnerText,
-          };
+          var field = new Field { Name = "VAR", Value = nodeChild.InnerText };
 
           block.Fields.Add(field);
 
@@ -59,6 +56,11 @@ public class XmlParser : Parser<XmlParser>
 
           workspace.Blocks.Add(block);
 
+          // Check for type
+          var type = nodeChild.GetAttribute("type");
+
+          if (!string.IsNullOrEmpty(type))
+            workspace.VariableTypes[field.Value] = type;
         }
       }
     }

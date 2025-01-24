@@ -17,6 +17,11 @@ public class Workspace : IFragment
   public readonly IList<Block> Blocks = [];
 
   /// <summary>
+  /// Mapping of variables to its types.
+  /// </summary>
+  public readonly Dictionary<string, string> VariableTypes = [];
+
+  /// <summary>
   /// Execute all blocks in the workspace.
   /// </summary>
   /// <param name="context">Execution context.</param>
@@ -132,7 +137,7 @@ public class Workspace : IFragment
     var scope = new GroupInfo();
 
     /* Use a dummy site. */
-    var context = new Context((IScriptSite)null!);
+    var context = new Context(null!, VariableTypes);
 
     /* Find all functions and generate the block list. */
     foreach (var block in Blocks.OfType<ProceduresDef>())

@@ -13,13 +13,19 @@ public class GroupingTests : TestEnvironment
     /* Just request some user input. */
     private const string Script1 = @"
         <xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable type=""group_execution_status"">StatusVar</variable>
+            <variable type=""group_execution_result_type"">ResultVar</variable>
+        </variables>            
         <block type=""execute_group"" id=""Outer"">
             <field name=""NAME"">Outer</field>
+            <field name=""STATUSVAR"">StatusVar</field>
+            <field name=""RESULTVAR"">ResultVar</field>
             <value name=""RESULT"">                
                 <block type=""group_execution_result"" id=""Outer.Result"">
                     <value name=""Result"">                
-                        <block type=""text"" id=""Outer.Result.Value"">
-                            <field name=""TEXT"">1</field>
+                        <block type=""group_execution_result_type"" id=""Outer.Result.Value"">
+                            <field name=""VALUE"">Failed</field>
                         </block>
                     </value>
                     <value name=""Type"">                
@@ -202,7 +208,7 @@ public class GroupingTests : TestEnvironment
         await done.Task;
 
         /* Validate hash. */
-        Assert.That(hash.Single(), Is.EqualTo("EB-EC-09-A4-23-68-07-03-59-59-08-25-83-D3-3A-1A-7B-E0-5F-8E-2B-2E-B7-FA-8A-84-FB-BA-19-28-D7-06"));
+        Assert.That(hash.Single(), Is.EqualTo("5E-C3-38-B4-A9-E4-85-C1-16-CD-73-44-01-E1-36-93-2A-7C-65-95-92-4A-23-43-43-4F-DE-E8-70-CE-8B-C7"));
 
         /* Validate status. */
         Assert.That(status, Is.Not.Null);
