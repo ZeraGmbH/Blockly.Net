@@ -150,7 +150,7 @@ public partial class ScriptEngine(
                 ServiceProvider.GetService<ICurrentUser>()?.FromToken(userToken);
 
                 /* Do additional cleanup */
-                await OnPrepareStartAsync();
+                await OnPrepareStartAsync(false);
 
                 Logger.LogTrace("Script '{Name}' started as {JobId}.", request.Name, script.JobId);
 
@@ -196,7 +196,7 @@ public partial class ScriptEngine(
                 ResetScript(repeat);
 
                 /* Do additional cleanup */
-                await OnPrepareStartAsync();
+                await OnPrepareStartAsync(true);
 
                 Logger.LogTrace("Script restarted.");
 
@@ -227,7 +227,8 @@ public partial class ScriptEngine(
     /// <summary>
     /// Allow customization to prepare for a script execution.
     /// </summary>
-    protected virtual Task OnPrepareStartAsync() => Task.CompletedTask;
+    /// <param name="restart">Set if the current script is restarted.</param>
+    protected virtual Task OnPrepareStartAsync(bool restart) => Task.CompletedTask;
 
     /// <inheritdoc/>
     public void Pause(string jobId)
