@@ -103,6 +103,25 @@ public partial class ScriptEngine(
             HasBeenPaused = _pause.IsCancellationRequested,
         };
 
+    private void ResetScript(IEnumerable<GroupRepeat>? repeat)
+    {
+        /* Finish outstanding input requests. */
+        _inputResponse?.SetException(new OperationCanceledException());
+
+        /* Prepare for next script to be executed - full reset internal state. */
+        _allProgress.Clear();
+        _cancel = new();
+        _codeHash = null!;
+        _done = false;
+        _error = null;
+        _groupManager.Reset(repeat);
+        _inputRequest = null;
+        _inputResponse = null;
+        _lastProgress = null;
+        _lastProgressValue = null;
+        _pause = new();
+    }
+
     /// <inheritdoc/>
     public virtual async Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null)
     {
@@ -121,20 +140,9 @@ public partial class ScriptEngine(
                     throw new InvalidOperationException("another script is already executing.");
 
                 /* Reset the internal state to the new script. */
-                _inputResponse?.SetException(new OperationCanceledException());
-
                 _active = script;
-                _allProgress.Clear();
-                _cancel = new();
-                _codeHash = null!;
-                _done = false;
-                _error = null;
-                _groupManager.Reset(options?.GroupResults?.GroupStatus);
-                _inputRequest = null;
-                _inputResponse = null;
-                _lastProgress = null;
-                _lastProgressValue = null;
-                _pause = new();
+
+                ResetScript(options?.GroupResults?.GroupStatus);
 
                 _activeScope = _rootProvider.CreateScope();
 
@@ -165,6 +173,52 @@ public partial class ScriptEngine(
         catch (Exception e)
         {
             Logger.LogError("Unable to start script '{Name}': {Exception}", request.Name, e.Message);
+
+            throw;
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual async Task<string> RestartAsync(IEnumerable<GroupRepeat>? repeat)
+    {
+        Logger.LogTrace("Script should be restarted");
+
+        try
+        {
+            using (Lock.Wait())
+            {
+                /* There must be some active script. */
+                var script = (Script?)_active ?? throw new InvalidOperationException("no script to restart.");
+
+                /* Generate a new job identifier and reset internal state. */
+                await script.ResetAsync();
+
+                ResetScript(repeat);
+
+                /* Do additional cleanup */
+                await OnPrepareStartAsync();
+
+                Logger.LogTrace("Script restarted.");
+
+                /* Process the script on a separate thread. */
+                Task.Factory.StartNew(RunScriptAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
+
+                /* Inform all. */
+                context?
+                    .SendAsync(ScriptEngineNotifyMethods.Started, CreateStartNotification(script))
+                    .ContinueWith(
+                        t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion,
+                        TaskScheduler.Current)
+                    .Touch();
+
+                return script.JobId;
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Unable to restart script: {Exception}", e.Message);
 
             throw;
         }
