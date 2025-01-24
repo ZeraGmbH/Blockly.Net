@@ -15,6 +15,13 @@ public interface IScriptEngine
     /// <param name="options">Further configuration of the script.</param>
     Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null);
 
+
+    /// <summary>
+    /// Restart the currently running script.
+    /// </summary>
+    /// <param name="repeat">What to recover from a previous execution.</param>
+    Task<string> RestartAsync(IEnumerable<GroupRepeat> repeat);
+
     /// <summary>
     /// Abort the currently running script.
     /// <param name="jobId"></param>

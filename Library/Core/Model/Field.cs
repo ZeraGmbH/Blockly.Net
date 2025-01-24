@@ -15,5 +15,10 @@ public class Field
     /// be converted accordingly.
     /// </summary>
     public required string Value { get; set; }
+
+    /// <summary>
+    /// Optional type of the variable.
+    /// </summary>
+    public string? Type { get; set; }
 }
 

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using BlocklyNet.Core.Blocks.Variables;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;

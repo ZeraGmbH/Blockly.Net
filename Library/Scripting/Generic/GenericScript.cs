@@ -7,17 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BlocklyNet.Scripting.Generic;
 
 /// <summary>
-/// 
-/// /// </summary>
-public interface IGenericScript
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    IStartGenericScript Request { get; }
-}
-
-/// <summary>
 /// Algorithm to execute an error measurement.
 /// </summary>
 /// <param name="request">All parameters for the measurement.</param>
@@ -30,6 +19,9 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
 
     /// <inheritdoc/>
     protected override Task OnExecuteAsync() => ExecuteAsync(this);
+
+    /// <inheritdoc/>
+    protected override Task OnResetAsync() => Task.CompletedTask;
 
     /// <summary>
     /// 
