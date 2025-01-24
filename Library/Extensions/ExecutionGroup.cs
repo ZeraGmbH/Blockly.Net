@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using BlocklyNet.Core.Blocks.Variables;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
@@ -114,13 +115,19 @@ public class ExecutionGroup : Block
             /* Decode the result information - object? will become a JSON document. */
             var rawResult = groupResult.GetResult()?.Result;
 
-            if (rawResult is JsonDocument doc && context.VariableTypes.TryGetValue(resultVar, out var resultType) && !string.IsNullOrEmpty(resultType))
+            var node = rawResult as JsonNode;
+            var elem = rawResult as JsonElement?;
+
+            if ((node != null || elem != null) && context.VariableTypes.TryGetValue(resultVar, out var resultType) && !string.IsNullOrEmpty(resultType))
             {
                 /* Convert if this is a known type. */
                 var modelInfos = context.ServiceProvider.GetRequiredService<IScriptModels>();
 
                 if (modelInfos.Models.TryGetValue(resultType, out var typeInfo) || modelInfos.Enums.TryGetValue(resultType, out typeInfo))
-                    rawResult = JsonSerializer.Deserialize(doc, typeInfo.Type, JsonUtils.JsonSettings);
+                    if (node != null)
+                        rawResult = JsonSerializer.Deserialize(node, typeInfo.Type, JsonUtils.JsonSettings);
+                    else if (elem != null)
+                        rawResult = JsonSerializer.Deserialize(elem.Value, typeInfo.Type, JsonUtils.JsonSettings);
             }
 
             /* Write to indicated variable. */
