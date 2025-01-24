@@ -14,7 +14,7 @@ namespace BlocklyNet.Extensions;
     "execute_group",
     "ExecutionGroups",
     @"{
-        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13"",
+        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 Save Status in %9 %10 Save Result in %11 %12"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
@@ -53,27 +53,22 @@ namespace BlocklyNet.Extensions;
                 ""check"": ""group_execution_result""
             },
             {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""STATUSVAR"",
-                ""text"": ""Save Status in""
-            },
-            {
                 ""type"": ""field_variable"",
                 ""name"": ""STATUSVAR"",
                 ""variable"": ""groupStatus""
             },
             {
-                ""type"": ""input_dummy""
-            },
-            {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""RESULTVAR"",
-                ""text"": ""Save Result in""
+                ""type"": ""input_dummy"",
+                ""name"": ""STATUSVAR""
             },
             {
                 ""type"": ""field_variable"",
                 ""name"": ""RESULTVAR"",
                 ""variable"": ""groupResult""
+            },
+            {
+                ""type"": ""input_dummy"",
+                ""name"": ""RESULTVAR""
             }
         ],
         ""previousStatement"": null,
