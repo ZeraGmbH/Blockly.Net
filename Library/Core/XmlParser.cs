@@ -46,7 +46,7 @@ public class XmlParser : Parser<XmlParser>
           // Generate variable members    
           var block = new GlobalVariablesSet();
 
-          var field = new Field { Name = "VAR", Value = nodeChild.InnerText };
+          var field = new Field { Name = "VAR", Value = nodeChild.InnerText, Type = nodeChild.GetAttribute("variabletype") };
 
           block.Fields.Add(field);
 
