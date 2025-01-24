@@ -63,7 +63,7 @@ public class RestartTests : TestEnvironment
         /* Run again. */
         done = new TaskCompletionSource();
 
-        var jobId2 = await Engine.RestartAsync([]);
+        var jobId2 = await Engine.RestartAsync(jobId1, []);
 
         /* Wait for the script to finish. */
         await done.Task;
