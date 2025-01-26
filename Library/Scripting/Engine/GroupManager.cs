@@ -3,21 +3,9 @@ using System.Text.Json;
 namespace BlocklyNet.Scripting.Engine;
 
 /// <summary>
-/// Customization interface for group manager.
-/// /// </summary>
-public interface IGroupManagerSink
-{
-    /// <summary>
-    /// Starts executing a new group.
-    /// </summary>
-    /// <param name="status">Status of the new group.</param>
-    Task BeginExecuteAsync(GroupStatus status);
-}
-
-/// <summary>
 /// Supports execution groups.
 /// </summary>
-public class GroupManager(IGroupManagerSink? sink = null) : IGroupManager
+public class GroupManager : IGroupManager
 {
     /// <summary>
     /// Helper to access previous execution data.
@@ -54,6 +42,11 @@ public class GroupManager(IGroupManagerSink? sink = null) : IGroupManager
         /// <returns>Unset if we are the root.</returns>
         public Previous? Pop() => parent;
     }
+
+    /// <summary>
+    /// May set the site.
+    /// </summary>
+    internal IGroupManagerSite? Site { get; set; }
 
     /// <summary>
     /// For nested groups the status to serialize to.
@@ -116,6 +109,7 @@ public class GroupManager(IGroupManagerSink? sink = null) : IGroupManager
 
         /* The new group. */
         var group = new GroupStatus { Key = id, Name = name, IsScript = nested, Details = details };
+        var report = group;
 
         lock (_groups)
         {
@@ -154,26 +148,33 @@ public class GroupManager(IGroupManagerSink? sink = null) : IGroupManager
                     group.SetResult(new() { Type = result.Type, Result = result.Result });
 
                     group.Children.AddRange(current.Children.Select(g => g.ToStatus()));
-
-                    /* Caller can abort nested proceessing. */
-                    return Tuple.Create<GroupStatus?, IGroupManager>(group, manager);
                 }
+                else
+                {
+                    /* Full process. */
+                    if (_previous != null) _previous = previous;
 
-                /* Full process. */
-                if (_previous != null) _previous = previous;
+                    _active.Push(group);
 
-                _active.Push(group);
+                    /* Do not recover. */
+                    report = null;
+                }
+            }
+            else
+            {
+                /* Do not recover. */
+                report = null;
             }
         }
 
         /* Wait for customization to do its work. */
-        if (sink != null) await sink.BeginExecuteAsync(group);
+        if (Site != null) await Site.BeginExecuteGroupAsync(group, report != null);
 
-        return Tuple.Create<GroupStatus?, IGroupManager>(null, manager);
+        return Tuple.Create<GroupStatus?, IGroupManager>(report, manager);
     }
 
     /// <inheritdoc/>
-    public Task<GroupStatus> FinishAsync(GroupResult result)
+    public async Task<GroupStatus> FinishAsync(GroupResult result)
     {
         GroupStatus status;
 
@@ -187,7 +188,10 @@ public class GroupManager(IGroupManagerSink? sink = null) : IGroupManager
             _previous = _previous?.Pop();
         }
 
-        return Task.FromResult(status);
+        /* Allow for customization. */
+        if (Site != null) await Site.DoneExecuteGroupAsync(status);
+
+        return status;
     }
 
     /// <summary>

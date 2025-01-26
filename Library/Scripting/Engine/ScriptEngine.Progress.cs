@@ -52,7 +52,7 @@ public partial class ScriptEngine
             _lastProgress = nextProgress;
             _lastProgress.GroupStatus = SerializeGroupStatus();
 
-            context?
+            _context?
                 .SendAsync(ScriptEngineNotifyMethods.Progress, _lastProgress)
                 .ContinueWith(
                     t => Logger.LogError("Failed to forward progress: {Exception}", t.Exception?.Message),

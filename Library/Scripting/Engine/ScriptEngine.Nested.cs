@@ -10,12 +10,29 @@ public partial class ScriptEngine
     /// <summary>
     /// Helper class to manage nested script calls.
     /// </summary>
-    /// <param name="engine">The main script engine.</param>
-    /// <param name="parent">Parent script.</param>
-    /// <param name="depth">Nestring depth of the script, at least 1.</param>
-    /// <param name="_groupManager">Group management for this nested script only.</param>
-    protected class ScriptSite(ScriptEngine engine, IScript? parent, int depth, ISiteGroupManager _groupManager) : IScriptSite
+    protected class ScriptSite : IScriptSite, IGroupManagerSite
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="engine">The main script engine.</param>
+        /// <param name="parent">Parent script.</param>
+        /// <param name="depth">Nestring depth of the script, at least 1.</param>
+        /// <param name="groupManager">Group management for this nested script only.</param>
+        public ScriptSite(ScriptEngine engine, IScript? parent, int depth, ISiteGroupManager groupManager)
+        {
+            _depth = depth;
+            _engine = engine;
+            _groupManager = groupManager;
+            Parent = parent;
+
+            _groupManager.AttachSite(this);
+        }
+
+        private readonly ISiteGroupManager _groupManager;
+
+        private readonly int _depth;
+
         /// <inheritdoc/>
         public IScriptEngine Engine => _engine;
 
@@ -27,7 +44,7 @@ public partial class ScriptEngine
         /// <summary>
         /// The script starting this script.
         /// </summary>
-        protected readonly IScript? Parent = parent;
+        protected readonly IScript? Parent;
 
         /// <summary>
         /// Synchronize access to the result.
@@ -53,7 +70,7 @@ public partial class ScriptEngine
         /// <summary>
         /// The main script engine.
         /// </summary>
-        private readonly ScriptEngine _engine = engine;
+        private readonly ScriptEngine _engine;
 
         /// <inheritdoc/>
         public IServiceProvider ServiceProvider => _engine.ServiceProvider;
@@ -88,7 +105,7 @@ public partial class ScriptEngine
 
         /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
-            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, depth);
+            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, _depth);
 
         /// <inheritdoc/>
         public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
@@ -100,7 +117,7 @@ public partial class ScriptEngine
             /* Remember and propagate. */
             LastProgress = new() { Progress = progress ?? 0, Name = name };
 
-            _engine.ReportProgress(info, depth);
+            _engine.ReportProgress(info, _depth);
         }
 
         /// <summary>
@@ -195,6 +212,12 @@ public partial class ScriptEngine
 
         /// <inheritdoc/>
         public Task SingleStepAsync(Block block) => Task.CompletedTask;
+
+        /// <inheritdoc/>
+        public virtual Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
+
+        /// <inheritdoc/>
+        public virtual Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
     }
 
     /// <summary>

@@ -92,7 +92,7 @@ public partial class ScriptEngine
                     ValueType = type,
                 };
 
-                context?
+                _context?
                     .SendAsync(ScriptEngineNotifyMethods.InputRequest, _inputRequest = inputRequest)
                     .ContinueWith(
                         t => Logger.LogError("Failed to request user input for script {JobId}: {Exception}", inputRequest.JobId, t.Exception?.Message),

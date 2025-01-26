@@ -13,27 +13,44 @@ namespace BlocklyNet.Scripting.Engine;
 /// The script execution engine. There can be at most one active
 /// script at any time.
 /// </summary>
-/// <param name="context">Execution context of the engine.</param>
-/// <param name="_rootProvider">Dependency injection manager.</param>
-/// <param name="logger">Logging helper.</param>
-/// <param name="parser">Script parser to use.</param>
-/// <param name="_groupManager">Helper to manage execution groups.</param>
-public partial class ScriptEngine(
-    IServiceProvider _rootProvider,
-    IScriptParser parser,
-    IGroupManager _groupManager,
-    ILogger<ScriptEngine> logger,
-    IScriptEngineNotifySink? context = null
-) :
-    IScriptEngine,
-    IScriptSite,
-    IDisposable
+public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSite, IDisposable
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context">Execution context of the engine.</param>
+    /// <param name="rootProvider">Dependency injection manager.</param>
+    /// <param name="logger">Logging helper.</param>
+    /// <param name="parser">Script parser to use.</param>
+    /// <param name="groupManager">Helper to manage execution groups.</param>
+    public ScriptEngine(
+        IServiceProvider rootProvider,
+        IScriptParser parser,
+        IGroupManager groupManager,
+        ILogger<ScriptEngine> logger,
+        IScriptEngineNotifySink? context = null
+    )
+    {
+        _context = context;
+        _groupManager = groupManager;
+        _rootProvider = rootProvider;
+        Logger = logger;
+        Parser = parser;
+
+        _groupManager.AttachSite(this);
+    }
+
+    private readonly IScriptEngineNotifySink? _context;
+
+    private readonly IServiceProvider _rootProvider;
+
+    private readonly IGroupManager _groupManager;
+
     /// <inheritdoc/>
     public IScriptEngine Engine => this;
 
     /// <inheritdoc/>
-    public ILogger Logger => logger;
+    public ILogger Logger { get; private set; }
 
     /// <summary>
     /// Synchronize modifying the result.
@@ -87,7 +104,7 @@ public partial class ScriptEngine(
     /// <summary>
     /// Script parser to use.
     /// </summary>
-    public IScriptParser Parser { get; } = parser;
+    public IScriptParser Parser { get; private set; }
 
     private string _codeHash = null!;
 
@@ -158,7 +175,7 @@ public partial class ScriptEngine(
                 Task.Factory.StartNew(RunScriptAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
 
                 /* Inform all. */
-                context?
+                _context?
                     .SendAsync(ScriptEngineNotifyMethods.Started, CreateStartNotification(script))
                     .ContinueWith(
                         t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
@@ -208,7 +225,7 @@ public partial class ScriptEngine(
                 Task.Factory.StartNew(RunScriptAsync, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
 
                 /* Inform all. */
-                context?
+                _context?
                     .SendAsync(ScriptEngineNotifyMethods.Started, CreateStartNotification(script))
                     .ContinueWith(
                         t => Logger.LogError("Failed to report active script: {Exception}", t.Exception?.Message),
@@ -336,8 +353,8 @@ public partial class ScriptEngine(
 
             /* Forward the information on the now terminated script. */
             var task = _error == null
-                ? context?.SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
-                : context?.SendAsync(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, _error));
+                ? _context?.SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(script))
+                : _context?.SendAsync(ScriptEngineNotifyMethods.Error, CreateErrorNotification(script, _error));
 
             /* In case of any error just log - actually this could be quite a problem. */
             task?.ContinueWith(
@@ -392,7 +409,7 @@ public partial class ScriptEngine(
                 Logger.LogTrace("Finish script {JobId}", jobId);
 
                 /* Inform all. */
-                context?
+                _context?
                     .SendAsync(ScriptEngineNotifyMethods.Finished, CreateFinishNotification(script))
                     .ContinueWith(
                         t => Logger.LogError("Failed to report script result: {Exception}", t.Exception?.Message),
@@ -516,4 +533,10 @@ public partial class ScriptEngine(
 
     /// <inheritdoc/>
     public Task<List<GroupInfo>> GetGroupsForScriptAsync(string code) => Parser.Parse(code).GetGroupTreeAsync();
+
+    /// <inheritdoc/>
+    public Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
 }
