@@ -145,6 +145,7 @@ public class GroupManager : IGroupManager
                 if (result != null && current!.Repeat == GroupRepeatType.Skip)
                 {
                     /* Simulate execution. */
+                    group.CustomizerBlob = current.CustomizerBlob;
                     group.SetResult(new() { Type = result.Type, Result = result.Result });
 
                     group.Children.AddRange(current.Children.Select(g => g.ToStatus()));
