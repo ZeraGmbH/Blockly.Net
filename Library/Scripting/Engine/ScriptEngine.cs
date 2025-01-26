@@ -535,8 +535,8 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
     public Task<List<GroupInfo>> GetGroupsForScriptAsync(string code) => Parser.Parse(code).GetGroupTreeAsync();
 
     /// <inheritdoc/>
-    public Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
+    public virtual Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
+    public virtual Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
 }
