@@ -156,13 +156,13 @@ public class GroupManager : IGroupManager
 
                     _active.Push(group);
 
-                    /* Do not recover. */
+                    /* If skip is not requested group will re-execute if result is null. */
                     report = null;
                 }
             }
             else
             {
-                /* Do not recover. */
+                /* Always start script - may skip own groups. */
                 report = null;
             }
         }
@@ -170,7 +170,7 @@ public class GroupManager : IGroupManager
         /* Wait for customization to do its work. */
         if (Site != null) await Site.BeginExecuteGroupAsync(group, report != null);
 
-        return Tuple.Create<GroupStatus?, IGroupManager>(report, manager);
+        return Tuple.Create(report, (IGroupManager)manager);
     }
 
     /// <inheritdoc/>
