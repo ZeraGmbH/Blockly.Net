@@ -61,6 +61,12 @@ public class GroupStatus<TChild> : GroupStatusCommon where TChild : GroupStatus<
     /// </summary>
     [NotNull, Required]
     public List<TChild> Children { get; set; } = [];
+
+    /// <summary>
+    /// Some additional data to allow customization. Serialized to
+    /// a string.
+    /// </summary>
+    public string? CustomizerBlob { get; set; }
 }
 
 /// <summary>

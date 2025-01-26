@@ -44,6 +44,11 @@ public class GroupManager : IGroupManager
     }
 
     /// <summary>
+    /// May set the site.
+    /// </summary>
+    internal IGroupManagerSite? Site { get; set; }
+
+    /// <summary>
     /// For nested groups the status to serialize to.
     /// </summary>
     public GroupStatus? _parentStatus = null;
@@ -92,18 +97,19 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, null, true).Item2;
+    public async Task<IGroupManager> CreateNestedAsync(string scriptId, string name) => (await CreateGroupAsync(scriptId, name, null, true)).Item2;
 
     /// <inheritdoc/>
-    public GroupStatus? Start(string id, string? name, string? details) => CreateGroup(id, name, details, false).Item1;
+    public async Task<GroupStatus?> StartAsync(string id, string? name, string? details) => (await CreateGroupAsync(id, name, details, false)).Item1;
 
-    private Tuple<GroupStatus?, IGroupManager> CreateGroup(string id, string? name, string? details, bool nested)
+    private async Task<Tuple<GroupStatus?, IGroupManager>> CreateGroupAsync(string id, string? name, string? details, bool nested)
     {
         /* Maybe a nested group manager must be created. */
         GroupManager manager = null!;
 
         /* The new group. */
         var group = new GroupStatus { Key = id, Name = name, IsScript = nested, Details = details };
+        var report = group;
 
         lock (_groups)
         {
@@ -142,35 +148,50 @@ public class GroupManager : IGroupManager
                     group.SetResult(new() { Type = result.Type, Result = result.Result });
 
                     group.Children.AddRange(current.Children.Select(g => g.ToStatus()));
-
-                    /* Caller can abort nested proceessing. */
-                    return Tuple.Create<GroupStatus?, IGroupManager>(group, manager);
                 }
+                else
+                {
+                    /* Full process. */
+                    if (_previous != null) _previous = previous;
 
-                /* Full process. */
-                if (_previous != null) _previous = previous;
+                    _active.Push(group);
 
-                _active.Push(group);
+                    /* If skip is not requested group will re-execute if result is null. */
+                    report = null;
+                }
+            }
+            else
+            {
+                /* Always start script - may skip own groups. */
+                report = null;
             }
         }
 
-        return Tuple.Create<GroupStatus?, IGroupManager>(null, manager);
+        /* Wait for customization to do its work. */
+        if (Site != null) await Site.BeginExecuteGroupAsync(group, report != null);
+
+        return Tuple.Create(report, (IGroupManager)manager);
     }
 
     /// <inheritdoc/>
-    public GroupStatus Finish(GroupResult result)
+    public async Task<GroupStatus> FinishAsync(GroupResult result)
     {
+        GroupStatus status;
+
         /* Get the active one and set the result - fire some exception if none is found. */
         lock (_groups)
         {
-            var status = _active.Pop();
+            status = _active.Pop();
 
             status.SetResult(new() { Type = result.Type, Result = result.Result });
 
             _previous = _previous?.Pop();
-
-            return status;
         }
+
+        /* Allow for customization. */
+        if (Site != null) await Site.DoneExecuteGroupAsync(status);
+
+        return status;
     }
 
     /// <summary>

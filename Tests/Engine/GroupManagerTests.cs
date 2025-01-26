@@ -36,10 +36,10 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Group_Manager_Can_Be_Reset()
+    public async Task Group_Manager_Can_Be_Reset_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
         Manager.Reset(null);
 
@@ -51,25 +51,26 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Bad_EndGroup_Will_Throw_Exception()
+    public async Task Bad_EndGroup_Will_Throw_Exception_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.Throws<InvalidOperationException>(() => Manager.Finish(new() { Type = GroupResultType.Failed }));
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => Manager.FinishAsync(new() { Type = GroupResultType.Failed }));
     }
 
     [Test]
-    public void Can_Manage_Three_Groups_In_Sequence()
+    public async Task Can_Manage_Three_Groups_In_Sequence_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Failed });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Failed });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
         var groups = Manager.Serialize();
 
@@ -93,17 +94,17 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Manage_Three_NestedGroups()
+    public async Task Can_Manage_Three_NestedGroups_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
         var groups = Manager.Serialize();
 
@@ -128,21 +129,21 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Have_Nested_Script()
+    public async Task Can_Have_Nested_Script_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        var nested = Manager.CreateNested("ID", "NAME");
+        var nested = await Manager.CreateNestedAsync("ID", "NAME");
 
-        nested.Start("2", "n2", null);
-        nested.Finish(new() { Type = GroupResultType.Succeeded });
+        await nested.StartAsync("2", "n2", null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        nested.Start("3", "n3", null);
-        nested.Finish(new() { Type = GroupResultType.Succeeded });
+        await nested.StartAsync("3", "n3", null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        Assert.That(Manager.Start("4", "n4", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        Assert.That(await Manager.StartAsync("4", "n4", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
         var groups = Manager.Serialize();
 
@@ -173,21 +174,21 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Flatten_Result_To_Array()
+    public async Task Can_Flatten_Result_To_Array_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        var nested = Manager.CreateNested("ID", "NAME");
+        var nested = await Manager.CreateNestedAsync("ID", "NAME");
 
-        nested.Start("2", "n2", null);
-        nested.Finish(new() { Type = GroupResultType.Succeeded, Result = 2 });
+        await nested.StartAsync("2", "n2", null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 2 });
 
-        nested.Start("3", "n3", null);
-        nested.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        await nested.StartAsync("3", "n3", null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
-        Assert.That(Manager.Start("4", "n4", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 4 });
+        Assert.That(await Manager.StartAsync("4", "n4", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 4 });
 
         var results = Manager.CreateFlatResults();
 
@@ -203,11 +204,11 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Retrieve_Status_On_Unfinished_Groups()
+    public async Task Can_Retrieve_Status_On_Unfinished_Groups_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
 
         var groups = Manager.Serialize();
 
@@ -229,7 +230,7 @@ public class GroupManagerTests
 
         Assert.That(Manager.CreateFlatResults(), Has.Count.EqualTo(0));
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
         var results = Manager.CreateFlatResults();
 
@@ -238,16 +239,16 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Restart_Sequence()
+    public async Task Can_Restart_Sequence_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Failed, Result = 2 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
         var groups = Manager.Serialize();
 
@@ -257,12 +258,12 @@ public class GroupManagerTests
             MakeRepeat(groups[2], GroupRepeatType.Skip),
         ]);
 
-        Assert.That(Manager.Start("1", "n1", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Not.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 4 });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Failed, Result = 4 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Not.Null);
 
         var results = Manager.CreateFlatResults();
 
@@ -277,17 +278,17 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Restart_Sequence_With_Nesting()
+    public async Task Can_Restart_Sequence_With_Nesting_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Failed, Result = 2 });
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
         var groups = Manager.Serialize();
 
@@ -296,9 +297,9 @@ public class GroupManagerTests
             MakeRepeat(groups[1], GroupRepeatType.Skip),
         ]);
 
-        Assert.That(Manager.Start("1", "n1", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Not.Null);
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Not.Null);
 
         var results = Manager.CreateFlatResults();
 
@@ -313,17 +314,17 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Restart_Sequence_With_Nested_Skip()
+    public async Task Can_Restart_Sequence_With_Nested_Skip_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Failed, Result = 2 });
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
         var groups = Manager.Serialize();
 
@@ -336,13 +337,13 @@ public class GroupManagerTests
             MakeRepeat(groups[1], GroupRepeatType.Skip),
         ]);
 
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Not.Null);
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Not.Null);
 
         var results = Manager.CreateFlatResults();
 
@@ -357,18 +358,18 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Restart_Sequence_With_Script()
+    public async Task Can_Restart_Sequence_With_Script_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        var nested = Manager.CreateNested("ID", "script");
+        var nested = await Manager.CreateNestedAsync("ID", "script");
 
-        Assert.That(nested.Start("2", "n2", null), Is.Null);
-        nested.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+        Assert.That(await nested.StartAsync("2", "n2", null), Is.Null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Failed, Result = 2 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
         var groups = Manager.Serialize();
 
@@ -382,13 +383,13 @@ public class GroupManagerTests
             MakeRepeat(groups[2], GroupRepeatType.Skip),
         ]);
 
-        Assert.That(Manager.Start("1", "n1", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Not.Null);
 
-        nested = Manager.CreateNested("ID", "script");
+        nested = await Manager.CreateNestedAsync("ID", "script");
 
-        Assert.That(nested.Start("2", "n2", null), Is.Not.Null);
+        Assert.That(await nested.StartAsync("2", "n2", null), Is.Not.Null);
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Not.Null);
 
         var results = Manager.CreateFlatResults();
 
@@ -403,18 +404,18 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Restart_Sequence_With_Script_Nested()
+    public async Task Can_Restart_Sequence_With_Script_Nested_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        var nested = Manager.CreateNested("ID", "script");
+        var nested = await Manager.CreateNestedAsync("ID", "script");
 
-        Assert.That(nested.Start("2", "n2", null), Is.Null);
-        nested.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+        Assert.That(await nested.StartAsync("2", "n2", null), Is.Null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Failed, Result = 2 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
         var groups = Manager.Serialize();
 
@@ -428,14 +429,14 @@ public class GroupManagerTests
             MakeRepeat(groups[2], GroupRepeatType.Skip),
         ]);
 
-        Assert.That(Manager.Start("1", "n1", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Not.Null);
 
-        nested = Manager.CreateNested("ID", "script");
+        nested = await Manager.CreateNestedAsync("ID", "script");
 
-        Assert.That(nested.Start("2", "n2", null), Is.Null);
-        nested.Finish(new() { Type = GroupResultType.Failed, Result = 4 });
+        Assert.That(await nested.StartAsync("2", "n2", null), Is.Null);
+        await nested.FinishAsync(new() { Type = GroupResultType.Failed, Result = 4 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Not.Null);
 
         var results = Manager.CreateFlatResults();
 
@@ -450,17 +451,17 @@ public class GroupManagerTests
     }
 
     [Test]
-    public void Can_Merge_Repeat_Information()
+    public async Task Can_Merge_Repeat_Information_Async()
     {
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Failed, Result = 2 });
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Failed, Result = 2 });
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
-        Assert.That(Manager.Start("3", "n3", null), Is.Null);
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 3 });
+        Assert.That(await Manager.StartAsync("3", "n3", null), Is.Null);
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 3 });
 
         var groups = Manager.Serialize();
 
@@ -473,11 +474,11 @@ public class GroupManagerTests
             MakeRepeat(groups[1], GroupRepeatType.Skip),
         ]);
 
-        Assert.That(Manager.Start("1", "n1", null), Is.Null);
+        Assert.That(await Manager.StartAsync("1", "n1", null), Is.Null);
 
-        Assert.That(Manager.Start("2", "n2", null), Is.Not.Null);
+        Assert.That(await Manager.StartAsync("2", "n2", null), Is.Not.Null);
 
-        Manager.Finish(new() { Type = GroupResultType.Succeeded, Result = 1 });
+        await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded, Result = 1 });
 
         var results = Manager.CreateFlatResults();
 
