@@ -15,7 +15,6 @@ public interface IScriptEngine
     /// <param name="options">Further configuration of the script.</param>
     Task<string> StartAsync(StartScript request, string userToken, StartScriptOptions? options = null);
 
-
     /// <summary>
     /// Restart the currently running script.
     /// </summary>

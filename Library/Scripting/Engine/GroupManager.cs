@@ -3,9 +3,21 @@ using System.Text.Json;
 namespace BlocklyNet.Scripting.Engine;
 
 /// <summary>
+/// Customization interface for group manager.
+/// /// </summary>
+public interface IGroupManagerSink
+{
+    /// <summary>
+    /// Starts executing a new group.
+    /// </summary>
+    /// <param name="status">Status of the new group.</param>
+    Task BeginExecuteAsync(GroupStatus status);
+}
+
+/// <summary>
 /// Supports execution groups.
 /// </summary>
-public class GroupManager : IGroupManager
+public class GroupManager(IGroupManagerSink? sink = null) : IGroupManager
 {
     /// <summary>
     /// Helper to access previous execution data.
@@ -92,12 +104,12 @@ public class GroupManager : IGroupManager
     }
 
     /// <inheritdoc/>
-    public IGroupManager CreateNested(string scriptId, string name) => CreateGroup(scriptId, name, null, true).Item2;
+    public async Task<IGroupManager> CreateNestedAsync(string scriptId, string name) => (await CreateGroupAsync(scriptId, name, null, true)).Item2;
 
     /// <inheritdoc/>
-    public GroupStatus? Start(string id, string? name, string? details) => CreateGroup(id, name, details, false).Item1;
+    public async Task<GroupStatus?> StartAsync(string id, string? name, string? details) => (await CreateGroupAsync(id, name, details, false)).Item1;
 
-    private Tuple<GroupStatus?, IGroupManager> CreateGroup(string id, string? name, string? details, bool nested)
+    private async Task<Tuple<GroupStatus?, IGroupManager>> CreateGroupAsync(string id, string? name, string? details, bool nested)
     {
         /* Maybe a nested group manager must be created. */
         GroupManager manager = null!;
@@ -154,23 +166,28 @@ public class GroupManager : IGroupManager
             }
         }
 
+        /* Wait for customization to do its work. */
+        if (sink != null) await sink.BeginExecuteAsync(group);
+
         return Tuple.Create<GroupStatus?, IGroupManager>(null, manager);
     }
 
     /// <inheritdoc/>
-    public GroupStatus Finish(GroupResult result)
+    public Task<GroupStatus> FinishAsync(GroupResult result)
     {
+        GroupStatus status;
+
         /* Get the active one and set the result - fire some exception if none is found. */
         lock (_groups)
         {
-            var status = _active.Pop();
+            status = _active.Pop();
 
             status.SetResult(new() { Type = result.Type, Result = result.Result });
 
             _previous = _previous?.Pop();
-
-            return status;
         }
+
+        return Task.FromResult(status);
     }
 
     /// <summary>

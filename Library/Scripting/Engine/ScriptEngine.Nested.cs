@@ -78,10 +78,10 @@ public partial class ScriptEngine
             => _engine.Parser.Parse(scriptAsXml).EvaluateAsync(presets, this);
 
         /// <inheritdoc/>
-        public GroupStatus? BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
+        public Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details) => _groupManager.StartAsync(key, name, details);
 
         /// <inheritdoc/>
-        public GroupStatus EndGroup(GroupResult result) => _groupManager.Finish(result);
+        public Task<GroupStatus> EndGroupAsync(GroupResult result) => _groupManager.FinishAsync(result);
 
         /// <inheritdoc/>
         public GroupStatus GetGroupStatus(int index) => _groupManager[index];
@@ -219,7 +219,7 @@ public partial class ScriptEngine
     protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
     {
         /* Create execution context. */
-        var site = CreateSite(parent, depth + 1, _groupManager.CreateNested((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));
+        var site = CreateSite(parent, depth + 1, await _groupManager.CreateNestedAsync((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));
 
         using (Lock.Wait())
         {

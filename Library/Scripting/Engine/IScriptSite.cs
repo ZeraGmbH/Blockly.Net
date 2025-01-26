@@ -93,12 +93,12 @@ public interface IScriptSite
     /// <param name="details">Optional details of the group executions.</param>
     /// <returns>null if the execution started, set if the result from
     /// a previous execution has been reuses.</returns>
-    GroupStatus? BeginGroup(string key, string? name, string? details);
+    Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details);
 
     /// <summary>
     /// End the execution of the current group.
     /// </summary>
-    GroupStatus EndGroup(GroupResult result);
+    Task<GroupStatus> EndGroupAsync(GroupResult result);
 
     /// <summary>
     /// Report the status of a single group execution.

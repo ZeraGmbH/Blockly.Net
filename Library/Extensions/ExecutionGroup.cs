@@ -85,7 +85,7 @@ public class ExecutionGroup : Block
     public override async Task<object?> EvaluateAsync(Context context)
     {
         /* Register the group. */
-        var groupResult = context.Engine.BeginGroup(Id, Fields["NAME"], await Values.EvaluateAsync<string?>("DETAILS", context, false));
+        var groupResult = await context.Engine.BeginGroupAsync(Id, Fields["NAME"], await Values.EvaluateAsync<string?>("DETAILS", context, false));
 
         if (groupResult == null)
         {
@@ -98,7 +98,7 @@ public class ExecutionGroup : Block
             var result = await Values.EvaluateAsync<GroupResult>("RESULT", context);
 
             /* Finish the group. */
-            groupResult = context.Engine.EndGroup(result);
+            groupResult = await context.Engine.EndGroupAsync(result);
         }
 
         /* Set status. */

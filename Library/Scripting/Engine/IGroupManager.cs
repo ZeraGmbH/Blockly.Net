@@ -13,20 +13,20 @@ public interface ISiteGroupManager
     /// <param name="details">Optional detail information for the execution.</param>
     /// <returns>null if the execution started, set if the result from
     /// a previous execution has been reuses.</returns>
-    GroupStatus? Start(string id, string? name, string? details);
+    Task<GroupStatus?> StartAsync(string id, string? name, string? details);
 
     /// <summary>
     /// Finish a group of execution.
     /// </summary>
     /// <param name="result">Result of the execution group.</param>
-    GroupStatus Finish(GroupResult result);
+    Task<GroupStatus> FinishAsync(GroupResult result);
 
     /// <summary>
     /// Create a nested group manager.
     /// </summary>
     /// <param name="scriptId">Unique identifier of the script.</param>
     /// <param name="name">Name of the Script.</param>
-    IGroupManager CreateNested(string scriptId, string name);
+    Task<IGroupManager> CreateNestedAsync(string scriptId, string name);
 
     /// <summary>
     /// Get the groups status for some group.

@@ -495,12 +495,12 @@ public partial class ScriptEngine(
     public Task SingleStepAsync(Block block) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public GroupStatus? BeginGroup(string key, string? name, string? details) => _groupManager.Start(key, name, details);
+    public Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details) => _groupManager.StartAsync(key, name, details);
 
     /// <inheritdoc/>
-    public GroupStatus EndGroup(GroupResult result)
+    public async Task<GroupStatus> EndGroupAsync(GroupResult result)
     {
-        var status = _groupManager.Finish(result);
+        var status = await _groupManager.FinishAsync(result);
 
         /* Interrupt right now. */
         if (_pause.IsCancellationRequested) throw new ScriptPausedException();
