@@ -105,7 +105,7 @@ public partial class ScriptEngine
 
         /// <inheritdoc/>
         public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
-            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, _depth);
+            => _engine.StartChildAsync<TResult>(request, CurrentScript, options, _depth, _groupManager);
 
         /// <inheritdoc/>
         public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
@@ -238,11 +238,12 @@ public partial class ScriptEngine
     /// <param name="parent">Parent script.</param>
     /// <param name="options">Detailed configuration of the new script.</param>
     /// <param name="depth">Nestring depth of the child.</param>
+    /// <param name="groupManager">Parent group manager to allow for any-depth nesting.</param>
     /// <returns>Task on the result.</returns>
-    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth)
+    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth, ISiteGroupManager groupManager)
     {
         /* Create execution context. */
-        var site = CreateSite(parent, depth + 1, await _groupManager.CreateNestedAsync((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));
+        var site = CreateSite(parent, depth + 1, await groupManager.CreateNestedAsync((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));
 
         using (Lock.Wait())
         {

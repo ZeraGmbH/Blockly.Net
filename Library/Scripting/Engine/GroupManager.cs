@@ -217,7 +217,7 @@ public class GroupManager : IGroupManager
         {
             /* Ask the whole tree to serialize itself. */
             foreach (var nested in _scripts)
-                nested._parentStatus!.Children = nested.Serialize();
+                nested._parentStatus!.Children = nested.Serialize(includeRepeat);
 
             /* Just report what we collected - make sure that we clone inside the lock. */
             var groups = JsonSerializer.Deserialize<List<GroupStatus>>(JsonSerializer.Serialize(_groups, JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;

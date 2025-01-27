@@ -434,7 +434,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
 
     /// <inheritdoc/>
     public Task<TResult> RunAsync<TResult>(StartScript request, StartScriptOptions? options = null)
-        => StartChildAsync<TResult>(request, _active, options, 0);
+        => StartChildAsync<TResult>(request, _active, options, 0, _groupManager);
 
     /// <summary>
     /// Finish using this instance.
