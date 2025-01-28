@@ -169,7 +169,7 @@ public class GroupManager : IGroupManager
         }
 
         /* Wait for customization to do its work. */
-        if (Site != null) await Site.BeginExecuteGroupAsync(group, report != null);
+        if (Site != null && !nested) await Site.BeginExecuteGroupAsync(group, report != null);
 
         return Tuple.Create(report, (IGroupManager)manager);
     }
