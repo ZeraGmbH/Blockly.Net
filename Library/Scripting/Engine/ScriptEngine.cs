@@ -65,7 +65,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
     /// <summary>
     /// Set when the one and only script is done.
     /// </summary>
-    private bool _done = false;
+    protected bool Done { get; private set; } = false;
 
     /// <summary>
     /// Exception observed during execution - only valid when _done is set.
@@ -129,7 +129,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
         _allProgress.Clear();
         _cancel = new();
         _codeHash = null!;
-        _done = false;
+        Done = false;
         _error = null;
         _groupManager.Reset(repeat);
         _inputRequest = null;
@@ -209,7 +209,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
 
                 if (script.JobId != jobId) throw new ArgumentException("not the active script");
 
-                if (!_done) throw new InvalidOperationException("script must be finished to be restarte");
+                if (!Done) throw new InvalidOperationException("script must be finished to be restarte");
 
                 /* Generate a new job identifier and reset internal state. */
                 await script.ResetAsync();
@@ -345,7 +345,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
             /* Make sure child processes will terminate as soon as possible. */
             await _cancel.CancelAsync();
 
-            _done = true;
+            Done = true;
             _error = error;
 
             /* Customize. */
@@ -391,7 +391,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
             if (script == null || script.JobId != jobId)
                 throw new ArgumentException("not the active script", nameof(jobId));
 
-            if (!_done)
+            if (!Done)
                 throw new ArgumentException("script not yet finished", nameof(jobId));
 
             /* Only report result - do not finish script. */
@@ -486,7 +486,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
                     .Touch();
 
             /* Script is completed - with or without error. */
-            if (_done)
+            if (Done)
                 if (_error == null)
                     client
                         .SendAsync(ScriptEngineNotifyMethods.Done, CreateDoneNotification(_active))
