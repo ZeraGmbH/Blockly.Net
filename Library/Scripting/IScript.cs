@@ -1,4 +1,5 @@
 using BlocklyNet.Scripting.Engine;
+using BlocklyNet.Scripting.Logging;
 
 namespace BlocklyNet.Scripting;
 
@@ -27,5 +28,22 @@ public interface IScript
     /// Report the related request.
     /// </summary>
     StartScript Request { get; }
+}
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TLogType"></typeparam>
+public interface IScript<TLogType> : IScript where TLogType : ScriptLoggingResult, new()
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    TLogType ResultForLogging { get; }
+
+    /// <summary>
+    /// Set the outcome of the script.
+    /// </summary>
+    /// <param name="result">Outcome of the script.</param>
+    Task SetResultAsync(ScriptExecutionResultTypes result);
 }

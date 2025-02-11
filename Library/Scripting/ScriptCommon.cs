@@ -7,7 +7,7 @@ namespace BlocklyNet.Scripting;
 /// <summary>
 /// Describes an active script.
 /// </summary>
-public abstract class Script<TOption, TLogType, TModifierType> : Script
+public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript<TLogType>
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
     where TModifierType : IScriptLogModifier
@@ -111,4 +111,12 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script
     /// <inheritdoc/>
     public override void SetGroups(ScriptGroupStatus? status)
         => ResultForLogging.GroupsFinished = status;
+
+    /// <inheritdoc/>
+    public virtual Task SetResultAsync(ScriptExecutionResultTypes result)
+    {
+        ResultForLogging.Result = result;
+
+        return Task.CompletedTask;
+    }
 }
