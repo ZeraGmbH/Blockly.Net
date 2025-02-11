@@ -63,4 +63,10 @@ public abstract class Script : IScriptInstance
     /// </summary>
     /// <param name="status">Status of the completed group.</param>
     public abstract Task EndGroupExecutionAsync(GroupStatus status);
+
+    /// <inheritdoc/>
+    public abstract void SetGroups(ScriptGroupStatus? status);
+
+    /// <inheritdoc/>
+    StartScript IScript.Request => GetRequest();
 }

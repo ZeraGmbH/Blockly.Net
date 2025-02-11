@@ -1,9 +1,11 @@
+using System.Reflection;
+
 namespace BlocklyNet.Scripting.Logging;
 
 /// <summary>
 /// 
 /// </summary>
-public abstract class ScriptLogModifier
+public interface IScriptLogModifier
 {
     /// <summary>
     /// Map library blind view of script implemenation type
@@ -11,5 +13,5 @@ public abstract class ScriptLogModifier
     /// </summary>
     /// <param name="script">Script to which this modifier belongs.</param>
     /// <param name="initial">Unset if this is a replay of the modification.</param>
-    public abstract Task ApplyAsync(Script script, bool initial);
+    Task ApplyAsync(Script script, bool initial);
 }
