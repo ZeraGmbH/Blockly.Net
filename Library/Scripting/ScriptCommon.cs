@@ -78,12 +78,8 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script
 
     private readonly Stack<CustomGroupInformation> _ActiveGroups = [];
 
-    /// <summary>
-    /// Report the start of a group execution.
-    /// </summary>
-    /// <param name="status">Status pf the group.</param>
-    /// <param name="repeat">Set if this is a repeat operation and results should be recovered.</param>
-    public async Task BeginGroupExecutionAsync(GroupStatus status, bool repeat)
+    /// <inheritdoc/>
+    public override async Task BeginGroupExecutionAsync(GroupStatus status, bool repeat)
     {
         if (repeat)
         {
@@ -98,11 +94,8 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script
             _ActiveGroups.Push(new() { ModifierIndex = _Modifiers.Count });
     }
 
-    /// <summary>
-    /// A group has finished execution - not called for repeat.
-    /// </summary>
-    /// <param name="status">Status of the completed group.</param>
-    public Task EndGroupExecutionAsync(GroupStatus status)
+    /// <inheritdoc/>
+    public override Task EndGroupExecutionAsync(GroupStatus status)
     {
         /* Get the side effects create by this group. */
         var info = _ActiveGroups.Pop();

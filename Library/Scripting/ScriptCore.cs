@@ -1,3 +1,5 @@
+using BlocklyNet.Scripting.Engine;
+
 namespace BlocklyNet.Scripting;
 
 /// <summary>
@@ -49,4 +51,16 @@ public abstract class Script : IScriptInstance
     /// </summary>
     protected virtual Task OnResetAsync() => throw new NotSupportedException($"can now restart {GetType().FullName}");
 
+    /// <summary>
+    /// Report the start of a group execution.
+    /// </summary>
+    /// <param name="status">Status pf the group.</param>
+    /// <param name="repeat">Set if this is a repeat operation and results should be recovered.</param>
+    public abstract Task BeginGroupExecutionAsync(GroupStatus status, bool repeat);
+
+    /// <summary>
+    /// A group has finished execution - not called for repeat.
+    /// </summary>
+    /// <param name="status">Status of the completed group.</param>
+    public abstract Task EndGroupExecutionAsync(GroupStatus status);
 }
