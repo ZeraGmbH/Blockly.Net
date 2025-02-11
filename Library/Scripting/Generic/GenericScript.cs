@@ -16,7 +16,7 @@ namespace BlocklyNet.Scripting.Generic;
 public class GenericScript<TLogType, TModifierType>(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
     : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType, TModifierType>(request, engine, options), IGenericScript
     where TLogType : ScriptLoggingResult, new()
-    where TModifierType : ScriptLogModifier, new()
+    where TModifierType : ScriptLogModifier
 {
     IStartGenericScript IGenericScript.Request => Request;
 
