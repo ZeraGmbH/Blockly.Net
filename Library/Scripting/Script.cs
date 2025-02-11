@@ -12,10 +12,12 @@ namespace BlocklyNet.Scripting;
 /// <typeparam name="TResult"></typeparam>
 /// <typeparam name="TOption"></typeparam>
 /// <typeparam name="TLogType"></typeparam>
-public abstract class Script<TRequest, TResult, TOption, TLogType>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption, TLogType>(options)
+/// <typeparam name="TModifierType"></typeparam>
+public abstract class Script<TRequest, TResult, TOption, TLogType, TModifierType>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption, TLogType, TModifierType>(options)
     where TRequest : StartScript
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
+    where TModifierType : ScriptLogModifier, new()
 {
     /// <summary>
     /// 

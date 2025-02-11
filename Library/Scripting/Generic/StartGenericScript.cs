@@ -32,6 +32,14 @@ public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult
 /// <summary>
 /// Start a generic script based on the integrated script language.
 /// </summary>
-public class StartGenericScript : StartGenericScript<GenericScript<ScriptLoggingResult>, GenericResult>
+public class StartGenericScript : StartGenericScript<GenericScript<ScriptLoggingResult, StartGenericScript.NoopModifier>, GenericResult>
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public class NoopModifier : ScriptLogModifier
+    {
+        /// <inheritdoc/>
+        public override Task ApplyAsync(Script script, bool initial) => Task.CompletedTask;
+    }
 }
