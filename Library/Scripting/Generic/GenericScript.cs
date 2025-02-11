@@ -13,8 +13,10 @@ namespace BlocklyNet.Scripting.Generic;
 /// <param name="request">All parameters for the measurement.</param>
 /// <param name="engine">Script engine executing the measurement.</param>
 /// <param name="options">Additional configuration of the script run-time.</param>
-public class GenericScript<TLogType>(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
-    : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType>(request, engine, options), IGenericScript where TLogType : ScriptLoggingResult, new()
+public class GenericScript<TLogType, TModifierType>(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
+    : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType, TModifierType>(request, engine, options), IGenericScript
+    where TLogType : ScriptLoggingResult, new()
+    where TModifierType : ScriptLogModifier, new()
 {
     IStartGenericScript IGenericScript.Request => Request;
 
@@ -33,7 +35,7 @@ public class GenericScript<TLogType>(StartGenericScript request, IScriptSite eng
     /// <typeparam name="TResult"></typeparam>
     /// <typeparam name="TOptions"></typeparam>
     /// <returns></returns>
-    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions, TLogType> script, Action<IScriptDefinition>? afterPresets = null)
+    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions, TLogType, TModifierType> script, Action<IScriptDefinition>? afterPresets = null)
         where TRequest : StartScript, IStartGenericScript
         where TResult : GenericResult, new()
         where TOptions : StartScriptOptions
