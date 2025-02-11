@@ -10,7 +10,7 @@ namespace BlocklyNet.Scripting;
 public abstract class Script<TOption, TLogType, TModifierType> : Script
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
-    where TModifierType : ScriptLogModifier
+    where TModifierType : IScriptLogModifier
 {
     private readonly TOption? _options;
 
@@ -107,4 +107,8 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script
 
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc/>
+    public override void SetGroups(ScriptGroupStatus? status)
+        => ResultForLogging.GroupsFinished = status;
 }
