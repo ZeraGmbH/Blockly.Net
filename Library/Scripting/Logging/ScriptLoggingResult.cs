@@ -23,13 +23,13 @@ public class ScriptLoggingResult
     /// Outcome of the measurement.
     /// </summary>
     [NotNull, Required]
-    public required ScriptExecutionResultTypes Result { get; set; }
+    public ScriptExecutionResultTypes Result { get; set; }
 
     /// <summary>
     /// When the measurement was started.
     /// </summary>
     [NotNull, Required]
-    public required DateTime Started { get; set; }
+    public DateTime Started { get; set; }
 
     /// <summary>
     /// When the measurement finished.
@@ -40,7 +40,7 @@ public class ScriptLoggingResult
     /// Opaque details of the measurement according to the type.
     /// </summary>
     [NotNull, Required]
-    public required string? Details { get; set; }
+    public string? Details { get; set; }
 
     /// <summary>
     /// Measurements initiated by this measurement.

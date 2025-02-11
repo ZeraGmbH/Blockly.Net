@@ -6,67 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BlocklyNet.Scripting;
 
 /// <summary>
-/// Describes an active script.
-/// </summary>
-public abstract class Script : IScriptInstance
-{
-    /// <summary>
-    /// The unique identifier of the active script.
-    /// </summary>
-    public string JobId { get; private set; } = Guid.NewGuid().ToString().ToUpper();
-
-    /// <summary>
-    /// Untyped result of the script.
-    /// </summary>
-    public object? Result { get; protected set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public abstract Task ExecuteAsync();
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public abstract StartScript GetRequest();
-
-    /// <summary>
-    /// Can be used to check for early termination.
-    /// </summary>
-    public abstract StartScriptOptions? Options { get; }
-
-    /// <summary>
-    /// Call to do some internal reset of the script.
-    /// </summary>
-    public async Task ResetAsync()
-    {
-        // Self.
-        JobId = Guid.NewGuid().ToString().ToUpper();
-        Result = null;
-
-        // Derived clas.
-        await OnResetAsync();
-    }
-
-    /// <summary>
-    /// Call to do some internal reset of the script.
-    /// </summary>
-    protected virtual Task OnResetAsync() => throw new NotSupportedException($"can now restart {GetType().FullName}");
-}
-
-/// <summary>
-/// Describes an active script.
-/// </summary>
-public abstract class Script<TOption, TLogType>(TOption? options) : Script
-    where TOption : StartScriptOptions
-    where TLogType : ScriptLoggingResult
-{
-    /// <inheritdoc/>
-    public override TOption? Options => options;
-}
-
-/// <summary>
 /// 
 /// </summary>
 /// <typeparam name="TRequest"></typeparam>
@@ -76,7 +15,7 @@ public abstract class Script<TOption, TLogType>(TOption? options) : Script
 public abstract class Script<TRequest, TResult, TOption, TLogType>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption, TLogType>(options)
     where TRequest : StartScript
     where TOption : StartScriptOptions
-    where TLogType : ScriptLoggingResult
+    where TLogType : ScriptLoggingResult, new()
 {
     /// <summary>
     /// 

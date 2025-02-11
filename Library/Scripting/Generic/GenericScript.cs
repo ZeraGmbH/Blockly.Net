@@ -14,7 +14,7 @@ namespace BlocklyNet.Scripting.Generic;
 /// <param name="engine">Script engine executing the measurement.</param>
 /// <param name="options">Additional configuration of the script run-time.</param>
 public class GenericScript<TLogType>(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
-    : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType>(request, engine, options), IGenericScript where TLogType : ScriptLoggingResult
+    : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType>(request, engine, options), IGenericScript where TLogType : ScriptLoggingResult, new()
 {
     IStartGenericScript IGenericScript.Request => Request;
 
