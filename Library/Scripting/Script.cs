@@ -1,5 +1,6 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Engine;
+using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlocklyNet.Scripting;
@@ -57,7 +58,9 @@ public abstract class Script : IScriptInstance
 /// <summary>
 /// Describes an active script.
 /// </summary>
-public abstract class Script<TOption>(TOption? options) : Script where TOption : StartScriptOptions
+public abstract class Script<TOption, TLogType>(TOption? options) : Script
+    where TOption : StartScriptOptions
+    where TLogType : ScriptLoggingResult
 {
     /// <inheritdoc/>
     public override TOption? Options => options;
@@ -69,7 +72,11 @@ public abstract class Script<TOption>(TOption? options) : Script where TOption :
 /// <typeparam name="TRequest"></typeparam>
 /// <typeparam name="TResult"></typeparam>
 /// <typeparam name="TOption"></typeparam>
-public abstract class Script<TRequest, TResult, TOption>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption>(options) where TRequest : StartScript where TOption : StartScriptOptions
+/// <typeparam name="TLogType"></typeparam>
+public abstract class Script<TRequest, TResult, TOption, TLogType>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption, TLogType>(options)
+    where TRequest : StartScript
+    where TOption : StartScriptOptions
+    where TLogType : ScriptLoggingResult
 {
     /// <summary>
     /// 

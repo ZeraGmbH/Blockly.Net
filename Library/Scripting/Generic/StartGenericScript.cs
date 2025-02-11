@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using BlocklyNet.Scripting.Logging;
 
 namespace BlocklyNet.Scripting.Generic;
 
@@ -31,6 +32,6 @@ public class StartGenericScript<TScript, TResult> : StartScript<TScript, TResult
 /// <summary>
 /// Start a generic script based on the integrated script language.
 /// </summary>
-public class StartGenericScript : StartGenericScript<GenericScript, GenericResult>
+public class StartGenericScript : StartGenericScript<GenericScript<ScriptLoggingResult>, GenericResult>
 {
 }

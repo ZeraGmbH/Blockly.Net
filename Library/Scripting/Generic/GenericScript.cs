@@ -2,6 +2,7 @@ using System.Text.Json;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Engine;
+using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlocklyNet.Scripting.Generic;
@@ -12,8 +13,8 @@ namespace BlocklyNet.Scripting.Generic;
 /// <param name="request">All parameters for the measurement.</param>
 /// <param name="engine">Script engine executing the measurement.</param>
 /// <param name="options">Additional configuration of the script run-time.</param>
-public class GenericScript(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
-    : Script<StartGenericScript, GenericResult, StartScriptOptions>(request, engine, options), IGenericScript
+public class GenericScript<TLogType>(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
+    : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType>(request, engine, options), IGenericScript where TLogType : ScriptLoggingResult
 {
     IStartGenericScript IGenericScript.Request => Request;
 
@@ -32,7 +33,7 @@ public class GenericScript(StartGenericScript request, IScriptSite engine, Start
     /// <typeparam name="TResult"></typeparam>
     /// <typeparam name="TOptions"></typeparam>
     /// <returns></returns>
-    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions> script, Action<IScriptDefinition>? afterPresets = null)
+    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions, TLogType> script, Action<IScriptDefinition>? afterPresets = null)
         where TRequest : StartScript, IStartGenericScript
         where TResult : GenericResult, new()
         where TOptions : StartScriptOptions
