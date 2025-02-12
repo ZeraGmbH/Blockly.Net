@@ -46,4 +46,16 @@ public interface IScript<TLogType> : IScript where TLogType : ScriptLoggingResul
     /// </summary>
     /// <param name="result">Outcome of the script.</param>
     Task SetResultAsync(ScriptExecutionResultTypes result);
+
+    /// <summary>
+    /// Update the current script status in the database.
+    /// </summary>
+    /// <returns>Unique identifier of the log record.</returns>
+    Task<string> WriteToLogAsync();
+
+    /// <summary>
+    /// Register a child measurement.
+    /// </summary>
+    /// <param name="measurementId">Unique identifier of the child measurement.</param>
+    Task RegisterChildAsync(string measurementId);
 }

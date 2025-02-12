@@ -39,6 +39,8 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// <returns></returns>
     protected virtual TLogType CreateResultForLogging() => new();
 
+    private string? _lastLogId;
+
     /// <summary>
     /// Internal reset of state.
     /// </summary>
@@ -48,6 +50,8 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
 
         _ActiveGroups.Clear();
         _Modifiers.Clear();
+
+        _lastLogId = null;
 
         return Task.CompletedTask;
     }
@@ -116,6 +120,22 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     public virtual Task SetResultAsync(ScriptExecutionResultTypes result)
     {
         ResultForLogging.Result = result;
+
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    public Task<string> WriteToLogAsync()
+    {
+        if (string.IsNullOrEmpty(_lastLogId)) _lastLogId = Guid.NewGuid().ToString();
+
+        return Task.FromResult(_lastLogId);
+    }
+
+    /// <inheritdoc/>
+    public Task RegisterChildAsync(string id)
+    {
+        ResultForLogging.Children.Add(id);
 
         return Task.CompletedTask;
     }
