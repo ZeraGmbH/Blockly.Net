@@ -125,7 +125,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     }
 
     /// <inheritdoc/>
-    public Task<string> WriteToLogAsync()
+    public virtual Task<string> WriteToLogAsync()
     {
         if (string.IsNullOrEmpty(_lastLogId)) _lastLogId = Guid.NewGuid().ToString();
 
@@ -133,7 +133,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     }
 
     /// <inheritdoc/>
-    public Task RegisterChildAsync(string id)
+    public virtual Task RegisterChildAsync(string id)
     {
         ResultForLogging.Children.Add(id);
 
