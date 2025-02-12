@@ -3,7 +3,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// Customization interface for group manager.
 /// /// </summary>
-public interface IGroupManagerSite
+internal interface IGroupManagerSite
 {
     /// <summary>
     /// Starts executing a new group.

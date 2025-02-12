@@ -146,10 +146,10 @@ partial class ScriptEngine<TLogType>
         }
 
         /// <summary>
-        /// 
+        /// Start a nested script.
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="options"></param>
+        /// <param name="request">Script startup information.</param>
+        /// <param name="options">Optional options for the script.</param>
         public void Start(StartScript request, StartScriptOptions? options = null)
         {
             Logger.LogTrace("Nested script '{Name}' should be started.", request.Name);

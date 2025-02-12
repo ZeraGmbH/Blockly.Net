@@ -70,7 +70,7 @@ public static class IGroupManagerExtensions
     /// </summary>
     /// <param name="manager">Some group manager.</param>
     /// <param name="site">Site to attach.</param>
-    public static void AttachSite(this ISiteGroupManager manager, IGroupManagerSite site)
+    internal static void AttachSite(this ISiteGroupManager manager, IGroupManagerSite site)
     {
         if (manager is GroupManager blocklyManager) blocklyManager.Site = site;
     }
