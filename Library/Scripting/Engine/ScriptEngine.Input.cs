@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
-public partial class ScriptEngine
+partial class ScriptEngine<TLogType>
 {
     /// <summary>
     /// Current active user reply.

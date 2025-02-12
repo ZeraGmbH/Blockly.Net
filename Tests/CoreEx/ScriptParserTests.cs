@@ -1,6 +1,7 @@
 using BlocklyNet.Core;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Engine;
+using BlocklyNet.Scripting.Logging;
 using BlocklyNet.Scripting.Parsing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -11,6 +12,10 @@ namespace BlocklyNetTests.CoreEx;
 [TestFixture]
 public class ScriptParserTests
 {
+    private class TestEngine(IServiceProvider rootProvider)
+        : ScriptEngine<ScriptLoggingResult>(rootProvider, rootProvider.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<TestEngine>())
+    { }
+
     private ServiceProvider Services = null!;
 
     [SetUp]
@@ -155,7 +160,7 @@ public class ScriptParserTests
             </xml>
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
+        var engine = new TestEngine(Services);
 
         await engine.EvaluateAsync(xml, []);
     }
@@ -250,7 +255,7 @@ public class ScriptParserTests
             </xml>
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
+        var engine = new TestEngine(Services);
 
         var presets = new Dictionary<string, object?> { { "d", "Jochen" } };
 
@@ -299,7 +304,7 @@ public class ScriptParserTests
             </xml>        
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
+        var engine = new TestEngine(Services);
 
         var body = await engine.EvaluateAsync(xml, []);
 
@@ -420,7 +425,7 @@ public class ScriptParserTests
             </xml>
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
+        var engine = new TestEngine(Services);
 
         var vars = (IList<object>)(await engine.EvaluateAsync(xml, []))!;
 
@@ -454,7 +459,7 @@ public class ScriptParserTests
             </xml>        
         ";
 
-        var engine = new ScriptEngine(Services, Services.GetRequiredService<IScriptParser>(), new GroupManager(), new NullLogger<ScriptEngine>(), null);
+        var engine = new TestEngine(Services);
         var parsed = engine.Parser.Parse(xml);
 
         Assert.That(parsed.GetVariableType("result"), Is.EqualTo("something"));

@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace BlocklyNet.Scripting.Logging;
 
 /// <summary>

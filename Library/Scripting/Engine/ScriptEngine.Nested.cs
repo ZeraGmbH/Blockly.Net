@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
 
-public partial class ScriptEngine
+partial class ScriptEngine<TLogType>
 {
     /// <summary>
     /// Helper class to manage nested script calls.
     /// </summary>
-    protected class ScriptSite : IScriptSite, IGroupManagerSite
+    protected class ScriptSite : IScriptSite<TLogType>, IGroupManagerSite
     {
         /// <summary>
         /// 
@@ -19,7 +19,7 @@ public partial class ScriptEngine
         /// <param name="parent">Parent script.</param>
         /// <param name="depth">Nestring depth of the script, at least 1.</param>
         /// <param name="groupManager">Group management for this nested script only.</param>
-        public ScriptSite(ScriptEngine engine, IScript? parent, int depth, ISiteGroupManager groupManager)
+        public ScriptSite(ScriptEngine<TLogType> engine, IScript<TLogType>? parent, int depth, ISiteGroupManager groupManager)
         {
             _depth = depth;
             _engine = engine;
@@ -44,7 +44,7 @@ public partial class ScriptEngine
         /// <summary>
         /// The script starting this script.
         /// </summary>
-        protected readonly IScript? Parent;
+        protected readonly IScript<TLogType>? Parent;
 
         /// <summary>
         /// Synchronize access to the result.
@@ -70,7 +70,7 @@ public partial class ScriptEngine
         /// <summary>
         /// The main script engine.
         /// </summary>
-        private readonly ScriptEngine _engine;
+        private readonly ScriptEngine<TLogType> _engine;
 
         /// <inheritdoc/>
         public IServiceProvider ServiceProvider => _engine.ServiceProvider;
@@ -85,10 +85,16 @@ public partial class ScriptEngine
         public bool MustPause => _engine.MustPause;
 
         /// <inheritdoc/>
-        public IScript? CurrentScript { get; private set; }
+        public IScript<TLogType>? CurrentScript { get; private set; }
 
         /// <inheritdoc/>
-        public IScript? MainScript => _engine.MainScript;
+        public IScript<TLogType>? MainScript => _engine.MainScript;
+
+        /// <inheritdoc/>
+        IScript? IScriptSite.CurrentScript => CurrentScript;
+
+        /// <inheritdoc/>
+        IScript? IScriptSite.MainScript => MainScript;
 
         /// <inheritdoc/>
         public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets)
@@ -154,7 +160,7 @@ public partial class ScriptEngine
             try
             {
                 /* Create the script instance from the configuration model. */
-                if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not Script script)
+                if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not IScriptInstance<TLogType> script)
                     throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
                 /* Start the background execution of the script. */
@@ -171,7 +177,7 @@ public partial class ScriptEngine
         /// <summary>
         /// Process the script.
         /// </summary>
-        private async Task RunScriptAsync(Script script)
+        private async Task RunScriptAsync(IScriptInstance<TLogType> script)
         {
             try
             {
@@ -227,7 +233,7 @@ public partial class ScriptEngine
     /// <param name="depth">Nesting depth.</param>
     /// <param name="groupManager">Execution group management helper.</param>
     /// <returns>The new site.</returns>
-    protected virtual ScriptSite CreateSite(IScript? parent, int depth, IGroupManager groupManager)
+    protected virtual ScriptSite CreateSite(IScript<TLogType>? parent, int depth, IGroupManager groupManager)
         => new(this, parent, depth, groupManager);
 
     /// <summary>
@@ -240,7 +246,7 @@ public partial class ScriptEngine
     /// <param name="depth">Nestring depth of the child.</param>
     /// <param name="groupManager">Parent group manager to allow for any-depth nesting.</param>
     /// <returns>Task on the result.</returns>
-    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript? parent, StartScriptOptions? options, int depth, ISiteGroupManager groupManager)
+    protected virtual async Task<TResult> StartChildAsync<TResult>(StartScript request, IScript<TLogType>? parent, StartScriptOptions? options, int depth, ISiteGroupManager groupManager)
     {
         /* Create execution context. */
         var site = CreateSite(parent, depth + 1, await groupManager.CreateNestedAsync((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));

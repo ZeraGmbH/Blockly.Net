@@ -1,3 +1,5 @@
+using BlocklyNet.Scripting.Logging;
+
 namespace BlocklyNet.Scripting;
 
 /// <summary>
@@ -20,4 +22,11 @@ public interface IScriptInstance : IScript
     /// 
     /// </summary>
     StartScript GetRequest();
+}
+
+/// <summary>
+/// 
+/// </summary>
+public interface IScriptInstance<TLogType> : IScript<TLogType>, IScriptInstance where TLogType : ScriptLoggingResult, new()
+{
 }

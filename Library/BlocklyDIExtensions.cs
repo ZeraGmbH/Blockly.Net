@@ -1,6 +1,7 @@
 using BlocklyNet.Core;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Engine;
+using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlocklyNet;
@@ -15,15 +16,17 @@ public static class BlocklyDIExtensions
     /// </summary>
     /// <param name="services">Dependency injection services.</param>
     /// <param name="xml">Unset to use JSON serialization instead of the default XML.</param>
-    public static void UseBlocklyNet(this IServiceCollection services, bool xml = true) => services.UseBlocklyNet<ScriptEngine>(xml);
+    public static void UseBlocklyNet(this IServiceCollection services, bool xml = true)
+        => services.UseBlocklyNet<ScriptEngine<ScriptLoggingResult>, ScriptLoggingResult>(xml);
 
     /// <summary>
     /// Configure the dependency injection environment.
     /// </summary>
     /// <typeparam name="TEngine">Engine implementation to use.</typeparam>
+    /// <typeparam name="TLogType">Type of the logging entires used by this very script engine..</typeparam>
     /// <param name="services">Dependency injection services.</param>
     /// <param name="xml">Unset to use JSON serialization instead of the default XML.</param>
-    public static void UseBlocklyNet<TEngine>(this IServiceCollection services, bool xml = true) where TEngine : ScriptEngine
+    public static void UseBlocklyNet<TEngine, TLogType>(this IServiceCollection services, bool xml = true) where TEngine : ScriptEngine<TLogType> where TLogType : ScriptLoggingResult, new()
     {
         /* Single management instance for all known models. */
         services.AddSingleton<IScriptModels, ScriptModels>();
