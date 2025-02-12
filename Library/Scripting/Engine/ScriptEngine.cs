@@ -557,5 +557,48 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// <param name="parent"></param>
     /// <param name="final"></param>
     /// <returns></returns>
-    protected virtual Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final) => Task.CompletedTask;
+    private async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
+    {
+        using (Lock.Wait())
+            try
+            {
+                /* For the outer script always add the current status of the exeuction groups. */
+                if (parent == null)
+                {
+                    script.SetGroups(SerializeGroupStatus(true));
+
+                    if (final)
+                        if (script.ResultForLogging.Result == ScriptExecutionResultTypes.Error)
+                            if (script.ResultForLogging.GroupsFinished?.HasBeenPaused == true)
+                                await script.SetResultAsync(ScriptExecutionResultTypes.Paused);
+                }
+
+                /* Mark as finished. */
+                if (final) script.ResultForLogging.Finished = DateTime.Now;
+
+                var measurementId = await script.WriteToLogAsync();
+
+                /* Register in parent script. */
+                if (parent == null || parent.ResultForLogging.Children.Contains(measurementId)) return;
+
+                /* First update for parent. */
+                await parent.RegisterChildAsync(measurementId);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Unable to create log entry: {Exception}", e.Message);
+
+                return;
+            }
+
+        try
+        {
+            /* Must forward to parent if child list has been updated. */
+            await UpdateLogAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Unable to create log entry: {Exception}", e.Message);
+        }
+    }
 }
