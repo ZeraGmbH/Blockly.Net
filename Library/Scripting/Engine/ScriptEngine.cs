@@ -557,7 +557,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// <param name="parent"></param>
     /// <param name="final"></param>
     /// <returns></returns>
-    private async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
+    protected async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
     {
         using (Lock.Wait())
             try
