@@ -82,9 +82,6 @@ partial class ScriptEngine<TLogType>
         public CancellationToken Cancellation => _engine.Cancellation;
 
         /// <inheritdoc/>
-        public bool MustPause => _engine.MustPause;
-
-        /// <inheritdoc/>
         public IScript<TLogType>? CurrentScript { get; private set; }
 
         /// <inheritdoc/>

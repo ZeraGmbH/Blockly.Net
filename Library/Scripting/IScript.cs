@@ -4,7 +4,7 @@ using BlocklyNet.Scripting.Logging;
 namespace BlocklyNet.Scripting;
 
 /// <summary>
-/// 
+/// Interface provided by any script.
 /// </summary>
 public interface IScript
 {
@@ -31,13 +31,13 @@ public interface IScript
 }
 
 /// <summary>
-/// 
+/// Type interface to a script.
 /// </summary>
-/// <typeparam name="TLogType"></typeparam>
+/// <typeparam name="TLogType">Type of a log entry.</typeparam>
 public interface IScript<TLogType> : IScript where TLogType : ScriptLoggingResult, new()
 {
     /// <summary>
-    /// 
+    /// Logging entry for this script.
     /// </summary>
     TLogType ResultForLogging { get; }
 

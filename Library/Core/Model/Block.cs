@@ -62,9 +62,6 @@ public abstract class Block : IFragment
         /* Always check for cancel before proceeding with the execution of the next block in chain. */
         context.Cancellation.ThrowIfCancellationRequested();
 
-        /* Execute an outstanding pause request. */
-        if (context.Engine.MustPause) throw new ScriptPausedException();
-
         /* Check for early stop. */
         if (context.Engine.CurrentScript?.Options?.ShouldStopNow?.Invoke() == true)
             throw new ScriptStoppedEarlyException();

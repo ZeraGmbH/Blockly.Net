@@ -124,7 +124,6 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
         {
             CodeHash = _codeHash,
             GroupStatus = _groupManager.Serialize(includeRepeat),
-            HasBeenPaused = _pause.IsCancellationRequested,
         };
 
     private void ResetScript(IEnumerable<GroupRepeat>? repeat)
@@ -259,24 +258,6 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     protected virtual Task OnPrepareStartAsync(bool restart) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public void Pause(string jobId)
-    {
-        using (Lock.Wait())
-        {
-            if (_active == null || _active.JobId != jobId)
-                throw new ArgumentException("not the active script", nameof(jobId));
-
-            /* Report the result. */
-            Logger.LogTrace("User paused script {JobId}", jobId);
-
-            _pause.Cancel();
-        }
-    }
-
-    /// <inheritdoc/>
-    public bool MustPause => _pause.IsCancellationRequested;
-
-    /// <inheritdoc/>
     public void Cancel(string jobId)
     {
         using (Lock.Wait())
@@ -386,7 +367,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
         await UpdateResultLogEntryAsync(script, parent, true);
 
         /* Always propagate error. */
-        if (!MustPause && parent != null && parent.ResultForLogging.Result == ScriptExecutionResultTypes.Active && script.ResultForLogging.Result != ScriptExecutionResultTypes.Success)
+        if (parent != null && parent.ResultForLogging.Result == ScriptExecutionResultTypes.Active && script.ResultForLogging.Result != ScriptExecutionResultTypes.Success)
             await parent.SetResultAsync(ScriptExecutionResultTypes.Failure);
     }
 
@@ -530,15 +511,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     public Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details) => _groupManager.StartAsync(key, name, details);
 
     /// <inheritdoc/>
-    public async Task<GroupStatus> EndGroupAsync(GroupResult result)
-    {
-        var status = await _groupManager.FinishAsync(result);
-
-        /* Interrupt right now. */
-        if (_pause.IsCancellationRequested) throw new ScriptPausedException();
-
-        return status;
-    }
+    public Task<GroupStatus> EndGroupAsync(GroupResult result) => _groupManager.FinishAsync(result);
 
     /// <inheritdoc/>
     public GroupStatus GetGroupStatus(int index) => _groupManager[index];
@@ -554,59 +527,4 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
 
     /// <inheritdoc/>
     public virtual Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
-
-    /// <inheritdoc/>
-    public Task UpdateLogAsync() => CurrentScript == null ? Task.CompletedTask : UpdateResultLogEntryAsync(CurrentScript, null, false);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="script"></param>
-    /// <param name="parent"></param>
-    /// <param name="final"></param>
-    /// <returns></returns>
-    protected async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
-    {
-        using (Lock.Wait())
-            try
-            {
-                /* For the outer script always add the current status of the exeuction groups. */
-                if (parent == null)
-                {
-                    script.SetGroups(SerializeGroupStatus(true));
-
-                    if (final)
-                        if (script.ResultForLogging.Result == ScriptExecutionResultTypes.Error)
-                            if (script.ResultForLogging.GroupsFinished?.HasBeenPaused == true)
-                                await script.SetResultAsync(ScriptExecutionResultTypes.Paused);
-                }
-
-                /* Mark as finished. */
-                if (final) script.ResultForLogging.Finished = DateTime.Now;
-
-                var measurementId = await script.WriteToLogAsync();
-
-                /* Register in parent script. */
-                if (parent == null || parent.ResultForLogging.Children.Contains(measurementId)) return;
-
-                /* First update for parent. */
-                await parent.RegisterChildAsync(measurementId);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError("Unable to create log entry: {Exception}", e.Message);
-
-                return;
-            }
-
-        try
-        {
-            /* Must forward to parent if child list has been updated. */
-            await UpdateLogAsync();
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Unable to create log entry: {Exception}", e.Message);
-        }
-    }
 }
