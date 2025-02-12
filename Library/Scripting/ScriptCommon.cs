@@ -7,7 +7,7 @@ namespace BlocklyNet.Scripting;
 /// <summary>
 /// Describes an active script.
 /// </summary>
-public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript<TLogType>
+public abstract class Script<TOption, TLogType, TModifierType> : Script, IScriptInstance<TLogType>
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
     where TModifierType : IScriptLogModifier

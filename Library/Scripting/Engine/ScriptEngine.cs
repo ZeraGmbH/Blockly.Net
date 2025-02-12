@@ -1,11 +1,12 @@
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Logging;
 using BlocklyNet.Scripting.Parsing;
 using BlocklyNet.User;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BlocklyNet.Scripting.Engine;
 
@@ -13,7 +14,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// The script execution engine. There can be at most one active
 /// script at any time.
 /// </summary>
-public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSite, IDisposable
+public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogType>, IGroupManagerSite, IDisposable where TLogType : ScriptLoggingResult, new()
 {
     /// <summary>
     /// 
@@ -27,7 +28,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
         IServiceProvider rootProvider,
         IScriptParser parser,
         IGroupManager groupManager,
-        ILogger<ScriptEngine> logger,
+        ILogger<ScriptEngine<TLogType>> logger,
         IScriptEngineNotifySink? context = null
     )
     {
@@ -60,7 +61,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
     /// <summary>
     /// The active script.
     /// </summary>
-    private IScriptInstance? _active;
+    private IScriptInstance<TLogType>? _active;
 
     /// <summary>
     /// Set when the one and only script is done.
@@ -91,10 +92,16 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
     private CancellationTokenSource _pause = new();
 
     /// <inheritdoc />
-    public IScript? CurrentScript => _active;
+    IScript? IScriptSite.CurrentScript => CurrentScript;
 
     /// <inheritdoc />
-    public IScript? MainScript => _active;
+    IScript? IScriptSite.MainScript => MainScript;
+
+    /// <inheritdoc />
+    public IScript<TLogType>? CurrentScript => _active;
+
+    /// <inheritdoc />
+    public IScript<TLogType>? MainScript => _active;
 
     /// <summary>
     /// Last progress seen.
@@ -147,7 +154,7 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
         try
         {
             /* Try to create the script instance. */
-            if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not Script script)
+            if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not IScriptInstance<TLogType> script)
                 throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
             using (Lock.Wait())
@@ -539,4 +546,16 @@ public partial class ScriptEngine : IScriptEngine, IScriptSite, IGroupManagerSit
 
     /// <inheritdoc/>
     public virtual Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public Task UpdateLogAsync() => CurrentScript == null ? Task.CompletedTask : UpdateResultLogEntryAsync(CurrentScript, null, false);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <param name="parent"></param>
+    /// <param name="final"></param>
+    /// <returns></returns>
+    protected virtual Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final) => Task.CompletedTask;
 }

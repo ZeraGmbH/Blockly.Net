@@ -1,4 +1,5 @@
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -32,16 +33,6 @@ public interface IScriptSite
     /// Set if the user has requested the script to pause.
     /// </summary>
     bool MustPause { get; }
-
-    /// <summary>
-    /// Report the currently running script.
-    /// </summary>
-    IScript? CurrentScript { get; }
-
-    /// <summary>
-    /// Report the outer script.
-    /// </summary>
-    IScript? MainScript { get; }
 
     /// <summary>
     /// Set progress information.
@@ -106,4 +97,35 @@ public interface IScriptSite
     /// <param name="index">Zero-based index of the group.</param>
     /// <returns>Information on the group.</returns>
     GroupStatus GetGroupStatus(int index);
+
+    /// <summary>
+    /// Report the currently running script.
+    /// </summary>
+    IScript? CurrentScript { get; }
+
+    /// <summary>
+    /// Report the outer script.
+    /// </summary>
+    IScript? MainScript { get; }
+
+    /// <summary>
+    /// Update the current log entry.
+    /// </summary>
+    Task UpdateLogAsync();
+}
+
+/// <summary>
+/// 
+/// </summary>
+public interface IScriptSite<TLogType> : IScriptSite where TLogType : ScriptLoggingResult, new()
+{
+    /// <summary>
+    /// Report the currently running script.
+    /// </summary>
+    new IScript<TLogType>? CurrentScript { get; }
+
+    /// <summary>
+    /// Report the outer script.
+    /// </summary>
+    new IScript<TLogType>? MainScript { get; }
 }

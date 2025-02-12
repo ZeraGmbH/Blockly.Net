@@ -2,14 +2,14 @@ using BlocklyNet.Scripting.Generic;
 
 namespace BlocklyNet.Scripting.Engine;
 
-public partial class ScriptEngine
+partial class ScriptEngine<TLogType>
 {
     /// <summary>
     /// 
     /// </summary>
     /// <param name="script"></param>
     /// <returns></returns>
-    protected virtual ScriptInformation CreateStartNotification(Script script)
+    protected virtual ScriptInformation CreateStartNotification(IScriptInstance script)
         => new()
         {
             JobId = script.JobId,
