@@ -380,7 +380,15 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// <summary>
     /// 
     /// </summary>
-    protected virtual Task OnScriptDoneAsync(IScriptInstance script, IScript? parent) => Task.CompletedTask;
+    protected virtual async Task OnScriptDoneAsync(IScriptInstance<TLogType> script, IScript<TLogType>? parent)
+    {
+        /* Create a log entry. */
+        await UpdateResultLogEntryAsync(script, parent, true);
+
+        /* Always propagate error. */
+        if (!MustPause && parent != null && parent.ResultForLogging.Result == ScriptExecutionResultTypes.Active && script.ResultForLogging.Result != ScriptExecutionResultTypes.Success)
+            await parent.SetResultAsync(ScriptExecutionResultTypes.Failure);
+    }
 
     /// <summary>
     /// 
