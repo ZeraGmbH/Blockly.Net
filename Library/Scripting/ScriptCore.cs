@@ -5,27 +5,20 @@ namespace BlocklyNet.Scripting;
 /// <summary>
 /// Describes an active script.
 /// </summary>
-public abstract class Script : IScriptInstance
+public abstract class Script : IScriptInstance, IScript
 {
     /// <summary>
     /// The unique identifier of the active script.
     /// </summary>
     public string JobId { get; private set; } = Guid.NewGuid().ToString().ToUpper();
 
-    /// <summary>
-    /// Untyped result of the script.
-    /// </summary>
+    /// <inheritdoc/>
     public object? Result { get; protected set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public abstract Task ExecuteAsync();
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public abstract StartScript GetRequest();
 
     /// <summary>
@@ -42,14 +35,14 @@ public abstract class Script : IScriptInstance
         JobId = Guid.NewGuid().ToString().ToUpper();
         Result = null;
 
-        // Derived clas.
+        // Derived class.
         await OnResetAsync();
     }
 
     /// <summary>
     /// Call to do some internal reset of the script.
     /// </summary>
-    protected virtual Task OnResetAsync() => throw new NotSupportedException($"can now restart {GetType().FullName}");
+    protected virtual Task OnResetAsync() => throw new NotSupportedException($"can not restart {GetType().FullName}");
 
     /// <summary>
     /// Report the start of a group execution.

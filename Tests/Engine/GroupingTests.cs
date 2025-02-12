@@ -1,5 +1,3 @@
-using System.Text.Json;
-using BlocklyNet;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;
@@ -224,71 +222,5 @@ public class GroupingTests : TestEnvironment
         var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
-    }
-
-    [Test]
-    public async Task Can_Pause_Script_Async()
-    {
-        /* Termination helper. */
-        var done = new TaskCompletionSource();
-
-        ScriptError? errorEvent = null;
-
-        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) =>
-        {
-            /* See if script is done. */
-            if (method != ScriptEngineNotifyMethods.Done)
-                if (method == ScriptEngineNotifyMethods.Error)
-                    errorEvent = (ScriptError?)arg;
-                else
-                    return;
-
-            done.SetResult();
-        };
-
-        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Run Groups", ScriptId = AddScript("SCRIPT", Script2) }, "");
-
-        /* Pause the operation. */
-        Engine.Pause(jobId);
-
-        /* Wait for the script to finish. */
-        await done.Task;
-
-        /* Check the result. */
-        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
-
-        Assert.That(result, Is.Null);
-        Assert.That(errorEvent, Is.Not.Null);
-
-        var groups = errorEvent.GroupStatus.GroupStatus;
-
-        Assert.That(groups, Has.Count.EqualTo(1));
-
-        var hash = errorEvent.GroupStatus.CodeHash;
-
-        var repeat = GroupManagerTests.MakeRepeat(groups[0], GroupRepeatType.Skip);
-
-        repeat.SetResult(new() { Type = GroupResultType.Succeeded, Result = 42 });
-
-        errorEvent = null;
-
-        done = new TaskCompletionSource();
-
-        jobId = await Engine.StartAsync(
-            new StartGenericScript { Name = "Run Groups", ScriptId = AddScript("SCRIPT", Script2) },
-            "",
-            new() { GroupResults = new() { CodeHash = hash, GroupStatus = { repeat } } }
-        );
-
-        await done.Task;
-
-        result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
-
-        Assert.That(errorEvent, Is.Null);
-
-        var list = (List<object?>)result.Result;
-
-        Assert.That(list, Has.Count.EqualTo(3));
-        Assert.That(((JsonElement)list[0]!).ToJsonScalar(), Is.EqualTo(42));
     }
 }

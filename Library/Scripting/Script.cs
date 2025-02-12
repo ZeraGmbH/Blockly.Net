@@ -1,4 +1,3 @@
-using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,13 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BlocklyNet.Scripting;
 
 /// <summary>
-/// 
+/// Official base class for implementing scripts.
 /// </summary>
-/// <typeparam name="TRequest"></typeparam>
-/// <typeparam name="TResult"></typeparam>
-/// <typeparam name="TOption"></typeparam>
-/// <typeparam name="TLogType"></typeparam>
-/// <typeparam name="TModifierType"></typeparam>
+/// <typeparam name="TRequest">Type of the configuration.</typeparam>
+/// <typeparam name="TResult">Result type of the script execution.</typeparam>
+/// <typeparam name="TOption">Option class to use.</typeparam>
+/// <typeparam name="TLogType">Type of each log entry.</typeparam>
+/// <typeparam name="TModifierType">Implementation class of log modifiers.</typeparam>
 public abstract class Script<TRequest, TResult, TOption, TLogType, TModifierType>(TRequest request, IScriptSite engine, TOption? options) : Script<TOption, TLogType, TModifierType>(options)
     where TRequest : StartScript
     where TOption : StartScriptOptions
@@ -20,34 +19,25 @@ public abstract class Script<TRequest, TResult, TOption, TLogType, TModifierType
     where TModifierType : IScriptLogModifier
 {
     /// <summary>
-    /// 
+    /// Configuration of the script.
     /// </summary>
     public TRequest Request { get; } = request;
 
     /// <inheritdoc/>
     public void SetResult(TResult result) => Result = result;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public override StartScript GetRequest() => Request;
 
     /// <summary>
-    /// 
+    /// Engine executing this script.
     /// </summary>
     public readonly IScriptSite Engine = engine;
 
     /// <summary>
     /// Test for cancel.
     /// </summary>
-    protected void CheckCancel()
-    {
-        // Brute force cancel.
-        Engine.Cancellation.ThrowIfCancellationRequested();
-
-        // More soft pause.
-        if (Engine.MustPause) throw new ScriptPausedException();
-    }
+    protected void CheckCancel() => Engine.Cancellation.ThrowIfCancellationRequested();
 
     /// <summary>
     /// Access a runtime service.

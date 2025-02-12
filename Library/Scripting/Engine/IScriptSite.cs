@@ -30,11 +30,6 @@ public interface IScriptSite
     CancellationToken Cancellation { get; }
 
     /// <summary>
-    /// Set if the user has requested the script to pause.
-    /// </summary>
-    bool MustPause { get; }
-
-    /// <summary>
     /// Set progress information.
     /// </summary>
     /// <param name="info">Script dependant progress data.</param>

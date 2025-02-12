@@ -1,13 +1,16 @@
-using System.Text.Json;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Logging;
+using System.Text.Json;
 
 namespace BlocklyNet.Scripting;
 
 /// <summary>
 /// Describes an active script.
 /// </summary>
-public abstract class Script<TOption, TLogType, TModifierType> : Script, IScriptInstance<TLogType>
+/// <typeparam name="TOption">Option class to use.</typeparam>
+/// <typeparam name="TLogType">Type of each log entry.</typeparam>
+/// <typeparam name="TModifierType">Implementation class of log modifiers.</typeparam>
+public abstract class Script<TOption, TLogType, TModifierType> : Script, IScriptInstance<TLogType>, IScript<TLogType>
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
     where TModifierType : IScriptLogModifier
@@ -15,9 +18,9 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     private readonly TOption? _options;
 
     /// <summary>
-    /// 
+    /// Must only be created inside this assembly.
     /// </summary>
-    /// <param name="options"></param>
+    /// <param name="options">Options to use.</param>
     public Script(TOption? options)
     {
         _options = options;
@@ -28,17 +31,20 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// <inheritdoc/>
     public override TOption? Options => _options;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public TLogType ResultForLogging { get; set; }
 
     /// <summary>
-    /// 
+    /// Create a brand new empty log entry.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Empty log entry.</returns>
     protected virtual TLogType CreateResultForLogging() => new();
 
+    /// <summary>
+    /// Identifier of the last log created in no-log
+    /// operation mode - pure imaginary and more or
+    /// less useless.
+    /// </summary>
     private string? _lastLogId;
 
     /// <summary>
@@ -56,12 +62,18 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// All side-effects applied to the log entry during
+    /// script execution - not used in no-log base 
+    /// operation mode.
+    /// </summary>
     private readonly List<TModifierType> _Modifiers = [];
 
     /// <summary>
-    /// 
+    /// Register a side-effect.
     /// </summary>
-    /// <param name="modifier"></param>
+    /// <param name="modifier">Side effect to apply to the
+    /// log entry and remember for replay.</param>
     protected Task RegisterModifierAsync(TModifierType modifier)
     {
         // Remember for later replay and execute now.
@@ -71,15 +83,25 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     }
 
     /// <summary>
-    /// 
+    /// Wrapper class for replay information on side-effects
+    /// on the log entry.
     /// </summary>
     private class CustomGroupInformation
     {
+        /// <summary>
+        /// Number of modfiers prior to these ones.
+        /// </summary>
         public int ModifierIndex { get; set; }
 
+        /// <summary>
+        /// List of modifiers for a single execution group.
+        /// </summary>
         public List<TModifierType> Modifiers { get; set; } = [];
     }
 
+    /// <summary>
+    /// Replay information for each execution group.
+    /// </summary>
     private readonly Stack<CustomGroupInformation> _ActiveGroups = [];
 
     /// <inheritdoc/>
@@ -119,6 +141,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// <inheritdoc/>
     public virtual Task SetResultAsync(ScriptExecutionResultTypes result)
     {
+        /* In no-log mode just update the entry. */
         ResultForLogging.Result = result;
 
         return Task.CompletedTask;
@@ -127,6 +150,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// <inheritdoc/>
     public virtual Task<string> WriteToLogAsync()
     {
+        /* In no-log mode just generate and keep a unique identifier for the log entry. */
         if (string.IsNullOrEmpty(_lastLogId)) _lastLogId = Guid.NewGuid().ToString();
 
         return Task.FromResult(_lastLogId);
@@ -135,6 +159,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// <inheritdoc/>
     public virtual Task RegisterChildAsync(string id)
     {
+        /* In no-log mode just remember the log entry in the hierarchy of nested scripts. */
         ResultForLogging.Children.Add(id);
 
         return Task.CompletedTask;

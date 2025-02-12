@@ -26,8 +26,4 @@ public class ScriptGroupStatus<TStatus> where TStatus : GroupStatus<TStatus>
 /// </summary>
 public class ScriptGroupStatus : ScriptGroupStatus<GroupStatus>
 {
-    /// <summary>
-    /// Set if a pause request has been detected.
-    /// </summary>
-    public bool HasBeenPaused { get; set; }
 }
