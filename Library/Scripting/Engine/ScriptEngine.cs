@@ -546,4 +546,16 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
 
     /// <inheritdoc/>
     public virtual Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public Task UpdateLogAsync() => CurrentScript == null ? Task.CompletedTask : UpdateResultLogEntryAsync(CurrentScript, null, false);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="script"></param>
+    /// <param name="parent"></param>
+    /// <param name="final"></param>
+    /// <returns></returns>
+    protected virtual Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final) => Task.CompletedTask;
 }

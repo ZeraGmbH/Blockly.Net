@@ -107,6 +107,11 @@ public interface IScriptSite
     /// Report the outer script.
     /// </summary>
     IScript? MainScript { get; }
+
+    /// <summary>
+    /// Update the current log entry.
+    /// </summary>
+    Task UpdateLogAsync();
 }
 
 /// <summary>

@@ -224,6 +224,9 @@ partial class ScriptEngine<TLogType>
 
         /// <inheritdoc/>
         public virtual Task DoneExecuteGroupAsync(GroupStatus status) => Task.CompletedTask;
+
+        /// <inheritdoc/>
+        public Task UpdateLogAsync() => CurrentScript == null ? Task.CompletedTask : _engine.UpdateResultLogEntryAsync(CurrentScript, Parent, false);
     }
 
     /// <summary>
