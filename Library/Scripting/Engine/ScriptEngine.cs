@@ -86,11 +86,6 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// <inheritdoc />
     public CancellationToken Cancellation => _cancel.Token;
 
-    /// <summary>
-    /// Manages the pausing.
-    /// </summary>
-    private CancellationTokenSource _pause = new();
-
     /// <inheritdoc />
     IScript? IScriptSite.CurrentScript => CurrentScript;
 
@@ -132,17 +127,17 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
         _inputResponse?.SetException(new OperationCanceledException());
 
         /* Prepare for next script to be executed - full reset internal state. */
+        Done = false;
+
         _allProgress.Clear();
         _cancel = new();
         _codeHash = null!;
-        Done = false;
         _error = null;
         _groupManager.Reset(repeat);
         _inputRequest = null;
         _inputResponse = null;
         _lastProgress = null;
         _lastProgressValue = null;
-        _pause = new();
     }
 
     /// <inheritdoc/>

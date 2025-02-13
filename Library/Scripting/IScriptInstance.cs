@@ -27,6 +27,6 @@ public interface IScriptInstance : IScript
 /// Logging ready description of a running script.
 /// </summary>
 /// <typeparam name="TLogType">Type of a log entry.</typeparam>
-public interface IScriptInstance<TLogType> : IScript<TLogType>, IScriptInstance where TLogType : ScriptLoggingResult, new()
+public interface IScriptInstance<TLogType> : IScript<TLogType>, IScriptInstance where TLogType : ScriptLoggingResult
 {
 }
