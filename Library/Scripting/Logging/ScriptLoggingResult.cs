@@ -1,11 +1,11 @@
+using BlocklyNet.Scripting.Engine;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using BlocklyNet.Scripting.Engine;
 
 namespace BlocklyNet.Scripting.Logging;
 
 /// <summary>
-/// Log entry for a new single measurement.
+/// Log entry for a new single script.
 /// </summary>
 public class ScriptLoggingResult
 {
@@ -20,30 +20,30 @@ public class ScriptLoggingResult
     public string? ScriptId { get; set; }
 
     /// <summary>
-    /// Outcome of the measurement.
+    /// Outcome of the script.
     /// </summary>
     [NotNull, Required]
     public ScriptExecutionResultTypes Result { get; set; }
 
     /// <summary>
-    /// When the measurement was started.
+    /// When the script was started.
     /// </summary>
     [NotNull, Required]
     public DateTime Started { get; set; }
 
     /// <summary>
-    /// When the measurement finished.
+    /// When the script finished.
     /// </summary>
     public DateTime? Finished { get; set; }
 
     /// <summary>
-    /// Opaque details of the measurement according to the type.
+    /// Opaque details of the script according to the type.
     /// </summary>
     [NotNull, Required]
     public string? Details { get; set; }
 
     /// <summary>
-    /// Measurements initiated by this measurement.
+    /// Nested scripts initiated by this script.
     /// </summary>
     [NotNull, Required]
     public List<string> Children { get; set; } = [];

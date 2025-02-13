@@ -13,7 +13,7 @@ partial class ScriptEngine<TLogType>
     /// <param name="script">Script to update.</param>
     /// <param name="parent">Optional the parent script - null for the root.</param>
     /// <param name="final">Set if the script is now finished - unset for updates during the execution.</param>
-    protected async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
+    private async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
     {
         using (Lock.Wait())
             try
@@ -24,13 +24,13 @@ partial class ScriptEngine<TLogType>
                 /* Mark as finished. */
                 if (final) script.ResultForLogging.Finished = DateTime.Now;
 
-                var measurementId = await script.WriteToLogAsync();
+                var id = await script.WriteToLogAsync();
 
                 /* Register in parent script. */
-                if (parent == null || parent.ResultForLogging.Children.Contains(measurementId)) return;
+                if (parent == null || parent.ResultForLogging.Children.Contains(id)) return;
 
-                /* First update for parent. */
-                await parent.RegisterChildAsync(measurementId);
+                /* Forward update to parent. */
+                await parent.RegisterChildAsync(id);
             }
             catch (Exception e)
             {
@@ -41,7 +41,7 @@ partial class ScriptEngine<TLogType>
 
         try
         {
-            /* Must forward to parent if child list has been updated. */
+            /* Must forward to parent if child list has been updated - make sure we left the lock. */
             await UpdateLogAsync();
         }
         catch (Exception e)

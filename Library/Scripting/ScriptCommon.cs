@@ -13,7 +13,7 @@ namespace BlocklyNet.Scripting;
 public abstract class Script<TOption, TLogType, TModifierType> : Script, IScriptInstance<TLogType>, IScript<TLogType>
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
-    where TModifierType : IScriptLogModifier
+    where TModifierType : ScriptLogModifier
 {
     private readonly TOption? _options;
 

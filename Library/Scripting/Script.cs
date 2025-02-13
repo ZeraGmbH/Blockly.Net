@@ -16,7 +16,7 @@ public abstract class Script<TRequest, TResult, TOption, TLogType, TModifierType
     where TRequest : StartScript
     where TOption : StartScriptOptions
     where TLogType : ScriptLoggingResult, new()
-    where TModifierType : IScriptLogModifier
+    where TModifierType : ScriptLogModifier
 {
     /// <summary>
     /// Configuration of the script.

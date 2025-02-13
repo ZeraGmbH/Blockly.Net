@@ -8,15 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BlocklyNet.Scripting.Generic;
 
 /// <summary>
-/// Algorithm to execute an error measurement.
+/// Algorithm to execute a generic script.
 /// </summary>
-/// <param name="request">All parameters for the measurement.</param>
-/// <param name="engine">Script engine executing the measurement.</param>
+/// <param name="request">All parameters for the script.</param>
+/// <param name="engine">Script engine executing the script.</param>
 /// <param name="options">Additional configuration of the script run-time.</param>
 public class GenericScript<TLogType, TModifierType>(StartGenericScript request, IScriptSite engine, StartScriptOptions? options)
     : Script<StartGenericScript, GenericResult, StartScriptOptions, TLogType, TModifierType>(request, engine, options), IGenericScript
     where TLogType : ScriptLoggingResult, new()
-    where TModifierType : IScriptLogModifier
+    where TModifierType : ScriptLogModifier
 {
     IStartGenericScript IGenericScript.Request => Request;
 

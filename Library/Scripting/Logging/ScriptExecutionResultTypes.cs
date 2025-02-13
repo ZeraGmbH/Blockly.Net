@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace BlocklyNet.Scripting.Logging;
 
 /// <summary>
-/// Possible outcomes of a measurement.
+/// Possible outcomes of a script.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ScriptExecutionResultTypes
@@ -36,5 +36,6 @@ public enum ScriptExecutionResultTypes
     /// <summary>
     /// Measurement has been paused and may be restarted.
     /// </summary>
+    [Obsolete("no longer used - only Aborted is supported", false)]
     Paused = 5,
 }
