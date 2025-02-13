@@ -112,7 +112,7 @@ public interface IScriptSite
 /// <summary>
 /// 
 /// </summary>
-public interface IScriptSite<TLogType> : IScriptSite where TLogType : ScriptLoggingResult, new()
+public interface IScriptSite<TLogType> : IScriptSite where TLogType : ScriptLoggingResult
 {
     /// <summary>
     /// Report the currently running script.

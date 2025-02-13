@@ -34,7 +34,7 @@ public interface IScript
 /// Type interface to a script.
 /// </summary>
 /// <typeparam name="TLogType">Type of a log entry.</typeparam>
-public interface IScript<TLogType> : IScript where TLogType : ScriptLoggingResult, new()
+public interface IScript<TLogType> : IScript where TLogType : ScriptLoggingResult
 {
     /// <summary>
     /// Logging entry for this script.
