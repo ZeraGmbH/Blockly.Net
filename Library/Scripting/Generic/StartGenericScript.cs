@@ -37,9 +37,9 @@ public class StartGenericScript : StartGenericScript<GenericScript<ScriptLogging
     /// <summary>
     /// 
     /// </summary>
-    public class NoopModifier : IScriptLogModifier
+    public class NoopModifier : ScriptLogModifier<IScript>
     {
         /// <inheritdoc/>
-        public Task ApplyAsync(Script script, bool initial) => Task.CompletedTask;
+        protected override Task OnApplyAsync(IScript script, bool initial) => Task.CompletedTask;
     }
 }

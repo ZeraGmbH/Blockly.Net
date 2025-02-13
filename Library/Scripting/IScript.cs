@@ -54,8 +54,8 @@ public interface IScript<TLogType> : IScript where TLogType : ScriptLoggingResul
     Task<string> WriteToLogAsync();
 
     /// <summary>
-    /// Register a child measurement.
+    /// Register a nested script.
     /// </summary>
-    /// <param name="measurementId">Unique identifier of the child measurement.</param>
-    Task RegisterChildAsync(string measurementId);
+    /// <param name="id">Unique identifier of the nested scripts log entry.</param>
+    Task RegisterChildAsync(string id);
 }

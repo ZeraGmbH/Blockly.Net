@@ -24,13 +24,13 @@ partial class ScriptEngine<TLogType>
                 /* Mark as finished. */
                 if (final) script.ResultForLogging.Finished = DateTime.Now;
 
-                var measurementId = await script.WriteToLogAsync();
+                var id = await script.WriteToLogAsync();
 
                 /* Register in parent script. */
-                if (parent == null || parent.ResultForLogging.Children.Contains(measurementId)) return;
+                if (parent == null || parent.ResultForLogging.Children.Contains(id)) return;
 
                 /* Forward update to parent. */
-                await parent.RegisterChildAsync(measurementId);
+                await parent.RegisterChildAsync(id);
             }
             catch (Exception e)
             {
