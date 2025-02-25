@@ -1,3 +1,4 @@
+using BlocklyNet.Core.Model;
 using BlocklyNet.Scripting.Engine;
 
 namespace BlocklyNet.Scripting.Parsing;
@@ -33,4 +34,9 @@ public interface IParsedScript
     /// <param name="name"></param>
     /// <returns></returns>
     string? GetVariableType(string name);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    Block[] Blocks { get; }
 }

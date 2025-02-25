@@ -28,6 +28,9 @@ public abstract class Parser
       private readonly Workspace _workspace = workspace;
 
       /// <inheritdoc/>
+      public Block[] Blocks => [.. _workspace.ParsedBlocks];
+
+      /// <inheritdoc/>
       public Task<object?> RunAsync(IScriptSite engine) => _workspace.EvaluateAsync(new Context(engine, _workspace.VariableTypes));
 
       /// <inheritdoc/>
