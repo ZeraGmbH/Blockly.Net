@@ -17,6 +17,11 @@ public class Workspace : IFragment
   public readonly IList<Block> Blocks = [];
 
   /// <summary>
+  /// All parsed blocks in the workspace - any nesting.
+  /// </summary>
+  public readonly IList<Block> ParsedBlocks = [];
+
+  /// <summary>
   /// Mapping of variables to its types.
   /// </summary>
   public readonly Dictionary<string, string> VariableTypes = [];

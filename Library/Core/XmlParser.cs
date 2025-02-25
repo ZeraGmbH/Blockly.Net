@@ -24,7 +24,7 @@ public class XmlParser : Parser<XmlParser>
     {
       if (node.LocalName == "block" || node.LocalName == "shadow")
       {
-        var block = ParseBlock(node);
+        var block = ParseBlock(node, workspace);
 
         if (block != null) workspace.Blocks.Add(block);
       }
@@ -68,7 +68,7 @@ public class XmlParser : Parser<XmlParser>
     return workspace;
   }
 
-  private Block? ParseBlock(XmlNode node)
+  private Block? ParseBlock(XmlNode node, Workspace workspace)
   {
     var type = node.GetAttribute("type");
 
@@ -76,6 +76,8 @@ public class XmlParser : Parser<XmlParser>
       throw new ApplicationException($"block type not registered: '{type}'");
 
     var block = blocks[type]();
+
+    workspace.ParsedBlocks.Add(block);
 
     block.Enabled = node.GetAttribute("disabled-reasons") == null;
     block.Id = node.GetAttribute("id");
@@ -92,18 +94,18 @@ public class XmlParser : Parser<XmlParser>
           ParseField(childNode, block);
           break;
         case "value":
-          ParseValue(childNode, block);
+          ParseValue(childNode, block, workspace);
           break;
         case "statement":
-          ParseStatement(childNode, block);
+          ParseStatement(childNode, block, workspace);
           break;
         case "comment":
           ParseComment(childNode, block);
           break;
         case "next":
-          var nextBlock = ParseBlock(childNode.FirstChild!);
-          if (null != nextBlock)
-            block.Next = nextBlock;
+          var nextBlock = ParseBlock(childNode.FirstChild!, workspace);
+
+          if (nextBlock != null) block.Next = nextBlock;
           break;
         default:
           throw new ArgumentException($"unknown xml type: {childNode.LocalName}");
@@ -122,13 +124,13 @@ public class XmlParser : Parser<XmlParser>
     block.Fields.Add(field);
   }
 
-  private void ParseValue(XmlNode valueNode, Block block)
+  private void ParseValue(XmlNode valueNode, Block block, Workspace workspace)
   {
     var childNode = valueNode.GetChild("block") ?? valueNode.GetChild("shadow");
     if (childNode == null)
       return;
 
-    var childBlock = ParseBlock(childNode)!;
+    var childBlock = ParseBlock(childNode, workspace)!;
 
     var value = new Value
     {
@@ -143,12 +145,12 @@ public class XmlParser : Parser<XmlParser>
     block.Comments.Add(new Comment(commentNode.InnerText));
   }
 
-  private void ParseStatement(XmlNode statementNode, Block block)
+  private void ParseStatement(XmlNode statementNode, Block block, Workspace workspace)
   {
     var childNode = statementNode.GetChild("block") ?? statementNode.GetChild("shadow");
     if (childNode == null)
       return;
-    var childBlock = ParseBlock(childNode);
+    var childBlock = ParseBlock(childNode, workspace);
 
     var statement = new Statement
     {
