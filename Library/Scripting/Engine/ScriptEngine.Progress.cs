@@ -17,7 +17,7 @@ partial class ScriptEngine<TLogType>
     /// <inheritdoc/>
     public void ReportProgress(object info, double? progress, string? name)
     {
-        _lastProgressValue = new() { Progress = progress ?? 0, Name = name };
+        _lastProgressValue = new() { Progress = progress ?? 0, Name = name, Info = info };
 
         ReportProgress(info, 0);
     }

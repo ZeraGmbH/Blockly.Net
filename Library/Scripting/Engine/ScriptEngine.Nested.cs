@@ -118,7 +118,7 @@ partial class ScriptEngine<TLogType>
         public void ReportProgress(object info, double? progress, string? name)
         {
             /* Remember and propagate. */
-            LastProgress = new() { Progress = progress ?? 0, Name = name };
+            LastProgress = new() { Progress = progress ?? 0, Name = name, Info = info };
 
             _engine.ReportProgress(info, _depth);
         }
