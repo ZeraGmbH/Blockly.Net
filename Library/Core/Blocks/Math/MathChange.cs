@@ -13,7 +13,7 @@ public class MathChange : Block
   public override async Task<object?> EvaluateAsync(Context context)
   {
     var variableName = Fields["VAR"];
-    var delta = await Values.EvaluateAsync<double>("DELTA", context);
+    var delta = await Values.EvaluateDoubleAsync("DELTA", context);
 
     if (!context.Variables.ContainsKey(variableName))
       throw new ApplicationException($"variable {variableName} not declared");

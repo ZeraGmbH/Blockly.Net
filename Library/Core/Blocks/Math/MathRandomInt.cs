@@ -14,8 +14,8 @@ public class MathRandomInt : Block
   /// <inheritdoc/>
   public override async Task<object?> EvaluateAsync(Context context)
   {
-    var from = await Values.EvaluateAsync<double>("FROM", context);
-    var to = await Values.EvaluateAsync<double>("TO", context);
+    var from = await Values.EvaluateDoubleAsync("FROM", context);
+    var to = await Values.EvaluateDoubleAsync("TO", context);
 
     return (double)rand.Next((int)System.Math.Min(from, to), (int)System.Math.Max(from, to));
   }

@@ -217,6 +217,7 @@ public abstract class TestEnvironment
         Site = new Mock<IScriptSite>();
 
         Site.Setup(s => s.Cancellation).Returns(Cancel.Token);
+        Site.SetupGet(s => s.ServiceProvider).Returns(() => di);
 
         /* Setup dependency injection. */
         var services = new ServiceCollection();
