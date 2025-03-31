@@ -82,7 +82,7 @@ namespace BlocklyNet.Extensions;
 public class ExecutionGroup : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         /* Register the group. */
         var groupResult = await context.Engine.BeginGroupAsync(Id, Fields["NAME"], await Values.EvaluateAsync<string?>("DETAILS", context, false));

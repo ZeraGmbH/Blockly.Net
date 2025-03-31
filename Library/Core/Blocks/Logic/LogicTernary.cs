@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Logic;
 public class LogicTernary : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var ifValue = await Values.EvaluateAsync<bool>("IF", context);
 

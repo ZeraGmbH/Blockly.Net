@@ -214,7 +214,7 @@ partial class ScriptEngine<TLogType>
         }
 
         /// <inheritdoc/>
-        public Task SingleStepAsync(Block block) => Task.CompletedTask;
+        public Task SingleStepAsync(Block block, bool finished) => Task.CompletedTask;
 
         /// <inheritdoc/>
         public virtual Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;

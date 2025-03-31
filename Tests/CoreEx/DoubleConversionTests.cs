@@ -44,7 +44,7 @@ public class DoubleConversionTests : TestEnvironment
                     }
                 };
 
-                var sum = await block.EvaluateAsync(new Context(Site.Object));
+                var sum = await block.EnterBlockAsync(new Context(Site.Object));
 
                 Assert.That((double)sum!, Is.EqualTo(12));
             }

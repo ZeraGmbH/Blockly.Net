@@ -8,7 +8,7 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsRepeatExt : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     /* See if there is a inner block we can execute. */
     var statement = Statements.TryGet("DO");

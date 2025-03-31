@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Lists;
 public class ListsSplit : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var mode = Fields["MODE"];
     var input = await Values.EvaluateAsync<object>("INPUT", context)!;

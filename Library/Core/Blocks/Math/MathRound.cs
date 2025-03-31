@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathRound : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var op = Fields["OP"];
     var number = await Values.EvaluateDoubleAsync("NUM", context);

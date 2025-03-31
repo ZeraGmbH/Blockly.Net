@@ -87,7 +87,7 @@ public class EnumBlock<T> : Block where T : Enum
     }
 
     /// <inheritdoc/>
-    public override Task<object?> EvaluateAsync(Context context)
+    protected override Task<object?> EvaluateAsync(Context context)
     {
         /* Just report the value. */
         return Task.FromResult((object?)Enum.Parse(typeof(T), Fields["VALUE"]));

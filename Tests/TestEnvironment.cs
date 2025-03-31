@@ -106,7 +106,7 @@ public abstract class TestEnvironment
         /// </summary>
         /// <param name="context">Execution context - will be ignored.</param>
         /// <returns>Our value.</returns>
-        public override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
+        protected override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
     }
 
     /// <summary>

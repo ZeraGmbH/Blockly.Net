@@ -37,7 +37,7 @@ namespace BlocklyNet.Extensions;
 public class CreateXmlDocument : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         var content = await Values.EvaluateAsync<string>("CONTENT", context);
 

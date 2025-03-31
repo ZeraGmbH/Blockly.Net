@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextIndexOf : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var mode = Fields["END"];
 

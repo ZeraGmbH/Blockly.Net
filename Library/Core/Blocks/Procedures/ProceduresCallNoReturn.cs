@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Procedures;
 public class ProceduresCallNoReturn : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     // todo: add guard for missing name
 

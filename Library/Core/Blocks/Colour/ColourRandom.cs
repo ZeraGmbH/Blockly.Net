@@ -12,7 +12,7 @@ public class ColourRandom : Block
   private readonly Random random = new Random();
 
   /// <inheritdoc/>
-  public override Task<object?> EvaluateAsync(Context context)
+  protected override Task<object?> EvaluateAsync(Context context)
   {
     var bytes = new byte[3];
 

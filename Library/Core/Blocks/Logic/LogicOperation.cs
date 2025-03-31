@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Logic;
 public class LogicOperation : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var a = await Values.EvaluateAsync<bool?>("A", context) ?? false;
     var b = await Values.EvaluateAsync<bool?>("B", context) ?? false;

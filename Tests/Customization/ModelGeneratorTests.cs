@@ -70,7 +70,7 @@ public class ModelGeneratorTests
     {
         private readonly object? _value = value;
 
-        public override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
+        protected override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
     }
 
     [Test]
@@ -156,7 +156,7 @@ public class ModelGeneratorTests
         model.Values.Add(new() { Name = nameof(TestModel.StringProp), Block = new ConstantBlock("testString") });
 
         var siteMock = new Mock<IScriptSite>();
-        var result = await model.EvaluateAsync(new(siteMock.Object));
+        var result = await model.EnterBlockAsync(new(siteMock.Object));
 
         Assert.That(result, Is.InstanceOf<TestModel>());
 

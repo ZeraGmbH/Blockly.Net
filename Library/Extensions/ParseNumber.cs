@@ -36,6 +36,6 @@ namespace BlocklyNet.Extensions;
 public class ParseNumber : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
         => double.Parse(await Values.EvaluateAsync<string>("NUMBER", context));
 }

@@ -28,7 +28,7 @@ public abstract class Executable : IFragment
         /* Use the block to get the current value. */
         for (var block = Block; block != null; block = block.Next)
             if (block.Enabled)
-                return block.EvaluateAsync(context);
+                return block.EnterBlockAsync(context);
 
         /* If there is no block the result will always be null. */
         return Task.FromResult<object?>(null);

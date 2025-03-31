@@ -14,7 +14,7 @@ public class ParseNumberTests : TestEnvironment
     {
         var block = new ParseNumber { Values = { new() { Name = "NUMBER", Block = CreateStringBlock(number) } } };
 
-        var result = await block.EvaluateAsync(new Context(Site.Object));
+        var result = await block.EnterBlockAsync(new Context(Site.Object));
 
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -26,6 +26,6 @@ public class ParseNumberTests : TestEnvironment
     {
         var block = new ParseNumber { Values = { new() { Name = "NUMBER", Block = CreateStringBlock(number) } } };
 
-        Assert.ThrowsAsync<FormatException>(() => block.EvaluateAsync(new Context(Site.Object)));
+        Assert.ThrowsAsync<FormatException>(() => block.EnterBlockAsync(new Context(Site.Object)));
     }
 }

@@ -11,7 +11,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextCaseChange : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var toCase = Fields["CASE"].ToString();
     var text = (await Values.EvaluateAsync("TEXT", context) ?? "").ToString();

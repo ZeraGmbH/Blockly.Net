@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class ColourBlend : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var colour1 = (await Values.EvaluateAsync("COLOUR1", context) ?? "").ToString();
     var colour2 = (await Values.EvaluateAsync("COLOUR2", context) ?? "").ToString();

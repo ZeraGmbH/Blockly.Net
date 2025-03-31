@@ -69,7 +69,9 @@ public interface IScriptSite
     /// Call just before a block is executed.
     /// </summary>
     /// <param name="block">The block to execute.</param>
-    Task SingleStepAsync(Block block);
+    /// <param name="finished">Set when a block has been finished - 
+    /// else a new block chain is started.</param>
+    Task SingleStepAsync(Block block, bool finished);
 
     /// <summary>
     /// Start the execution of a new group.

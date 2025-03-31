@@ -34,7 +34,7 @@ public class VariablesSet : Block
   }
 
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     Set(context, Fields["VAR"], await Values.EvaluateAsync("VALUE", context));
 

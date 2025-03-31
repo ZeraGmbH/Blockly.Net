@@ -10,7 +10,7 @@ public class ListsSetIndex : Block
     private static readonly Random rnd = new();
 
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         var list = new ListWrapper(await Values.EvaluateAsync("LIST", context));
 

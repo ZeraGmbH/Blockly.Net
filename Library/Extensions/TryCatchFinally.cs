@@ -39,7 +39,7 @@ namespace BlocklyNet.Extensions;
 public class TryCatchFinally : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         try
         {

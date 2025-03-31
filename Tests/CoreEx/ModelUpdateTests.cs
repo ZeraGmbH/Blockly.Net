@@ -50,7 +50,7 @@ public class ModelUpdateTests : TestEnvironment
             }
         };
 
-        await block.EvaluateAsync(Context);
+        await block.EnterBlockAsync(Context);
 
         Assert.That(instance.Name, Is.EqualTo("Replace-Outer"));
 
@@ -66,7 +66,7 @@ public class ModelUpdateTests : TestEnvironment
                 }
             };
 
-            await test.EvaluateAsync(Context);
+            await test.EnterBlockAsync(Context);
 
             Assert.That(instance.Inner[i].Id, Is.EqualTo(42 + i));
         }
@@ -86,7 +86,7 @@ public class ModelUpdateTests : TestEnvironment
     {
         var parser = new ParseJson { Values = { new() { Name = "JSON", Block = CreateStringBlock(jsonModel) } } };
 
-        dynamic instance = (await parser.EvaluateAsync(Context))!;
+        dynamic instance = (await parser.EnterBlockAsync(Context))!;
 
         Context.Variables["instance"] = instance;
 
@@ -99,7 +99,7 @@ public class ModelUpdateTests : TestEnvironment
         }
         };
 
-        await block.EvaluateAsync(Context);
+        await block.EnterBlockAsync(Context);
 
         Assert.That(instance.name, Is.EqualTo("Replace-Outer"));
 
@@ -115,7 +115,7 @@ public class ModelUpdateTests : TestEnvironment
             }
             };
 
-            await test.EvaluateAsync(Context);
+            await test.EnterBlockAsync(Context);
 
             Assert.That(instance.inner[i].id, Is.EqualTo(42 + i));
         }
@@ -137,7 +137,7 @@ public class ModelUpdateTests : TestEnvironment
         }
         };
 
-        await block.EvaluateAsync(Context);
+        await block.EnterBlockAsync(Context);
 
         Assert.That(instance["b"], Is.EqualTo(42));
     }
@@ -158,7 +158,7 @@ public class ModelUpdateTests : TestEnvironment
         }
         };
 
-        await block.EvaluateAsync(Context);
+        await block.EnterBlockAsync(Context);
 
         Assert.That(instance[Modes.One], Is.EqualTo(42));
     }
@@ -179,7 +179,7 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock("Name") }, }
         };
 
-        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo("Outer"));
+        Assert.That(await block.EnterBlockAsync(Context), Is.EqualTo("Outer"));
 
         for (var i = 0; i < 3; i++)
         {
@@ -192,7 +192,7 @@ public class ModelUpdateTests : TestEnvironment
             }
             };
 
-            Assert.That(await test.EvaluateAsync(Context), Is.EqualTo(-(i + 1)));
+            Assert.That(await test.EnterBlockAsync(Context), Is.EqualTo(-(i + 1)));
         }
     }
 
@@ -201,7 +201,7 @@ public class ModelUpdateTests : TestEnvironment
     {
         var parser = new ParseJson { Values = { new() { Name = "JSON", Block = CreateStringBlock(jsonModel) } } };
 
-        Context.Variables["instance"] = await parser.EvaluateAsync(Context);
+        Context.Variables["instance"] = await parser.EnterBlockAsync(Context);
 
         var block = new ReadFromModel
         {
@@ -209,7 +209,7 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock("name") }, }
         };
 
-        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo("Outer"));
+        Assert.That(await block.EnterBlockAsync(Context), Is.EqualTo("Outer"));
 
         for (var i = 0; i < 3; i++)
         {
@@ -222,7 +222,7 @@ public class ModelUpdateTests : TestEnvironment
             }
             };
 
-            Assert.That(await test.EvaluateAsync(Context), Is.EqualTo(-(i + 1)));
+            Assert.That(await test.EnterBlockAsync(Context), Is.EqualTo(-(i + 1)));
         }
     }
 
@@ -237,7 +237,7 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock("b") }, }
         };
 
-        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo(-2));
+        Assert.That(await block.EnterBlockAsync(Context), Is.EqualTo(-2));
     }
 
     [Test]
@@ -251,6 +251,6 @@ public class ModelUpdateTests : TestEnvironment
             Values = { new() { Name = "PATH", Block = CreateStringBlock(Modes.One.ToString()) }, }
         };
 
-        Assert.That(await block.EvaluateAsync(Context), Is.EqualTo(-1));
+        Assert.That(await block.EnterBlockAsync(Context), Is.EqualTo(-1));
     }
 }

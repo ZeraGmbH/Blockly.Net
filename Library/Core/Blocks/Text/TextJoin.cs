@@ -11,7 +11,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextJoin : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var items = int.Parse(Mutations.GetValue("items"));
 

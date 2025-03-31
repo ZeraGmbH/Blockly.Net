@@ -76,7 +76,7 @@ namespace BlocklyNet.Extensions;
 public class UpdateModelProperty : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         var varName = Fields["VAR"];
         var data = context.Variables.TryGetValue(varName, out var local) ? local : context.GetRootContext().Variables[varName];

@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextIsEmpty : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var text = (await Values.EvaluateAsync("VALUE", context) ?? "").ToString();
 

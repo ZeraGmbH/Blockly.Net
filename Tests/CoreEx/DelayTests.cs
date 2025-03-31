@@ -22,7 +22,7 @@ public class DelayTests : TestEnvironment
         /* Run test and see if time advances for at least the given amount. */
         var start = DateTime.Now;
 
-        await block.EvaluateAsync(new Context(Site.Object));
+        await block.EnterBlockAsync(new Context(Site.Object));
 
         Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(490));
     }

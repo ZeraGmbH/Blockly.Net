@@ -26,7 +26,7 @@ public class SetProgressTests : TestEnvironment
 
         Site.Setup(e => e.ReportProgress(It.IsAny<object>(), 0.299d, "ZERA")).Callback((object? p, double? rel, string? name) => progress = (GenericProgress)p!);
 
-        await block.EvaluateAsync(new Context(Site.Object));
+        await block.EnterBlockAsync(new Context(Site.Object));
 
         Assert.That(progress, Is.Not.Null);
 

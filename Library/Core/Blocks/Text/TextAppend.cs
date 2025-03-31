@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextAppend : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var variables = context.Variables;
 

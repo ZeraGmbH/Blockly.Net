@@ -8,7 +8,7 @@ namespace BlocklyNet.Core.Blocks.Procedures;
 public class ProceduresIfReturn : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     if (await Values.EvaluateAsync<bool>("CONDITION", context))
       throw new ReturnProcedureIfException(await Values.EvaluateAsync("VALUE", context));

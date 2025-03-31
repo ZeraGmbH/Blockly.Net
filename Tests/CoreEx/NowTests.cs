@@ -19,7 +19,7 @@ public class NowTests : TestEnvironment
             Values = { new() { Name = "FORMAT", Block = CreateStringBlock("dd.MM.yyyy") } }
         };
 
-        var value = await block.EvaluateAsync(new Context(Site.Object));
+        var value = await block.EnterBlockAsync(new Context(Site.Object));
 
         /* May fail when tested around midnight. */
         var now = DateTime.Now;

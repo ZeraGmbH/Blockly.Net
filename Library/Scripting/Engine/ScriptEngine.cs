@@ -500,7 +500,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     }
 
     /// <inheritdoc/>
-    public Task SingleStepAsync(Block block) => Task.CompletedTask;
+    public Task SingleStepAsync(Block block, bool finished) => Task.CompletedTask;
 
     /// <inheritdoc/>
     public Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details) => _groupManager.StartAsync(key, name, details);

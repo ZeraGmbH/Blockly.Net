@@ -46,7 +46,7 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 42);
 
-        var input = await block.EvaluateAsync(new Context(Site.Object));
+        var input = await block.EnterBlockAsync(new Context(Site.Object));
 
         Assert.That(input, Is.EqualTo(42));
 
@@ -69,7 +69,7 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 
-        var input = await block.EvaluateAsync(new Context(Site.Object));
+        var input = await block.EnterBlockAsync(new Context(Site.Object));
 
         Assert.Multiple(() =>
         {
@@ -97,7 +97,7 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 
-        var except = Assert.ThrowsAsync<TimeoutException>(() => block.EvaluateAsync(new Context(Site.Object)));
+        var except = Assert.ThrowsAsync<TimeoutException>(() => block.EnterBlockAsync(new Context(Site.Object)));
 
         Assert.That(except.Message, Is.EqualTo("busted"));
     }
