@@ -12,8 +12,8 @@ public class MathModulo : Block
   /// <inheritdoc/>
   public override async Task<object?> EvaluateAsync(Context context)
   {
-    var dividend = await Values.EvaluateAsync<double>("DIVIDEND", context);
-    var divisor = await Values.EvaluateAsync<double>("DIVISOR", context);
+    var dividend = await Values.EvaluateDoubleAsync("DIVIDEND", context);
+    var divisor = await Values.EvaluateDoubleAsync("DIVISOR", context);
 
     return dividend % divisor;
   }

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace BlocklyNet.Core.Model;
 
 /// <summary>
@@ -39,6 +41,36 @@ public class Values : Entities<Value>
 
         /* Try to evaluate the value. */
         return value.EvaluateAsync(context);
+    }
+
+    /// <summary>
+    /// Get a number - may be auto-converted from some other type.
+    /// </summary>
+    /// <param name="name">Name of the parameter.</param>
+    /// <param name="context">Operation context.</param>
+    /// <returns>Requested number.</returns>
+    public async Task<double> EvaluateDoubleAsync(string name, Context context)
+    {
+        /* Retrieve raw value. */
+        var raw = await EvaluateAsync(name, context) ?? throw new ArgumentException($"value {name} not found");
+
+        /* Already a number. */
+        if (raw is double num) return num;
+
+        /* Check for converter. */
+        var cvt = context.ServiceProvider.GetService<IDoubleExtractor>();
+
+        if (cvt == null) return (double)raw;
+
+        /* Run converter - report cast error on mismatch. */
+        try
+        {
+            return cvt.GetNumber(raw);
+        }
+        catch (Exception)
+        {
+            return (double)raw;
+        }
     }
 
     /// <summary>

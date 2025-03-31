@@ -1,6 +1,5 @@
 using BlocklyNet.Core.Blocks.Math;
 using BlocklyNet.Core.Blocks.Text;
-using BlocklyNetTests;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.Core;

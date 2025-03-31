@@ -13,7 +13,7 @@ public class MathRound : Block
   public override async Task<object?> EvaluateAsync(Context context)
   {
     var op = Fields["OP"];
-    var number = await Values.EvaluateAsync<double>("NUM", context);
+    var number = await Values.EvaluateDoubleAsync("NUM", context);
 
     switch (op)
     {

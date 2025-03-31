@@ -12,8 +12,8 @@ public class MathArithmetic : Block
   /// <inheritdoc/>
   public override async Task<object?> EvaluateAsync(Context context)
   {
-    var a = await Values.EvaluateAsync<double>("A", context);
-    var b = await Values.EvaluateAsync<double>("B", context);
+    var a = await Values.EvaluateDoubleAsync("A", context);
+    var b = await Values.EvaluateDoubleAsync("B", context);
 
     var opValue = Fields["OP"];
 

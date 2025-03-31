@@ -13,7 +13,7 @@ public class MathNumberProperty : Block
   public override async Task<object?> EvaluateAsync(Context context)
   {
     var op = Fields["PROPERTY"];
-    var number = await Values.EvaluateAsync<double>("NUMBER_TO_CHECK", context);
+    var number = await Values.EvaluateDoubleAsync("NUMBER_TO_CHECK", context);
 
     switch (op)
     {
@@ -23,7 +23,7 @@ public class MathNumberProperty : Block
       case "WHOLE": return 0 == number % 1.0;
       case "POSITIVE": return number > 0;
       case "NEGATIVE": return number < 0;
-      case "DIVISIBLE_BY": return 0 == number % await Values.EvaluateAsync<double>("DIVISOR", context);
+      case "DIVISIBLE_BY": return 0 == number % await Values.EvaluateDoubleAsync("DIVISOR", context);
       default: throw new ApplicationException($"Unknown PROPERTY {op}");
     }
   }
