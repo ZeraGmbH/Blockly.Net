@@ -1,4 +1,5 @@
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Debugger;
 using BlocklyNet.Scripting.Logging;
 using BlocklyNet.Scripting.Parsing;
 using BlocklyNet.User;
@@ -67,6 +68,12 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// Set when the one and only script is done.
     /// </summary>
     protected bool Done { get; private set; } = false;
+
+
+    /// <summary>
+    /// Debugger attached to this script.
+    /// </summary>
+    private IScriptDebugger? _debugger;
 
     /// <summary>
     /// Exception observed during execution - only valid when _done is set.
@@ -331,6 +338,9 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
             Done = true;
             _error = error;
 
+            /* Inform debugger. */
+            _debugger?.ScriptFinished(_error);
+
             /* Customize. */
             await OnScriptDoneAsync(script, null);
 
@@ -500,7 +510,11 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     }
 
     /// <inheritdoc/>
-    public Task SingleStepAsync(Block block, bool finished) => Task.CompletedTask;
+    public Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason)
+        => _debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
+
+    /// <inheritdoc/>
+    public void SetDebugger(IScriptDebugger? debugger) => _debugger = debugger;
 
     /// <inheritdoc/>
     public Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details) => _groupManager.StartAsync(key, name, details);

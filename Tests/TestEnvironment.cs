@@ -113,9 +113,10 @@ public abstract class TestEnvironment
     /// In manual mode create a block reporting a constant number.
     /// </summary>
     /// <param name="value">Number as text.</param>
+    /// <param name="id">Optional identifier for the block.</param>
     /// <returns>New block.</returns>
-    protected static Block CreateNumberBlock(string value)
-        => new MathNumber { Fields = { new() { Name = "NUM", Value = value } } };
+    protected static Block CreateNumberBlock(string value, string? id = null)
+        => new MathNumber { Id = id ?? string.Empty, Fields = { new() { Name = "NUM", Value = value } } };
 
     /// <summary>
     /// In manual mode create a block reporting a constant string.

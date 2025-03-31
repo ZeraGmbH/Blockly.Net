@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using BlocklyNet.Scripting.Debugger;
 
 namespace BlocklyNet.Core.Model;
 
@@ -59,7 +60,7 @@ public abstract class Block
     protected virtual async Task<object?> EvaluateAsync(Context context)
     {
         /* Wait for debugger to allow execution - the current block as finished its work. */
-        await context.Engine.SingleStepAsync(this, true);
+        await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Leave);
 
         /* Always check for cancel before proceeding with the execution of the next block in chain. */
         context.Cancellation.ThrowIfCancellationRequested();
@@ -72,7 +73,7 @@ public abstract class Block
         if (context.EscapeMode == EscapeMode.None)
             for (var next = Next; next != null; next = next.Next)
                 if (next.Enabled)
-                    return await next.EvaluateAsync(context);
+                    return await next.EnterBlockAsync(context);
 
         return null;
     }
@@ -85,8 +86,14 @@ public abstract class Block
     public async Task<object?> EnterBlockAsync(Context context)
     {
         /* Wait for debugger to allow execution - we enter a new chain of execution, e.g. calculating a value or control block. */
-        await context.Engine.SingleStepAsync(this, false);
+        await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Enter);
 
-        return await EvaluateAsync(context);
+        /* Execute the block itself. */
+        var result = await EvaluateAsync(context);
+
+        /* Wait for debugger to allow execution - the current block as finished its work. */
+        await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Finish);
+
+        return result;
     }
 }

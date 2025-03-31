@@ -25,9 +25,6 @@ public class DoubleConversionTests : TestEnvironment
         base.OnSetup(services);
     }
 
-    /// <summary>
-    /// See if the execution of a script can stall for a while.
-    /// </summary>
     [Test]
     public async Task Can_Convert_Custom_Numbers_Async()
     {
