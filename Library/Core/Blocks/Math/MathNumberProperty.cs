@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathNumberProperty : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var op = Fields["PROPERTY"];
     var number = await Values.EvaluateDoubleAsync("NUMBER_TO_CHECK", context);

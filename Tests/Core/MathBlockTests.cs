@@ -44,7 +44,7 @@ public class MathBlockTests : TestEnvironment
         };
 
         /* Execute the block tree. */
-        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo(3));
+        Assert.That(await block.EnterBlockAsync(new Context(Site.Object)), Is.EqualTo(3));
     }
 
     [Test]

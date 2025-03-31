@@ -8,7 +8,7 @@ namespace BlocklyNet.Core.Blocks.Text;
 public class TextSubstring : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var value = await Values.EvaluateAsync<string>("STRING", context);
     var from = Fields["WHERE1"];

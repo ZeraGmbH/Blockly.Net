@@ -58,7 +58,7 @@ namespace BlocklyNet.Extensions;
 public class QueryXmlDocument : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         var source = await Values.EvaluateAsync("SOURCE", context);
         var query = await Values.EvaluateAsync<string>("XPATH", context);

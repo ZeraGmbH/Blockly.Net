@@ -1,5 +1,6 @@
 using System.Reflection;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Debugger;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.Logging;
 
@@ -66,6 +67,11 @@ partial class ScriptEngine<TLogType>
         /// of the result variable.
         /// </summary>
         private object? _result;
+
+        /// <summary>
+        /// Debugger attached to this script.
+        /// </summary>
+        private IScriptDebugger? _debugger;
 
         /// <summary>
         /// The main script engine.
@@ -200,6 +206,9 @@ partial class ScriptEngine<TLogType>
             }
             finally
             {
+                /* Inform debugger if still active. */
+                _debugger?.ScriptFinished(_error);
+
                 /* Customize. */
                 await _engine.OnScriptDoneAsync(script, Parent);
 
@@ -214,7 +223,8 @@ partial class ScriptEngine<TLogType>
         }
 
         /// <inheritdoc/>
-        public Task SingleStepAsync(Block block) => Task.CompletedTask;
+        public Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason)
+            => _debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
 
         /// <inheritdoc/>
         public virtual Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
@@ -224,6 +234,9 @@ partial class ScriptEngine<TLogType>
 
         /// <inheritdoc/>
         public Task UpdateLogAsync() => CurrentScript == null ? Task.CompletedTask : _engine.UpdateResultLogEntryAsync(CurrentScript, Parent, false);
+
+        /// <inheritdoc/>
+        public void SetDebugger(IScriptDebugger? debugger) => _debugger = debugger;
     }
 
     /// <summary>

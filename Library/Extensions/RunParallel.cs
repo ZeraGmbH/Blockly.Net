@@ -49,7 +49,7 @@ namespace BlocklyNet.Extensions;
 public class RunParallel : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     /* Request the script blocks in configuration mode - will not execute on this thread. */
     context.ParallelMode++;

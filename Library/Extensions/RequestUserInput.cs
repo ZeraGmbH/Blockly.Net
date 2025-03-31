@@ -85,7 +85,7 @@ namespace BlocklyNet.Extensions;
 public class RequestUserInput : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var key = await Values.EvaluateAsync<string>("KEY", context);
     var type = await Values.EvaluateAsync<string>("TYPE", context, false);

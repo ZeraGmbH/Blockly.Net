@@ -1,4 +1,5 @@
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Debugger;
 using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.Logging;
 
@@ -69,7 +70,9 @@ public interface IScriptSite
     /// Call just before a block is executed.
     /// </summary>
     /// <param name="block">The block to execute.</param>
-    Task SingleStepAsync(Block block);
+    /// <param name="context">Script execution environment.</param>
+    /// <param name="reason">Reason why the debugger is informed.</param>
+    Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason);
 
     /// <summary>
     /// Start the execution of a new group.
@@ -107,6 +110,12 @@ public interface IScriptSite
     /// Update the current log entry.
     /// </summary>
     Task UpdateLogAsync();
+
+    /// <summary>
+    /// Attach or detach the debugger associated with this script site.
+    /// </summary>
+    /// <param name="debugger">Debugger to use or null to detach.</param>
+    void SetDebugger(IScriptDebugger? debugger);
 }
 
 /// <summary>

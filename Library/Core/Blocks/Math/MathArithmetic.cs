@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Math;
 public class MathArithmetic : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var a = await Values.EvaluateDoubleAsync("A", context);
     var b = await Values.EvaluateDoubleAsync("B", context);

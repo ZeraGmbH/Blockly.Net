@@ -8,7 +8,7 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsWhileUntil : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var value = Values.TryGet("BOOL");
     var statement = Statements.TryGet("DO");

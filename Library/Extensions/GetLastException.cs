@@ -22,5 +22,5 @@ namespace BlocklyNet.Extensions;
 public class GetLastException : Block
 {
     /// <inheritdoc/>
-    public override Task<object?> EvaluateAsync(Context context) => Task.FromResult<object?>(context.LastException?.Message);
+    protected override Task<object?> EvaluateAsync(Context context) => Task.FromResult<object?>(context.LastException?.Message);
 }

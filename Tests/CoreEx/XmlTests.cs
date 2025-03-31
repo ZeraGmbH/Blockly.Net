@@ -46,7 +46,7 @@ public class XmlTests : TestEnvironment
         };
 
         /* Parse XML. */
-        var file = await block.EvaluateAsync(new Context(Site.Object));
+        var file = await block.EnterBlockAsync(new Context(Site.Object));
 
         /* Validate result. */
         Assert.That(file, Is.TypeOf<XmlFile>());
@@ -65,7 +65,7 @@ public class XmlTests : TestEnvironment
         };
 
         /* Parse XML. */
-        var value = await block.EvaluateAsync(new Context(Site.Object));
+        var value = await block.EnterBlockAsync(new Context(Site.Object));
         var nodes = ((IEnumerable<XmlNode>)value!).ToList();
 
         /* Validate result. */
@@ -102,7 +102,7 @@ public class XmlTests : TestEnvironment
         };
 
         /* Parse XML. */
-        var value = await block.EvaluateAsync(new Context(Site.Object));
+        var value = await block.EnterBlockAsync(new Context(Site.Object));
         var nodes = ((IEnumerable<XmlNode>)value!).ToList();
 
         /* Build block tree. */
@@ -115,7 +115,7 @@ public class XmlTests : TestEnvironment
         };
 
         /* Execute. */
-        value = await block.EvaluateAsync(new Context(Site.Object));
+        value = await block.EnterBlockAsync(new Context(Site.Object));
         nodes = ((IEnumerable<XmlNode>)value!).ToList();
 
         /* Validate result. */

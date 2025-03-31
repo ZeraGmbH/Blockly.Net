@@ -94,7 +94,7 @@ namespace BlocklyNet.Extensions;
 public class SetProgress : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         var script = context.Engine.MainScript as IGenericScript;
         var progress = await Values.EvaluateAsync<double>("PROGRESS", context);

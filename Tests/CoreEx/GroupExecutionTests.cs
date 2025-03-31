@@ -1,5 +1,6 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions;
+using BlocklyNet.Scripting.Debugger;
 using BlocklyNet.Scripting.Engine;
 using Moq;
 using NUnit.Framework;
@@ -27,12 +28,12 @@ public class GroupExecutionTests : TestEnvironment
 
         Site.Setup(s => s.BeginGroupAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync((GroupStatus?)null);
 
-        await block.EvaluateAsync(new Context(Site.Object));
+        await block.EnterBlockAsync(new Context(Site.Object));
 
         Site.Verify(s => s.BeginGroupAsync("A", "A1", null), Times.Once);
         Site.Verify(s => s.BeginGroupAsync("B", "B2", null), Times.Once);
         Site.Verify(s => s.EndGroupAsync(It.IsAny<GroupResult>()), Times.Exactly(2));
-        Site.Verify(s => s.SingleStepAsync(It.IsAny<Block>()), Times.Exactly(2));
+        Site.Verify(s => s.SingleStepAsync(It.IsAny<Block>(), It.IsAny<Context>(), It.IsAny<ScriptDebuggerStopReason>()), Times.Exactly(10));
         Site.VerifyGet(s => s.Cancellation, Times.Exactly(6));
         Site.VerifyGet(s => s.CurrentScript, Times.Exactly(2));
 

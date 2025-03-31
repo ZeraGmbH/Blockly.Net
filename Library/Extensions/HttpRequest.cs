@@ -108,7 +108,7 @@ namespace BlocklyNet.Extensions;
 public class HttpRequest : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     /* Get the endpoint. */
     var uri = await Values.EvaluateAsync<string>("URI", context);

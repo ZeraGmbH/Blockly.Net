@@ -109,7 +109,7 @@ public class RunScript : Block
   }
 
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     /* Convert the configuration. */
     var config = await ReadConfigurationAsync(context);

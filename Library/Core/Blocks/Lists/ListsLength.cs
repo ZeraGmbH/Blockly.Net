@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Lists;
 public class ListsLength : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     if (await Values.EvaluateAsync("VALUE", context) is not IEnumerable<object> value)
       return 0.0;

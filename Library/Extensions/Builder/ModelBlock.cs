@@ -348,7 +348,7 @@ public class ModelBlock<T> : Block where T : class, new()
     }
 
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         /* Create a new model instance. */
         var model = new T();

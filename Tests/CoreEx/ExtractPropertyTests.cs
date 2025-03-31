@@ -39,7 +39,7 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo(12.3d));
+        Assert.That(await block.EnterBlockAsync(new Context(Site.Object)), Is.EqualTo(12.3d));
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.True);
+        Assert.That(await block.EnterBlockAsync(new Context(Site.Object)), Is.True);
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo("0.1"));
+        Assert.That(await block.EnterBlockAsync(new Context(Site.Object)), Is.EqualTo("0.1"));
     }
 
     [Test]
@@ -102,6 +102,6 @@ public class ExtractPropertyTests : TestEnvironment
         }
         };
 
-        Assert.That(await block.EvaluateAsync(new Context(Site.Object)), Is.EqualTo("Jochen"));
+        Assert.That(await block.EnterBlockAsync(new Context(Site.Object)), Is.EqualTo("Jochen"));
     }
 }

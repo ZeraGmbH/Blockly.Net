@@ -72,7 +72,7 @@ public class RunScriptParameter
 public class CreateRunScriptParameter : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     return new RunScriptParameter
     {

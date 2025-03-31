@@ -44,7 +44,7 @@ public class Workspace : IFragment
       /* Create the function itself and remember it. */
       context.Cancellation.ThrowIfCancellationRequested();
 
-      await block.EvaluateAsync(context);
+      await block.PrepareAsync(context);
 
       functions.Add(block);
     }
@@ -58,7 +58,7 @@ public class Workspace : IFragment
             /* Remember the result and report the last result afterwards. */
             context.Cancellation.ThrowIfCancellationRequested();
 
-            returnValue = await exec.EvaluateAsync(context);
+            returnValue = await exec.EnterBlockAsync(context);
 
             /* Did this path. */
             break;
@@ -146,7 +146,7 @@ public class Workspace : IFragment
 
     /* Find all functions and generate the block list. */
     foreach (var block in Blocks.OfType<ProceduresDef>())
-      await block.EvaluateAsync(context);
+      await block.PrepareAsync(context);
 
     /* Inspect all blocks. */
     foreach (var block in Blocks)

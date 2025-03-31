@@ -15,7 +15,7 @@ public class ThrowTests : TestEnvironment
 
         try
         {
-            await block.EvaluateAsync(new Context(Site.Object));
+            await block.EnterBlockAsync(new Context(Site.Object));
         }
         catch (Exception e)
         {
@@ -46,7 +46,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.EvaluateAsync(context);
+        await block.EnterBlockAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(10));
     }
@@ -70,7 +70,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.EvaluateAsync(context);
+        await block.EnterBlockAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(80));
     }
@@ -102,7 +102,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.EvaluateAsync(context);
+        await block.EnterBlockAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(40));
     }
@@ -135,7 +135,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.EvaluateAsync(context);
+        await block.EnterBlockAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(20));
     }
@@ -176,7 +176,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.EvaluateAsync(context);
+        await block.EnterBlockAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo(30));
     }
@@ -209,7 +209,7 @@ public class ThrowTests : TestEnvironment
 
         var context = new Context(Site.Object);
 
-        await block.EvaluateAsync(context);
+        await block.EnterBlockAsync(context);
 
         Assert.That(context.Variables["result"], Is.EqualTo("bad"));
     }

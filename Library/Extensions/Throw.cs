@@ -47,7 +47,7 @@ namespace BlocklyNet.Extensions;
 public class Throw : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         throw new Exception(await Values.EvaluateAsync<string>("MESSAGE", context));
     }

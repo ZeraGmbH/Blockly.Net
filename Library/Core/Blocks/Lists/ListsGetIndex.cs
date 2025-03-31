@@ -12,7 +12,7 @@ public class ListsGetIndex : Block
   private static readonly Random rnd = new Random();
 
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var values = new ListWrapper(await Values.EvaluateAsync("VALUE", context));
 

@@ -22,7 +22,7 @@ public class ParseJsonTests : TestEnvironment
 
         var block = new ParseJson { Values = { new() { Name = "JSON", Block = CreateStringBlock(json) } } };
 
-        var result = await block.EvaluateAsync(new Context(Site.Object));
+        var result = await block.EnterBlockAsync(new Context(Site.Object));
 
         Assert.That(result, Is.TypeOf<ExpandoObject>());
 

@@ -48,7 +48,7 @@ namespace BlocklyNet.Extensions;
 public class Now : Block
 {
     /// <inheritdoc/>
-    public override async Task<object?> EvaluateAsync(Context context)
+    protected override async Task<object?> EvaluateAsync(Context context)
     {
         var format = await Values.EvaluateAsync<string>("FORMAT", context);
 

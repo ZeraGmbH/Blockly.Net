@@ -12,7 +12,10 @@ public class ProceduresDef : Block
   /// </summary>
   /// <param name="context">Current execution context.</param>
   /// <returns>Always null.</returns>
-  public override Task<object?> EvaluateAsync(Context context)
+  public Task<object?> PrepareAsync(Context context) => EvaluateAsync(context);
+
+  /// <inheritdoc/>
+  protected override Task<object?> EvaluateAsync(Context context)
   {
     /* Retrieve the name and the content of the function. */
     var name = Fields["NAME"];
@@ -74,6 +77,6 @@ public class ProceduresDef : Block
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Task<object?> EvaluateAsync(Context context) => value.EvaluateAsync(context);
+    protected override Task<object?> EvaluateAsync(Context context) => value.EvaluateAsync(context);
   }
 }

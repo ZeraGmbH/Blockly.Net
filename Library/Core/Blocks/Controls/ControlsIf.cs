@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsIf : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var ifCount = 1;
     if (null != Mutations.GetValue("elseif"))

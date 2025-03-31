@@ -10,7 +10,7 @@ namespace BlocklyNet.Core.Blocks.Controls;
 public class ControlsForEach : Block
 {
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var variableName = Fields["VAR"];
     var list = await Values.EvaluateAsync<IEnumerable<object>>("LIST", context);

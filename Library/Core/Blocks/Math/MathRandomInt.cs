@@ -12,7 +12,7 @@ public class MathRandomInt : Block
   private static readonly Random rand = new Random();
 
   /// <inheritdoc/>
-  public override async Task<object?> EvaluateAsync(Context context)
+  protected override async Task<object?> EvaluateAsync(Context context)
   {
     var from = await Values.EvaluateDoubleAsync("FROM", context);
     var to = await Values.EvaluateDoubleAsync("TO", context);
