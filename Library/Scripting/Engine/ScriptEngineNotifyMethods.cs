@@ -3,18 +3,13 @@ namespace BlocklyNet.Scripting.Engine;
 /// <summary>
 /// 
 /// </summary>
-public sealed class ScriptEngineNotifyMethods
+/// <param name="method"></param>
+public sealed class ScriptEngineNotifyMethods(string method)
 {
     /// <summary>
     /// 
     /// </summary>
-    public readonly string Method;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="method"></param>
-    public ScriptEngineNotifyMethods(string method) { Method = method; }
+    public readonly string Method = method;
 
     /// <summary>
     /// 
