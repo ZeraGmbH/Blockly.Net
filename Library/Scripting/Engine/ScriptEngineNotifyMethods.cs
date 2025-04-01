@@ -14,7 +14,7 @@ public sealed class ScriptEngineNotifyMethods
     /// 
     /// </summary>
     /// <param name="method"></param>
-    private ScriptEngineNotifyMethods(string method) { Method = method; }
+    public ScriptEngineNotifyMethods(string method) { Method = method; }
 
     /// <summary>
     /// 
