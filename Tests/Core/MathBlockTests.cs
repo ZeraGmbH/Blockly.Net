@@ -48,6 +48,20 @@ public class MathBlockTests : TestEnvironment
     }
 
     [Test]
+    public async Task Can_Get_Power_Of_Ten_As_Block_Async()
+    {
+        /* Manually create the block tree. */
+        var block = new MathSingle
+        {
+            Fields = { new() { Name = "OP", Value = "POW10" } },
+            Values = { new() { Name = "NUM", Block = CreateNumberBlock("2") } }
+        };
+
+        /* Execute the block tree. */
+        Assert.That(await block.EnterBlockAsync(new Context(Site.Object)), Is.EqualTo(100));
+    }
+
+    [Test]
     public async Task Can_Calculate_Sin_Async()
     {
         var script = Engine.Parser.Parse(@"
