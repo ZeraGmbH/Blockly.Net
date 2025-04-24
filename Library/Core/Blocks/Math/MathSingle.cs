@@ -23,7 +23,7 @@ public class MathSingle : Block
       case "LN": return System.Math.Log(number);
       case "LOG10": return System.Math.Log10(number);
       case "EXP": return System.Math.Exp(number);
-      case "POW10": return System.Math.Pow(number, 10);
+      case "POW10": return System.Math.Pow(10, number);
 
       case "SIN": return System.Math.Sin(number / 180 * System.Math.PI);
       case "COS": return System.Math.Cos(number / 180 * System.Math.PI);
