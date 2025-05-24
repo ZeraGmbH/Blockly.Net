@@ -19,4 +19,10 @@ public class ProgressDetails
     /// The optional progress information depending on the type of script.
     /// </summary>
     public object? Info { get; set; }
+
+    /// <summary>
+    /// If possible an estimation on long it takes to
+    /// get to a progress of 1 - in seconds.
+    /// </summary>
+    public double? EstimatedRemainingSeconds { get; set; }
 }
