@@ -144,7 +144,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
         _inputRequest = null;
         _inputResponse = null;
         _lastProgress = null;
-        _lastProgressValue = null;
+        _progress.Reset();
     }
 
     /// <inheritdoc/>

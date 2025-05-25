@@ -11,25 +11,15 @@ namespace BlocklyNet.Extensions;
     "set_progress",
     "",
     @"{
-        ""message0"": ""SetProgress %1 %2 %3 %4 %5 %6 %7 %8 %9"",
+        ""message0"": ""SetProgress %1 Name of the progress %2 Progress (%%) %3 Extra data %4 Type of extra data %5 Add Time Estimation %6"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
             },
             {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""NAME"",
-                ""text"": ""Name of the progress""
-            },
-            {
                 ""type"": ""input_value"",
                 ""name"": ""NAME"",
                 ""check"": ""String""
-            },
-            {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""PROGRESS"",
-                ""text"": ""Progress (%)""
             },
             {
                 ""type"": ""input_value"",
@@ -37,23 +27,18 @@ namespace BlocklyNet.Extensions;
                 ""check"": ""Number""
             },
             {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""PAYLOAD"",
-                ""text"": ""Extra data""
-            },
-            {
                 ""type"": ""input_value"",
                 ""name"": ""PAYLOAD""
-            },
-            {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""PAYLOADTYPE"",
-                ""text"": ""Type of extra data""
             },
             {
                 ""type"": ""input_value"",
                 ""name"": ""PAYLOADTYPE"",
                 ""check"": ""String""
+            },
+            {
+                ""type"": ""input_value"",
+                ""name"": ""ADDESTIMATION"",
+                ""check"": ""Boolean""
             }
         ],
         ""previousStatement"": null,
@@ -87,6 +72,14 @@ namespace BlocklyNet.Extensions;
                         ""TEXT"": """"
                     }
                 }
+            },
+            ""ADDESTIMATION"": {
+                ""shadow"": {
+                ""type"": ""logic_boolean"",
+                ""fields"": {
+                    ""BOOL"": ""FALSE""
+                }
+                }
             }
         }
     }"
@@ -100,13 +93,18 @@ public class SetProgress : Block
         var progress = await Values.EvaluateAsync<double>("PROGRESS", context);
         var name = await Values.EvaluateAsync<string?>("NAME", context, false);
 
-        context.Engine.ReportProgress(new GenericProgress
-        {
-            Payload = await Values.EvaluateAsync("PAYLOAD", context, false),
-            PayloadType = await Values.EvaluateAsync<string>("PAYLOADTYPE", context, false),
-            Percentage = progress,
-            ScriptId = script?.Request.ScriptId
-        }, progress / 100d, name);
+        context.Engine.ReportProgress(
+            new GenericProgress
+            {
+                Payload = await Values.EvaluateAsync("PAYLOAD", context, false),
+                PayloadType = await Values.EvaluateAsync<string>("PAYLOADTYPE", context, false),
+                Percentage = progress,
+                ScriptId = script?.Request.ScriptId
+            },
+            progress / 100d,
+            name,
+            await Values.EvaluateAsync<bool?>("ADDESTIMATION", context, false) == true
+        );
 
         return await base.EvaluateAsync(context);
     }

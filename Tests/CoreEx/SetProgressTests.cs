@@ -19,12 +19,15 @@ public class SetProgressTests : TestEnvironment
                 new() { Name = "PAYLOADTYPE", Block = CreateStringBlock("text/xml") },
                 new() { Name = "PROGRESS", Block = CreateNumberBlock("29.9") },
                 new() { Name = "NAME", Block = CreateStringBlock("ZERA") },
+                new() { Name = "ADDESTIMATION", Block = CreateBooleanBlock("TRUE") },
             }
         };
 
         GenericProgress? progress = null;
 
-        Site.Setup(e => e.ReportProgress(It.IsAny<object>(), 0.299d, "ZERA")).Callback((object? p, double? rel, string? name) => progress = (GenericProgress)p!);
+        Site
+            .Setup(e => e.ReportProgress(It.IsAny<object>(), 0.299d, "ZERA", true))
+            .Callback((object? p, double? rel, string? name, bool? add) => progress = (GenericProgress)p!);
 
         await block.EnterBlockAsync(new Context(Site.Object));
 

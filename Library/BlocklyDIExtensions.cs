@@ -1,8 +1,11 @@
+using System.Runtime.CompilerServices;
 using BlocklyNet.Core;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.DependencyInjection;
+
+[assembly: InternalsVisibleTo("BlocklyNetTests")]
 
 namespace BlocklyNet;
 
