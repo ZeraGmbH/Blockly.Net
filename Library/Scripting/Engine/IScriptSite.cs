@@ -36,7 +36,8 @@ public interface IScriptSite
     /// <param name="info">Script dependant progress data.</param>
     /// <param name="progress">Progress as a number between 0 and 1.</param>
     /// <param name="name">Optional display name of the progress.</param>
-    void ReportProgress(object info, double? progress, string? name);
+    /// <param name="addEstimation">If set add time to end estimtation if possible.</param>
+    void ReportProgress(object info, double? progress, string? name, bool? addEstimation);
 
     /// <summary>
     ///  Execute Blockly XML Script and report variables.

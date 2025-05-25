@@ -12,12 +12,12 @@ partial class ScriptEngine<TLogType>
     /// <summary>
     /// Last progress reported.
     /// </summary>
-    private ProgressDetails? _lastProgressValue;
+    private readonly ProgressManager _progress = new();
 
     /// <inheritdoc/>
-    public void ReportProgress(object info, double? progress, string? name)
+    public void ReportProgress(object info, double? progress, string? name, bool? addEstimation)
     {
-        _lastProgressValue = new() { Progress = progress ?? 0, Name = name, Info = info };
+        _progress.Update(info, progress, name, addEstimation);
 
         ReportProgress(info, 0);
     }
@@ -41,7 +41,7 @@ partial class ScriptEngine<TLogType>
             }
 
             /* Fill in all nested progress in order. */
-            if (_lastProgressValue != null) nextProgress.AllProgress.Add(_lastProgressValue);
+            if (_progress.Latest != null) nextProgress.AllProgress.Add(_progress.Latest);
 
             foreach (var list in _allProgress)
                 foreach (var site in list)

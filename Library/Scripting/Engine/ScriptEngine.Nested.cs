@@ -40,7 +40,12 @@ partial class ScriptEngine<TLogType>
         /// <summary>
         /// Last progress information of this child script.
         /// </summary>
-        public ProgressDetails? LastProgress = null;
+        public ProgressDetails? LastProgress => _progress.Latest;
+
+        /// <summary>
+        /// Progress management.
+        /// </summary>
+        private readonly ProgressManager _progress = new();
 
         /// <summary>
         /// The script starting this script.
@@ -121,10 +126,10 @@ partial class ScriptEngine<TLogType>
             => _engine.GetUserInputAsync<T>(key, type, delay);
 
         /// <inheritdoc/>
-        public void ReportProgress(object info, double? progress, string? name)
+        public void ReportProgress(object info, double? progress, string? name, bool? addEstimation)
         {
             /* Remember and propagate. */
-            LastProgress = new() { Progress = progress ?? 0, Name = name, Info = info };
+            _progress.Update(info, progress, name, addEstimation);
 
             _engine.ReportProgress(info, _depth);
         }
