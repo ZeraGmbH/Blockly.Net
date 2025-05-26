@@ -1,3 +1,5 @@
+using BlocklyNet.Core;
+using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +10,29 @@ namespace BlocklyNetTests.Engine;
 [TestFixture]
 public class GroupingTests : TestEnvironment
 {
+    private class ResultClass
+    {
+        public string Name { get; set; } = null!;
+    }
+
+    class Configurator : IParserConfiguration
+    {
+        /// <inheritdoc/>
+        public void Configure<TParser>(BlocklyExtensions.BlockBuilder<TParser> builder) where TParser : Parser<TParser>
+        {
+            builder.AddModel<ResultClass>("result_class", "The result class");
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSetup(IServiceCollection services)
+    {
+        base.OnSetup(services);
+
+        services.AddSingleton<IScriptEngineNotifySink, Sink>();
+        services.AddSingleton<IParserConfiguration, Configurator>();
+    }
+
     /* Just request some user input. */
     private const string Script1 = @"
         <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -55,101 +80,68 @@ public class GroupingTests : TestEnvironment
         </block>
         </xml>";
 
-    private const string Script2 = @"
-        <xml xmlns=""https://developers.google.com/blockly/xml"">
-        <block type=""procedures_defreturn"" id=""V_XO,cjG??A#2*p!kMlu"" x=""875"" y=""75"">
-            <field name=""NAME"">Wait a bit</field>
-            <comment pinned=""false"" h=""80"" w=""160"">Describe this function...</comment>
-            <statement name=""STACK"">
-            <block type=""delay"" id=""iD_m(VVb=YIY3A~u2(sy"">
-                <field name=""DELAY"">Delay (ms)</field>
-                <value name=""DELAY"">
-                <shadow type=""math_number"" id=""o+pgs:6XrzMPHiK5l!@!"">
-                    <field name=""NUM"">500</field>
-                </shadow>
-                </value>
-            </block>
-            </statement>
-            <value name=""RETURN"">
-            <block type=""math_number"" id=""7[bqSm*qUh)_I{D*IlsV"">
-                <field name=""NUM"">2</field>
-            </block>
-            </value>
-        </block>
-        <block type=""execute_group"" id=""X~V-HnS3^/Kt4H)%BuoZ"" x=""175"" y=""125"">
-            <field name=""NAME"">Name of the group</field>
+    public const string Script2 = @"<xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable id=""jRl,$B07:ak%A+}Ae`7e"">groupStatus</variable>
+            <variable id=""jtUShfEj2=2oQNw;n(!5"">multi</variable>
+            <variable type=""result_class"" id=""mbWJ:X%U!e`RnjZ~O6Y+"">single</variable>
+            <variable id=""VJ*txd)2=H1N[7|:!70f"">result</variable>
+        </variables>
+        <block type=""execute_group"" id=""p%pFJy;4En4FWUcOI{3."" x=""175"" y=""125"">
+            <field name=""NAME"">Test</field>
+            <field name=""DETAILS"">Details</field>
             <field name=""RESULT"">Result</field>
-            <value name=""RESULT"">
-            <block type=""group_execution_result"" id=""/g~|rqb5t7yYK*.98O0l"">
-                <field name=""Type"">Type</field>
-                <field name=""Result"">Result</field>
-                <value name=""Type"">
-                <shadow type=""group_execution_result_type"" id=""w,B.`+|YSD=n)bAqpi4O"">
-                    <field name=""VALUE"">Succeeded</field>
-                </shadow>
-                </value>
-                <value name=""Result"">
-                <block type=""math_number"" id="")2Bi0@WsT_gr.P{AK=Nw"">
-                    <field name=""NUM"">1</field>
+            <field name=""STATUSVAR"" id=""jRl,$B07:ak%A+}Ae`7e"">groupStatus</field>
+            <field name=""RESULTVAR"" id=""jtUShfEj2=2oQNw;n(!5"">multi</field>
+            <field name=""RESULTVARELEMENT"" id=""mbWJ:X%U!e`RnjZ~O6Y+"">single</field>
+            <statement name=""DO"">
+                <block type=""variables_set"" id=""TDg8],OZU#M5OYl{5P)w"">
+                    <field name=""VAR"" id=""mbWJ:X%U!e`RnjZ~O6Y+"" variabletype=""result_class"">single</field>
+                    <value name=""VALUE"">
+                        <block type=""result_class"" id=""4`]cxJxHEq[XZ7IzfV=K"">
+                            <field name=""Name"">Name</field>
+                            <value name=""Name"">
+                                <shadow type=""text"" id=""#AUq9`s!U3g~#=g}_?q{"">
+                                    <field name=""TEXT"">Pete</field>
+                                </shadow>
+                            </value>
+                        </block>
+                    </value>
                 </block>
-                </value>
-            </block>
-            </value>
-            <next>
-            <block type=""execute_group"" id=""30_ieh}RB`Iwu:eV,AFx"">
-                <field name=""NAME"">Name of the group</field>
-                <field name=""RESULT"">Result</field>
-                <value name=""RESULT"">
-                <block type=""group_execution_result"" id=""H%`$2;N6A@6aQulC[jwC"">
+            </statement>
+            <value name=""RESULT"">
+                <block type=""group_execution_result"" id=""{bNS9bT_NKk/+`.3^;u,"">
                     <field name=""Type"">Type</field>
                     <field name=""Result"">Result</field>
                     <value name=""Type"">
-                    <shadow type=""group_execution_result_type"" id=""j#9-aQR_G+rVEo[(owM)"">
-                        <field name=""VALUE"">Failed</field>
-                    </shadow>
-                    </value>
-                    <value name=""Result"">
-                    <block type=""procedures_callreturn"" id=""H`IQ7RN3J6?9qI=NBom%"">
-                        <mutation name=""Wait a bit""></mutation>
-                    </block>
-                    </value>
-                </block>
-                </value>
-                <next>
-                <block type=""execute_group"" id=""+DafGPJZI0?7`j%,9a/1"">
-                    <field name=""NAME"">Name of the group</field>
-                    <field name=""RESULT"">Result</field>
-                    <value name=""RESULT"">
-                    <block type=""group_execution_result"" id=""6w,g%%98{3QEFOD@,dWw"">
-                        <field name=""Type"">Type</field>
-                        <field name=""Result"">Result</field>
-                        <value name=""Type"">
-                        <shadow type=""group_execution_result_type"" id=""T2z*fcFPj,P!Skd`vbg`"">
+                        <shadow type=""group_execution_result_type"" id=""0z!Q^}TyTsLl[egdewE-"">
                             <field name=""VALUE"">Succeeded</field>
                         </shadow>
-                        </value>
-                        <value name=""Result"">
-                        <block type=""math_number"" id=""KBpA_5da#H+I^CJS{_O/"">
-                            <field name=""NUM"">3</field>
+                    </value>
+                    <value name=""Result"">
+                        <block type=""lists_create_with"" id=""/5AJxpVmWw$!@T=$SOMU"">
+                            <mutation items=""1""></mutation>
+                            <value name=""ADD0"">
+                                <block type=""variables_get"" id=""?H]E2W8j55ZApi2mF%mn"">
+                                    <field name=""VAR"" id=""mbWJ:X%U!e`RnjZ~O6Y+"" variabletype=""result_class"">single</field>
+                                </block>
+                            </value>
                         </block>
-                        </value>
-                    </block>
                     </value>
                 </block>
-                </next>
-            </block>
+            </value>
+            <next>
+                <block type=""variables_set"" id=""M]P2{$xD#$_JL`KtOX!1"">
+                    <field name=""VAR"" id=""VJ*txd)2=H1N[7|:!70f"">result</field>
+                    <value name=""VALUE"">
+                        <block type=""variables_get"" id=""a8[Ds1i,S+bvMdA_F9b}"">
+                            <field name=""VAR"" id=""jtUShfEj2=2oQNw;n(!5"">multi</field>
+                        </block>
+                    </value>
+                </block>
             </next>
         </block>
         </xml>";
-
-    /// <inheritdoc/>
-    protected override void OnSetup(IServiceCollection services)
-    {
-        base.OnSetup(services);
-
-        /* Register the broadcast sink. */
-        services.AddSingleton<IScriptEngineNotifySink, Sink>();
-    }
 
     [Test]
     public async Task Can_Run_Groups_In_Sequence_Async()
@@ -175,6 +167,39 @@ public class GroupingTests : TestEnvironment
         var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That((IList<object?>)result.Result, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public async Task Can_Run_Groups_With_Array_Result_Async()
+    {
+        /* Termination helper. */
+        var done = new TaskCompletionSource();
+
+        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) =>
+        {
+            /* See if script is done. */
+            if (method == ScriptEngineNotifyMethods.Done)
+                done.SetResult();
+            else if (method == ScriptEngineNotifyMethods.Error)
+                done.SetResult();
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Run Groups", ScriptId = AddScript("SCRIPT", Script2) }, "");
+
+        /* Wait for the script to finish. */
+        await done.Task;
+
+        /* Check the result. */
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+        var list = (IList<object?>)result.Result;
+
+        Assert.That(list, Has.Count.EqualTo(1));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(list[0], Is.TypeOf<ResultClass>());
+            Assert.That(((ResultClass)list[0]!).Name, Is.EqualTo("Pete"));
+        });
     }
 
     [Test]

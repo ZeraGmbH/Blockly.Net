@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using BlocklyNet.Core.Blocks.Variables;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
@@ -14,7 +15,7 @@ namespace BlocklyNet.Extensions;
     "execute_group",
     "ExecutionGroups",
     @"{
-        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 Save Status in %9 %10 Save Result in %11 %12"",
+        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 Save Status in %9 %10 Save Result in %11 %12 Element Type %13"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
@@ -69,7 +70,11 @@ namespace BlocklyNet.Extensions;
             {
                 ""type"": ""input_dummy"",
                 ""name"": ""RESULTVAR""
-            }
+            },
+            {
+                ""type"": ""input_dummy"",
+                ""name"": ""RESULTVARELEMENT""
+            }            
         ],
         ""previousStatement"": null,
         ""nextStatement"": null,
@@ -114,14 +119,29 @@ public class ExecutionGroup : Block
             /* Decode the result information - object? will become a JSON document. */
             var rawResult = groupResult.GetResult()?.Result;
 
-            if (rawResult is JsonElement elem && context.VariableTypes.TryGetValue(resultVar, out var resultType) && !string.IsNullOrEmpty(resultType))
-            {
-                /* Convert if this is a known type. */
-                var modelInfos = context.ServiceProvider.GetRequiredService<IScriptModels>();
+            if (rawResult is JsonElement elem)
+                if (context.VariableTypes.TryGetValue(resultVar, out var resultType) && !string.IsNullOrEmpty(resultType))
+                {
+                    var modelInfos = context.ServiceProvider.GetRequiredService<IScriptModels>();
 
-                if (modelInfos.Models.TryGetValue(resultType, out var typeInfo) || modelInfos.Enums.TryGetValue(resultType, out typeInfo))
-                    rawResult = JsonSerializer.Deserialize(elem, typeInfo.Type, JsonUtils.JsonSettings);
-            }
+                    /* Convert if this is a known type. */
+                    if (modelInfos.Models.TryGetValue(resultType, out var typeInfo) || modelInfos.Enums.TryGetValue(resultType, out typeInfo))
+                        rawResult = JsonSerializer.Deserialize(elem, typeInfo.Type, JsonUtils.JsonSettings);
+                }
+                else if (elem.ValueKind == JsonValueKind.Array)
+                {
+                    /* See if we know the array type. */
+                    var resultVarType = Fields.TryGet("RESULTVARELEMENT")?.Value;
+
+                    if (!string.IsNullOrEmpty(resultVarType) && context.VariableTypes.TryGetValue(resultVarType, out resultType) && !string.IsNullOrEmpty(resultType))
+                    {
+                        var modelInfos = context.ServiceProvider.GetRequiredService<IScriptModels>();
+
+                        /* Convert if this is a known type. */
+                        if (modelInfos.Models.TryGetValue(resultType, out var typeInfo) || modelInfos.Enums.TryGetValue(resultType, out typeInfo))
+                            rawResult = JsonSerializer.Deserialize(elem, typeInfo.Type.MakeArrayType(), JsonUtils.JsonSettings);
+                    }
+                }
 
             /* Write to indicated variable. */
             VariablesSet.Set(context, resultVar, rawResult);
