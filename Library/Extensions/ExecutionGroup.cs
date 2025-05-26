@@ -15,7 +15,7 @@ namespace BlocklyNet.Extensions;
     "execute_group",
     "ExecutionGroups",
     @"{
-        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 Save Status in %9 %10 Save Result in %11 %12 Element Type %13"",
+        ""message0"": ""ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 Save Status in %9 %10 Save Result in %11 %12 Element Type %13 %14"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
@@ -72,9 +72,13 @@ namespace BlocklyNet.Extensions;
                 ""name"": ""RESULTVAR""
             },
             {
+                ""type"": ""field_variable"",
+                ""name"": ""RESULTVARELEMENT""
+            },
+            {
                 ""type"": ""input_dummy"",
                 ""name"": ""RESULTVARELEMENT""
-            }            
+            }           
         ],
         ""previousStatement"": null,
         ""nextStatement"": null,
