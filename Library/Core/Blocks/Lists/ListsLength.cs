@@ -1,5 +1,6 @@
 
 
+using System.Collections;
 using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Core.Blocks.Lists;
@@ -12,9 +13,12 @@ public class ListsLength : Block
   /// <inheritdoc/>
   protected override async Task<object?> EvaluateAsync(Context context)
   {
-    if (await Values.EvaluateAsync("VALUE", context) is not IEnumerable<object> value)
-      return 0.0;
+    var count = 0;
 
-    return (double)value.Count();
+    if (await Values.EvaluateAsync("VALUE", context) is IEnumerable value)
+      foreach (var item in value)
+        count++;
+
+    return (double)count;
   }
 }
