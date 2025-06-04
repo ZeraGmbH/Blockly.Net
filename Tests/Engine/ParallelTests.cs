@@ -10,15 +10,6 @@ namespace BlocklyNetTests.Engine;
 [TestFixture]
 public class ParallelTests : TestEnvironment
 {
-    private class Parameter(string name, string type, bool? required = null) : IScriptParameter
-    {
-        public string Type => type;
-
-        public string Name => name;
-
-        public bool? Required => required;
-    }
-
     /* Script to be run in parallel - just waits a bit and reports run-time. */
     private const string single = @"
     <xml xmlns=""https://developers.google.com/blockly/xml"">
@@ -195,7 +186,7 @@ public class ParallelTests : TestEnvironment
         /* Configure the broadcast sink. */
         ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) => { if (method == ScriptEngineNotifyMethods.Done) done.SetResult(); };
 
-        AddScript("SINGLE", single, [new Parameter("delay", "number", true)]);
+        AddScript("SINGLE", single, new Parameter("delay", "number", true));
 
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Will run in parallel", ScriptId = AddScript("MULTI", parallel) }, "");
 
