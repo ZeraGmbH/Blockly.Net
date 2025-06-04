@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using BlocklyNet;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
+using BlocklyNet.Scripting.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -26,14 +27,26 @@ public class ParameterTests : TestEnvironment
         </block>
         </xml>";
 
-
     /// <inheritdoc/>
     protected override void OnSetup(IServiceCollection services)
     {
+        var builtIn = GenericScript<ScriptLoggingResult, StartGenericScript.NoopModifier>.BuiltInTypesForUnitTest;
+
+        builtIn.Add("boolean", typeof(bool));
+        builtIn.Add("email", typeof(string));
+        builtIn.Add("number", typeof(double));
+        builtIn.Add("string", typeof(string));
+
         base.OnSetup(services);
 
         /* Register the broadcast sink. */
         services.AddSingleton<IScriptEngineNotifySink, Sink>();
+    }
+
+    [TearDown]
+    public void Teardown()
+    {
+        GenericScript<ScriptLoggingResult, StartGenericScript.NoopModifier>.BuiltInTypesForUnitTest.Clear();
     }
 
     /// <summary>
