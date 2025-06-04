@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Engine;
@@ -22,7 +21,7 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
     IStartGenericScript IGenericScript.Request => Request;
 
     /// <inheritdoc/>
-    protected override Task OnExecuteAsync() => ExecuteAsync(this);
+    protected override Task OnExecuteAsync() => ExecuteAsync(this, null, LookupBuiltInType);
 
     /// <inheritdoc/>
     protected override Task OnResetAsync() => Task.CompletedTask;
@@ -30,13 +29,26 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
     /// <summary>
     /// 
     /// </summary>
+    internal static Dictionary<string, Type> BuiltInTypesForUnitTest = [];
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="typeName"></param>
+    /// <returns></returns>
+    protected virtual Type? LookupBuiltInType(string typeName) => BuiltInTypesForUnitTest.TryGetValue(typeName, out var type) ? type : null;
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="script"></param>
     /// <param name="afterPresets"></param>
+    /// <param name="getBuiltInType"></param>
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResult"></typeparam>
     /// <typeparam name="TOptions"></typeparam>
     /// <returns></returns>
-    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions, TLogType, TModifierType> script, Action<IScriptDefinition>? afterPresets = null)
+    public static async Task ExecuteAsync<TRequest, TResult, TOptions>(Script<TRequest, TResult, TOptions, TLogType, TModifierType> script, Action<IScriptDefinition>? afterPresets = null, Func<string, Type?>? getBuiltInType = null)
         where TRequest : StartScript, IStartGenericScript
         where TResult : GenericResult, new()
         where TOptions : StartScriptOptions
@@ -79,24 +91,9 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
 
                     /* Check for converter. */
                     var singleType = param.Type[..^2];
-                    var scalarType = models.Models.TryGetValue(singleType, out var modelInfo) ? modelInfo.Type : null;
+                    var scalarType = models.Models.TryGetValue(singleType, out var modelInfo) ? modelInfo.Type : getBuiltInType?.Invoke(singleType);
 
-                    if (scalarType == null)
-                        switch (singleType)
-                        {
-                            case "number":
-                                scalarType = typeof(double);
-                                break;
-                            case "boolean":
-                                scalarType = typeof(bool);
-                                break;
-                            case "email":
-                            case "string":
-                                scalarType = typeof(string);
-                                break;
-                            default:
-                                continue;
-                        }
+                    if (scalarType == null) continue;
 
                     /* Do convert if we get raw json. */
                     presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), scalarType.MakeArrayType(), JsonUtils.JsonSettings);
