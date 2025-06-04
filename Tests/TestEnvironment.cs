@@ -109,6 +109,18 @@ public abstract class TestEnvironment
         protected override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
     }
 
+    protected class Parameter(string name, string type, bool? required = null) : IScriptParameter
+    {
+        /// <inheritdoc/>
+        public string Type => type;
+
+        /// <inheritdoc/>
+        public string Name => name;
+
+        /// <inheritdoc/>
+        public bool? Required => required;
+    }
+
     /// <summary>
     /// In manual mode create a block reporting a constant number.
     /// </summary>
@@ -192,11 +204,11 @@ public abstract class TestEnvironment
     /// <param name="code">Block tree in XML representation.</param>
     /// <param name="args">Argument list of the script.</param>
     /// <returns>Unique identifier of the new script definition.</returns>
-    protected string AddScript(string name, string code, List<IScriptParameter>? args = null)
+    protected string AddScript(string name, string code, params IScriptParameter[] args)
     {
         var storage = (Storage)GetService<IScriptDefinitionStorage>();
 
-        return storage.Add(name, code, args ?? []);
+        return storage.Add(name, code, [.. args]);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Engine;
@@ -71,13 +72,43 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
                 presets[param.Name] = Enum.Parse(enumInfo.Type, enumString);
             }
             else if (preset is JsonElement json)
-            {
-                /* Check for converter. */
-                if (!models.Models.TryGetValue(param.Type, out var modelInfo)) continue;
+                if (json.ValueKind == JsonValueKind.Array)
+                {
+                    /* Must be some array type. */
+                    if (!param.Type.EndsWith("[]")) continue;
 
-                /* Do convert if we get raw json. */
-                presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), modelInfo.Type, JsonUtils.JsonSettings);
-            }
+                    /* Check for converter. */
+                    var singleType = param.Type[..^2];
+                    var scalarType = models.Models.TryGetValue(singleType, out var modelInfo) ? modelInfo.Type : null;
+
+                    if (scalarType == null)
+                        switch (singleType)
+                        {
+                            case "number":
+                                scalarType = typeof(double);
+                                break;
+                            case "boolean":
+                                scalarType = typeof(bool);
+                                break;
+                            case "email":
+                            case "string":
+                                scalarType = typeof(string);
+                                break;
+                            default:
+                                continue;
+                        }
+
+                    /* Do convert if we get raw json. */
+                    presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), scalarType.MakeArrayType(), JsonUtils.JsonSettings);
+                }
+                else
+                {
+                    /* Check for converter. */
+                    if (!models.Models.TryGetValue(param.Type, out var modelInfo)) continue;
+
+                    /* Do convert if we get raw json. */
+                    presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), modelInfo.Type, JsonUtils.JsonSettings);
+                }
         }
 
         /* Execute the script. */
