@@ -59,7 +59,7 @@ public class ParameterTests : TestEnvironment
     [TestCase("boolean", false)]
     [TestCase("boolean[]", new bool[] { true, false })]
     [TestCase("email", "ich@me.de")]
-    [TestCase("email[]", new string[] { "ich@me.uk", "ich@me.au" })]
+    [TestCase("email{}", new string[] { "ich@me.uk", "ich@me.au" })]
     public async Task Can_Use_Parameters_Async(string type, object value)
     {
         /* Termination helper. */

@@ -87,7 +87,7 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
                 if (json.ValueKind == JsonValueKind.Array)
                 {
                     /* Must be some array type. */
-                    if (!param.Type.EndsWith("[]")) continue;
+                    if (!param.Type.EndsWith("[]") && !param.Type.EndsWith("{}")) continue;
 
                     /* Check for converter. */
                     var singleType = param.Type[..^2];
