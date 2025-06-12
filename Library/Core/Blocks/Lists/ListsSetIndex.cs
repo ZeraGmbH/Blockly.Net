@@ -14,34 +14,31 @@ public class ListsSetIndex : Block
     {
         var list = new ListWrapper(await Values.EvaluateAsync("LIST", context));
 
-        var where = Fields["WHERE"];
+        var mode = Fields["MODE"];
+        var isInsert = mode switch
+        {
+            "INSERT" => true,
+            "SET" => false,
+            _ => throw new NotSupportedException($"unsupported mode ({mode})")
+        };
 
+        var where = Fields["WHERE"];
         var index = where switch
         {
             "FIRST" => 0,
             "FROM_END" => list.Count - Convert.ToInt32(await Values.EvaluateAsync("AT", context)),
             "FROM_START" => Convert.ToInt32(await Values.EvaluateAsync("AT", context)) - 1,
-            "LAST" => list.Count - 1,
+            "LAST" => list.Count - (isInsert ? 0 : 1),
             "RANDOM" => rnd.Next(list.Count),
             _ => throw new NotSupportedException($"unsupported where ({where})"),
         };
 
         var value = await Values.EvaluateAsync("TO", context);
 
-        var mode = Fields["MODE"];
-        switch (mode)
-        {
-            case "SET":
-                list[index] = value;
-                break;
-
-            case "INSERT":
-                list.InsertAt(index, value);
-                break;
-
-            default:
-                throw new NotSupportedException($"unsupported mode ({mode})");
-        }
+        if (isInsert)
+            list.InsertAt(index, value);
+        else
+            list[index] = value;
 
         return await base.EvaluateAsync(context);
     }
