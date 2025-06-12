@@ -233,4 +233,46 @@ public class ListTests : TestEnvironment
 
         Assert.That(await script.RunAsync(Site.Object), Is.EqualTo("bar"));
     }
+
+    [Test]
+    public async Task Can_Append_To_Emtpy_List_Async()
+    {
+        var script = Engine.Parser.Parse(@"
+            <xml xmlns=""http://www.w3.org/1999/xhtml"">
+                <variables>
+                    <variable>x</variable>
+                </variables>
+                <block type=""variables_set"">
+                    <field name=""VAR"">x</field>
+                    <value name=""VALUE"">
+                        <block type=""lists_create_with"">
+                            <mutation items=""0""></mutation>
+                        </block>
+                    </value>
+                    <next>
+                        <block type=""lists_setIndex"">
+                            <field name=""MODE"">INSERT</field>
+                            <field name=""WHERE"">LAST</field>
+                            <value name=""LIST"">
+                                <block type=""variables_get"">
+                                    <field name=""VAR"">x</field>
+                                </block>
+                            </value>
+                            <value name=""TO"">
+                                <block type=""math_number"">
+                                    <field name=""NUM"">42</field>
+                                </block>
+                            </value>
+                            <next>
+                                <block type=""variables_get"">
+                                    <field name=""VAR"">x</field>
+                                </block>
+                            </next>
+                        </block>
+                    </next>
+                </block>
+            </xml>");
+
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(new double[] { 42 }));
+    }
 }
