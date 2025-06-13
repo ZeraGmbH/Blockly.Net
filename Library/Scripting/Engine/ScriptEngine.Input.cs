@@ -111,20 +111,12 @@ partial class ScriptEngine<TLogType>
                 var value = t.Result.Value;
 
                 if (value is JsonElement json)
-                {
-                    /* Check for scalar. */
-                    value = json.ToJsonScalar();
-
-                    /* Check for model. */
-                    if (value is JsonElement element && !string.IsNullOrEmpty(t.Result.ValueType))
-                    {
-                        /* Check for converter. */
-                        var models = ServiceProvider.GetRequiredService<IScriptModels>();
-
-                        if (models.Models.TryGetValue(t.Result.ValueType, out var modelInfo))
-                            value = JsonSerializer.Deserialize(element.ToString(), modelInfo.Type, JsonUtils.JsonSettings);
-                    }
-                }
+                    if (!string.IsNullOrEmpty(t.Result.ValueType) && ServiceProvider.GetRequiredService<IScriptModels>().Models.TryGetValue(t.Result.ValueType, out var model))
+                        /* Reconstruct to known model. */
+                        value = JsonSerializer.Deserialize(value.ToString() ?? "null", model.Type, JsonUtils.JsonSettings);
+                    else
+                        /* Just check for scalar. */
+                        value = json.ToJsonScalar();
 
                 return value == null ? default : (T?)value;
             }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
