@@ -12,20 +12,14 @@ public class ListsIndexOf : Block
   /// <inheritdoc/>
   protected override async Task<object?> EvaluateAsync(Context context)
   {
-    var direction = Fields["END"];
     var value = await Values.EvaluateAsync<IEnumerable<object>>("VALUE", context);
     var find = await Values.EvaluateAsync("FIND", context);
 
-    switch (direction)
+    return (double)(Fields["END"] switch
     {
-      case "FIRST":
-        return value.ToList().IndexOf(find!) + 1;
-
-      case "LAST":
-        return value.ToList().LastIndexOf(find!) + 1;
-
-      default:
-        throw new NotSupportedException("$Unknown end: {direction}");
-    }
+      "FIRST" => value.ToList().IndexOf(find!) + 1,
+      "LAST" => value.ToList().LastIndexOf(find!) + 1,
+      _ => throw new NotSupportedException($"Unknown end: '{Fields["END"]}'"),
+    });
   }
 }
