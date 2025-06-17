@@ -248,6 +248,7 @@ public static class BlocklyExtensions
         builder.AddBlock<Delay>();
         builder.AddBlock<ExecutionGroup>();
         builder.AddBlock<ExtractProperty>();
+        builder.AddBlock<FormatAsString>();
         builder.AddBlock<GetGroupStatus>();
         builder.AddBlock<GetLastException>();
         builder.AddBlock<HttpRequest>();
