@@ -108,6 +108,9 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
                 }
         }
 
+        /* Create log entry. */
+        await script.WriteToLogAsync();
+
         /* Execute the script. */
         var result = await script.Engine.EvaluateAsync(def.Code, presets);
 
