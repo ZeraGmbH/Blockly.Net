@@ -225,7 +225,8 @@ public class ModelAndEnumTests : TestEnvironment
 
         /* The model toolbox entry. */
         var toolbox = (JsonArray)provider.Configuration["toolbox"]![0]!["contents"]!;
-        var theToolbox = toolbox.Single(j => j!["type"]?.GetValue<string>() == "delay")!;
+        var globals = (JsonArray)toolbox[0]!["contents"]!;
+        var theToolbox = globals.Single(j => j!["type"]?.GetValue<string>() == "delay")!;
 
         Assert.That(theToolbox["_name"]!.GetValue<string>(), Is.EqualTo("Delay"));
     }

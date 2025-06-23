@@ -38,10 +38,14 @@ public class ConfigurationService : IConfigurationService
             /* In each category provide an at least stable order using the unique block key. */
             var items = category.Select(c => c.Item2).OrderBy(i => (string)i["_name"]!);
 
-            /* Entries without a category will be added on the top level of the toolbox. */
+            /* Entries without a category will be added on the global section of the toolbox. */
             if (string.IsNullOrEmpty(category.Key))
-                foreach (var item in items)
-                    toolbox.Add(item);
+                toolbox.Add(new JsonObject
+                {
+                    ["kind"] = "category",
+                    ["name"] = "$GLOBALS$",
+                    ["contents"] = new JsonArray([.. items])
+                });
             else
             {
                 /* Create a new category in the toolbox - nesting is not yet supported. */
@@ -51,7 +55,7 @@ public class ConfigurationService : IConfigurationService
                 {
                     ["kind"] = "category",
                     ["name"] = isModels ? "$Models$" : $"${category.Key}$",
-                    ["contents"] = new JsonArray(items.ToArray())
+                    ["contents"] = new JsonArray([.. items])
                 };
 
                 toolbox.Add(entry);
@@ -61,8 +65,8 @@ public class ConfigurationService : IConfigurationService
         /* Create the configuration object. */
         _cache = new JsonObject
         {
-            ["blocks"] = new JsonArray(parser.BlockDefinitions.ToArray()),
-            ["models"] = new JsonArray(parser.ModelDefinitions.ToArray()),
+            ["blocks"] = new JsonArray([.. parser.BlockDefinitions]),
+            ["models"] = new JsonArray([.. parser.ModelDefinitions]),
             ["toolbox"] = new JsonArray(
                 new JsonObject
                 {
