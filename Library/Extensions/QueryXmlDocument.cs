@@ -48,7 +48,7 @@ namespace BlocklyNet.Extensions;
                 ""shadow"": {
                     ""type"": ""text"",
                     ""fields"": {
-                        ""NUM"": """"
+                        ""TEXT"": """"
                     }
                 }
             }
