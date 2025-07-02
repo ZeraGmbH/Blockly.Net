@@ -1,0 +1,1514 @@
+{
+  "blocks": [
+    {
+      "message0": "ScriptParameter %1 %2 %3 %4 %5",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "NAME",
+          "text": "Variable name"
+        },
+        {
+          "type": "input_value",
+          "name": "NAME",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "VALUE",
+          "text": "Value"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        }
+      ],
+      "output": "run_script_parameter",
+      "colour": 230,
+      "tooltip": "Create a script parameter",
+      "helpUrl": "",
+      "type": "create_script_parameter"
+    },
+    {
+      "message0": "Delay %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "DELAY",
+          "text": "Delay (ms)"
+        },
+        {
+          "type": "input_value",
+          "name": "DELAY",
+          "check": "Number"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": "#107159",
+      "tooltip": "Delay execution",
+      "helpUrl": "",
+      "type": "delay"
+    },
+    {
+      "message0": "ExecutionGroup %1 %2 %3 %4 %5 %6 %7 %8 Save Status in %9 %10 Save Result in %11 %12 Element Type %13 %14",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_input",
+          "name": "NAME",
+          "text": "Name of the Group"
+        },
+        {
+          "type": "input_dummy",
+          "name": "NAME"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "DETAILS",
+          "text": "Details"
+        },
+        {
+          "type": "input_value",
+          "name": "DETAILS",
+          "check": "String"
+        },
+        {
+          "type": "input_statement",
+          "name": "DO"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "RESULT",
+          "text": "Result"
+        },
+        {
+          "type": "input_value",
+          "name": "RESULT",
+          "check": "group_execution_result"
+        },
+        {
+          "type": "field_variable",
+          "name": "STATUSVAR",
+          "variable": "groupStatus"
+        },
+        {
+          "type": "input_dummy",
+          "name": "STATUSVAR"
+        },
+        {
+          "type": "field_variable",
+          "name": "RESULTVAR",
+          "variable": "groupResult"
+        },
+        {
+          "type": "input_dummy",
+          "name": "RESULTVAR"
+        },
+        {
+          "type": "field_variable",
+          "name": "RESULTVARELEMENT"
+        },
+        {
+          "type": "input_dummy",
+          "name": "RESULTVARELEMENT"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": "#107159",
+      "tooltip": "Execute something as a group.",
+      "helpUrl": "",
+      "type": "execute_group"
+    },
+    {
+      "message0": "ExtractProperty %1 %2 %3 %4 %5",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "OBJECT",
+          "text": "Object"
+        },
+        {
+          "type": "input_value",
+          "name": "JSON"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "PROPERTY",
+          "text": "Property"
+        },
+        {
+          "type": "input_value",
+          "name": "PROPERTY"
+        }
+      ],
+      "output": null,
+      "colour": "#107159",
+      "tooltip": "Extract property from JSON Object",
+      "helpUrl": "",
+      "type": "extract_property"
+    },
+    {
+      "message0": "FormatAsString %1 Value %2 Format %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "input_value",
+          "name": "FORMAT",
+          "check": "String"
+        }
+      ],
+      "output": "String",
+      "colour": "#107159",
+      "tooltip": "Create a string from anything.",
+      "helpUrl": "",
+      "type": "format_as_string"
+    },
+    {
+      "message0": "GetGroupStatus %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "INDEX",
+          "text": "Index"
+        },
+        {
+          "type": "input_value",
+          "name": "INDEX",
+          "check": "Number"
+        }
+      ],
+      "output": "group_execution_status",
+      "colour": "#107159",
+      "tooltip": "Get the Status of a Group Execution.",
+      "helpUrl": "",
+      "type": "get_group_execution_status"
+    },
+    {
+      "message0": "GetLastException",
+      "args0": [],
+      "output": "String",
+      "colour": "#107159",
+      "tooltip": "Get Exception of current Catch.",
+      "helpUrl": "",
+      "type": "get_last_exception"
+    },
+    {
+      "message0": "HTTP %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11",
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "METHOD",
+          "options": [
+            [
+              "GET",
+              "GET"
+            ],
+            [
+              "POST",
+              "POST"
+            ],
+            [
+              "PUT",
+              "PUT"
+            ],
+            [
+              "DELETE",
+              "DELETE"
+            ]
+          ]
+        },
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "URI",
+          "text": "Url"
+        },
+        {
+          "type": "input_value",
+          "name": "URI",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "BODY",
+          "text": "Payload"
+        },
+        {
+          "type": "input_value",
+          "name": "BODY",
+          "check": "String"
+        },
+        {
+          "type": "field_dropdown",
+          "name": "AUTHMETHOD",
+          "options": [
+            [
+              "No Authentication",
+              ""
+            ],
+            [
+              "Bearer",
+              "Bearer"
+            ],
+            [
+              "Basic",
+              "Basic"
+            ]
+          ]
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "AUTHTOKEN",
+          "text": "Token"
+        },
+        {
+          "type": "input_value",
+          "name": "AUTHTOKEN",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "AUTHHEADER",
+          "text": "HTTP-Header"
+        },
+        {
+          "type": "input_value",
+          "name": "AUTHHEADER",
+          "check": "String"
+        }
+      ],
+      "inputsInline": false,
+      "output": null,
+      "colour": "#107159",
+      "tooltip": "HTTP Request",
+      "type": "http_request"
+    },
+    {
+      "message0": "Now %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "FORMAT",
+          "text": "Format"
+        },
+        {
+          "type": "input_value",
+          "name": "FORMAT",
+          "check": "String"
+        }
+      ],
+      "output": null,
+      "colour": "#107159",
+      "tooltip": "Get the current time",
+      "helpUrl": "",
+      "type": "get_date_time"
+    },
+    {
+      "message0": "ParseJSON %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "JSON",
+          "text": "JSON string"
+        },
+        {
+          "type": "input_value",
+          "name": "JSON",
+          "check": "String"
+        }
+      ],
+      "output": null,
+      "colour": "#107159",
+      "tooltip": "Create object from JSON string",
+      "helpUrl": "",
+      "type": "parse_json"
+    },
+    {
+      "message0": "ParseNumber %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "NUMBER",
+          "text": "Number as string"
+        },
+        {
+          "type": "input_value",
+          "name": "NUMBER",
+          "check": "String"
+        }
+      ],
+      "output": null,
+      "colour": "#107159",
+      "tooltip": "Create number from string",
+      "helpUrl": "",
+      "type": "parse_number"
+    },
+    {
+      "message0": "ReadFromModel %1 %2 %3 %4 %5 %6",
+      "args0": [
+        {
+          "type": "field_variable",
+          "name": "VAR",
+          "text": "Variable"
+        },
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "PATH",
+          "text": "Path to value"
+        },
+        {
+          "type": "input_value",
+          "name": "PATH",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "INDEXES",
+          "text": "Indexes in path"
+        },
+        {
+          "type": "input_value",
+          "name": "INDEXES",
+          "check": [
+            "Array(Number)",
+            "Array"
+          ]
+        }
+      ],
+      "output": null,
+      "colour": "#107159",
+      "tooltip": "Read a single field from a model variable",
+      "helpUrl": "",
+      "type": "read_model_property"
+    },
+    {
+      "message0": "AwaitUserInteraction %1 %2 %3 %4 %5 %6 %7 %8 %9",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "KEY",
+          "text": "Key"
+        },
+        {
+          "type": "input_value",
+          "name": "KEY",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "TYPE",
+          "text": "Type"
+        },
+        {
+          "type": "input_value",
+          "name": "TYPE"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "DELAY",
+          "text": "Auto close after (s)"
+        },
+        {
+          "type": "input_value",
+          "name": "DELAY",
+          "check": "Number"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "THROWMESSAGE",
+          "text": "Exception on auto close"
+        },
+        {
+          "type": "input_value",
+          "name": "THROWMESSAGE",
+          "check": "String"
+        }
+      ],
+      "output": null,
+      "colour": 230,
+      "tooltip": "Request interaction from the user",
+      "helpUrl": "",
+      "type": "request_user_input"
+    },
+    {
+      "message0": "RunParallel %1 %2 %3 %4 %5",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "SCRIPTS",
+          "text": "scripts"
+        },
+        {
+          "type": "input_value",
+          "name": "SCRIPTS",
+          "check": [
+            "Array(run_script_by_name)",
+            "Array"
+          ]
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "LEADINGSCRIPT",
+          "text": "leading"
+        },
+        {
+          "type": "input_value",
+          "name": "LEADINGSCRIPT",
+          "check": "Number"
+        }
+      ],
+      "output": null,
+      "colour": 230,
+      "tooltip": "Run a a number of scripts in parallel",
+      "helpUrl": "",
+      "type": "run_script_in_parallel"
+    },
+    {
+      "message0": "RunScript %1 %2 %3 %4 %5 %6 %7",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "NAME",
+          "text": "Display name"
+        },
+        {
+          "type": "input_value",
+          "name": "NAME",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "ARGS",
+          "text": "Parameters"
+        },
+        {
+          "type": "input_value",
+          "name": "ARGS",
+          "check": [
+            "Array(run_script_parameter)",
+            "Array"
+          ]
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "BUILDONLY",
+          "text": "Do not execute"
+        },
+        {
+          "type": "input_value",
+          "name": "BUILDONLY",
+          "check": "Boolean"
+        }
+      ],
+      "output": null,
+      "colour": 230,
+      "tooltip": "Run a script by name",
+      "helpUrl": "",
+      "type": "run_script_by_name"
+    },
+    {
+      "message0": "SetProgress %1 Name of the progress %2 Progress (%%) %3 Extra data %4 Type of extra data %5 Add Time Estimation %6",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "input_value",
+          "name": "NAME",
+          "check": "String"
+        },
+        {
+          "type": "input_value",
+          "name": "PROGRESS",
+          "check": "Number"
+        },
+        {
+          "type": "input_value",
+          "name": "PAYLOAD"
+        },
+        {
+          "type": "input_value",
+          "name": "PAYLOADTYPE",
+          "check": "String"
+        },
+        {
+          "type": "input_value",
+          "name": "ADDESTIMATION",
+          "check": "Boolean"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": "#107159",
+      "tooltip": "Set script execution progress in percentage",
+      "helpUrl": "",
+      "type": "set_progress"
+    },
+    {
+      "message0": "Throw %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "MESSAGE",
+          "text": "Message"
+        },
+        {
+          "type": "input_value",
+          "name": "MESSAGE",
+          "check": "String"
+        }
+      ],
+      "previousStatement": null,
+      "colour": "#107159",
+      "tooltip": "Throw an exception",
+      "helpUrl": "",
+      "type": "throw_exception"
+    },
+    {
+      "message0": "Try / Catch / Finally %1 Try %2 Catch %3 Finally %4",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "input_statement",
+          "name": "TRY"
+        },
+        {
+          "type": "input_statement",
+          "name": "CATCH"
+        },
+        {
+          "type": "input_statement",
+          "name": "FINALLY"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": "#107159",
+      "tooltip": "Execute block with exception handling",
+      "helpUrl": "",
+      "type": "try_catch_finally"
+    },
+    {
+      "message0": "UpdateModelProperty %1 %2 %3 %4 %5 %6 %7 %8",
+      "args0": [
+        {
+          "type": "field_variable",
+          "name": "VAR",
+          "text": "Variable"
+        },
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "PATH",
+          "text": "Path to value"
+        },
+        {
+          "type": "input_value",
+          "name": "PATH",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "INDEXES",
+          "text": "Indexes in path"
+        },
+        {
+          "type": "input_value",
+          "name": "INDEXES",
+          "check": [
+            "Array(Number)",
+            "Array"
+          ]
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "VALUE",
+          "text": "Value"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": "#107159",
+      "tooltip": "Update a single field of a model variable",
+      "helpUrl": "",
+      "type": "update_model_property"
+    },
+    {
+      "message0": "CreateXmlDocument %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "CONTENT",
+          "text": "XML Content"
+        },
+        {
+          "type": "input_value",
+          "name": "CONTENT",
+          "check": "String"
+        }
+      ],
+      "output": "xml_file",
+      "colour": "#107159",
+      "tooltip": "Create an XML Document from a String.",
+      "helpUrl": "",
+      "type": "xml_create_document"
+    },
+    {
+      "message0": "QueryXmlDocument %1 %2 %3 %4 %5",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "SOURCE",
+          "text": "XML File"
+        },
+        {
+          "type": "input_value",
+          "name": "SOURCE",
+          "check": [
+            "xml_file",
+            "xml_node"
+          ]
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "XPATH",
+          "text": "XPATH Query"
+        },
+        {
+          "type": "input_value",
+          "name": "XPATH",
+          "check": "String"
+        }
+      ],
+      "output": [
+        "Array",
+        "Array(xml_node)"
+      ],
+      "colour": "#107159",
+      "tooltip": "Query an XML Document.",
+      "helpUrl": "",
+      "type": "xml_query_document"
+    }
+  ],
+  "models": [
+    {
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "VALUE",
+          "options": [
+            [
+              "Failed",
+              "Failed"
+            ],
+            [
+              "Invalid",
+              "Invalid"
+            ],
+            [
+              "Succeeded",
+              "Succeeded"
+            ]
+          ]
+        }
+      ],
+      "message0": "Result of the Exceution %1",
+      "inputsInline": true,
+      "output": "group_execution_result_type",
+      "tooltip": "Result of the Exceution",
+      "type": "group_execution_result_type"
+    },
+    {
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Type",
+          "text": "Type"
+        },
+        {
+          "type": "input_value",
+          "name": "Type",
+          "check": "group_execution_result_type"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Result",
+          "text": "Result"
+        },
+        {
+          "type": "input_value",
+          "name": "Result"
+        }
+      ],
+      "message0": "Result of a group execution %1 %2 %3 %4 %5",
+      "output": "group_execution_result",
+      "tooltip": "Result of a group execution",
+      "type": "group_execution_result"
+    },
+    {
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "IsScript",
+          "text": "IsScript"
+        },
+        {
+          "type": "input_value",
+          "name": "IsScript",
+          "check": "Boolean"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Key",
+          "text": "Key"
+        },
+        {
+          "type": "input_value",
+          "name": "Key",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Name",
+          "text": "Name"
+        },
+        {
+          "type": "input_value",
+          "name": "Name",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Details",
+          "text": "Details"
+        },
+        {
+          "type": "input_value",
+          "name": "Details",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Result",
+          "text": "Result"
+        },
+        {
+          "type": "input_value",
+          "name": "Result",
+          "check": "String"
+        }
+      ],
+      "message0": "Status of a group execution %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11",
+      "output": "group_execution_status",
+      "tooltip": "Status of a group execution",
+      "type": "group_execution_status"
+    },
+    {
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Name",
+          "text": "Name"
+        },
+        {
+          "type": "input_value",
+          "name": "Name",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "LocalName",
+          "text": "LocalName"
+        },
+        {
+          "type": "input_value",
+          "name": "LocalName",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Namespace",
+          "text": "Namespace"
+        },
+        {
+          "type": "input_value",
+          "name": "Namespace",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Value",
+          "text": "Value"
+        },
+        {
+          "type": "input_value",
+          "name": "Value",
+          "check": "String"
+        }
+      ],
+      "message0": "XML DOM Attribute %1 %2 %3 %4 %5 %6 %7 %8 %9",
+      "output": "xml_attribute",
+      "tooltip": "XML DOM Attribute",
+      "type": "xml_attribute"
+    },
+    {
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Attributes",
+          "text": "Attributes"
+        },
+        {
+          "type": "input_value",
+          "name": "Attributes",
+          "check": [
+            "Array(xml_attribute)",
+            "Array"
+          ]
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Name",
+          "text": "Name"
+        },
+        {
+          "type": "input_value",
+          "name": "Name",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "LocalName",
+          "text": "LocalName"
+        },
+        {
+          "type": "input_value",
+          "name": "LocalName",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Namespace",
+          "text": "Namespace"
+        },
+        {
+          "type": "input_value",
+          "name": "Namespace",
+          "check": "String"
+        },
+        {
+          "type": "field_label_serializable",
+          "name": "Content",
+          "text": "Content"
+        },
+        {
+          "type": "input_value",
+          "name": "Content",
+          "check": "String"
+        }
+      ],
+      "message0": "XML DOM Node %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11",
+      "output": "xml_node",
+      "tooltip": "XML DOM Node",
+      "type": "xml_node"
+    },
+    {
+      "args0": [
+        {
+          "type": "input_dummy"
+        }
+      ],
+      "message0": "XML DOM %1",
+      "output": "xml_file",
+      "tooltip": "XML DOM",
+      "type": "xml_file"
+    }
+  ],
+  "toolbox": [
+    {
+      "kind": "category",
+      "name": "$CUSTOMROOT$",
+      "contents": [
+        {
+          "kind": "category",
+          "name": "$GLOBALS$",
+          "contents": [
+            {
+              "inputs": {
+                "DELAY": {
+                  "shadow": {
+                    "type": "math_number",
+                    "fields": {
+                      "NUM": "0"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "Delay",
+              "kind": "block",
+              "type": "delay"
+            },
+            {
+              "inputs": {
+                "PROPERTY": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "ExtractProperty",
+              "kind": "block",
+              "type": "extract_property"
+            },
+            {
+              "inputs": {
+                "FORMAT": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": "G"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "FormatAsString",
+              "kind": "block",
+              "type": "format_as_string"
+            },
+            {
+              "_kind": "block",
+              "_name": "GetLastException",
+              "kind": "block",
+              "type": "get_last_exception"
+            },
+            {
+              "inputs": {
+                "URI": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "AUTHHEADER": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": "Authorization"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "HTTP",
+              "kind": "block",
+              "type": "http_request"
+            },
+            {
+              "inputs": {
+                "FORMAT": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": "dd.MM.yyyy HH:mm:ss"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "Now",
+              "kind": "block",
+              "type": "get_date_time"
+            },
+            {
+              "inputs": {
+                "JSON": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": "{}"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "ParseJSON",
+              "kind": "block",
+              "type": "parse_json"
+            },
+            {
+              "_kind": "block",
+              "_name": "ParseNumber",
+              "kind": "block",
+              "type": "parse_number"
+            },
+            {
+              "inputs": {
+                "PATH": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "ReadFromModel",
+              "kind": "block",
+              "type": "read_model_property"
+            },
+            {
+              "inputs": {
+                "NAME": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "PROGRESS": {
+                  "shadow": {
+                    "type": "math_number",
+                    "fields": {
+                      "NUM": "0"
+                    }
+                  }
+                },
+                "PAYLOADTYPE": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "ADDESTIMATION": {
+                  "shadow": {
+                    "type": "logic_boolean",
+                    "fields": {
+                      "BOOL": "FALSE"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "SetProgress",
+              "kind": "block",
+              "type": "set_progress"
+            },
+            {
+              "inputs": {
+                "MESSAGE": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "Throw",
+              "kind": "block",
+              "type": "throw_exception"
+            },
+            {
+              "_kind": "block",
+              "_name": "Try",
+              "kind": "block",
+              "type": "try_catch_finally"
+            },
+            {
+              "inputs": {
+                "PATH": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "UpdateModelProperty",
+              "kind": "block",
+              "type": "update_model_property"
+            }
+          ]
+        },
+        {
+          "kind": "category",
+          "name": "$ExecutionGroups$",
+          "contents": [
+            {
+              "_kind": "block",
+              "_name": "ExecutionGroup",
+              "kind": "block",
+              "type": "execute_group"
+            },
+            {
+              "inputs": {
+                "INDEX": {
+                  "shadow": {
+                    "type": "math_number",
+                    "fields": {
+                      "NUM": "1"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "GetGroupStatus",
+              "kind": "block",
+              "type": "get_group_execution_status"
+            },
+            {
+              "_kind": "model",
+              "_name": "Result of a group execution",
+              "inputs": {
+                "Type": {
+                  "shadow": {
+                    "type": "group_execution_result_type",
+                    "fields": {
+                      "VALUE": "Invalid"
+                    }
+                  }
+                }
+              },
+              "kind": "block",
+              "type": "group_execution_result"
+            },
+            {
+              "_kind": "enum",
+              "_name": "Result of the Exceution",
+              "kind": "block",
+              "type": "group_execution_result_type"
+            },
+            {
+              "_kind": "model",
+              "_name": "Status of a group execution",
+              "inputs": {
+                "IsScript": {
+                  "shadow": {
+                    "type": "logic_boolean",
+                    "fields": {
+                      "BOOL": "FALSE"
+                    }
+                  }
+                },
+                "Key": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Name": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Details": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Result": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "kind": "block",
+              "type": "group_execution_status"
+            }
+          ]
+        },
+        {
+          "kind": "category",
+          "name": "$Scripts$",
+          "contents": [
+            {
+              "inputs": {
+                "KEY": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "TYPE": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "AwaitUserInteraction",
+              "kind": "block",
+              "type": "request_user_input"
+            },
+            {
+              "_kind": "block",
+              "_name": "RunParallel",
+              "kind": "block",
+              "type": "run_script_in_parallel"
+            },
+            {
+              "inputs": {
+                "NAME": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "BUILDONLY": {
+                  "shadow": {
+                    "type": "logic_boolean",
+                    "fields": {
+                      "BOOL": "FALSE"
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "RunScript",
+              "kind": "block",
+              "type": "run_script_by_name"
+            },
+            {
+              "inputs": {
+                "NAME": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "ScriptParameter",
+              "kind": "block",
+              "type": "create_script_parameter"
+            }
+          ]
+        },
+        {
+          "kind": "category",
+          "name": "$XML$",
+          "contents": [
+            {
+              "_kind": "block",
+              "_name": "CreateXmlDocument",
+              "kind": "block",
+              "type": "xml_create_document"
+            },
+            {
+              "inputs": {
+                "XPATH": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "_kind": "block",
+              "_name": "QueryXmlDocument",
+              "kind": "block",
+              "type": "xml_query_document"
+            },
+            {
+              "_kind": "model",
+              "_name": "XML DOM",
+              "inputs": {},
+              "kind": "block",
+              "type": "xml_file"
+            },
+            {
+              "_kind": "model",
+              "_name": "XML DOM Attribute",
+              "inputs": {
+                "Name": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "LocalName": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Namespace": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Value": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "kind": "block",
+              "type": "xml_attribute"
+            },
+            {
+              "_kind": "model",
+              "_name": "XML DOM Node",
+              "inputs": {
+                "Name": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "LocalName": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Namespace": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                },
+                "Content": {
+                  "shadow": {
+                    "type": "text",
+                    "fields": {
+                      "TEXT": ""
+                    }
+                  }
+                }
+              },
+              "kind": "block",
+              "type": "xml_node"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
