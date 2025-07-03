@@ -210,4 +210,41 @@ public class TextTests : TestEnvironment
 
         Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(expected));
     }
+
+    [TestCase("Hello World!", "Hello", "Goodbye", "Goodbye World!")]
+    [TestCase("Hello World!", "l", "a", "Heaao Worad!")]
+    [TestCase("", "@", "!", "")]
+    [TestCase("Hello world!", "!", "", "Hello world")]
+    public async Task Can_Replace_In_String_Async(string text, string from, string to, string expected)
+    {
+        var template = @"
+            <xml xmlns=""https://developers.google.com/blockly/xml"">
+                <block type=""text_replace"" id=""HHmCMG(CS1R|5y/9_3/h"" x=""325"" y=""125"">
+                    <value name=""FROM"">
+                    <block type=""text"" id=""VNau#/(w-)}v_+p*9iRX"">
+                        <field name=""TEXT"">$$FROM$$</field>
+                    </block>
+                    </value>
+                    <value name=""TO"">
+                    <block type=""text"" id=""r@u0nc((L;PSWT_J77OI"">
+                        <field name=""TEXT"">$$TO$$</field>
+                    </block>
+                    </value>
+                    <value name=""TEXT"">
+                    <block type=""text"" id=""UP@VpzHw0yhCU`:}]mMe"">
+                        <field name=""TEXT"">$$TEXT$$</field>
+                    </block>
+                    </value>
+                </block>
+            </xml>";
+
+        var script = Engine.Parser.Parse(
+            template
+                .Replace("$$FROM$$", from)
+                .Replace("$$TO$$", to)
+                .Replace("$$TEXT$$", text)
+        );
+
+        Assert.That(await script.RunAsync(Site.Object), Is.EqualTo(expected));
+    }
 }
