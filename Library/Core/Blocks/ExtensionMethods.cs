@@ -46,7 +46,7 @@ public static class Extensions
         return parentContext;
 
       parentContext = parentContext.Parent;
-    };
+    }
 
     return context!;
   }
@@ -96,6 +96,7 @@ public static class Extensions
     parser.AddBlock<TextLength>("text_length");
     parser.AddBlock<TextSubstring>("text_getSubstring");
     parser.AddBlock<TextTrim>("text_trim");
+    parser.AddBlock<TextReplace>("text_replace");
 
     parser.AddBlock<VariablesGet>("variables_get");
     parser.AddBlock<VariablesSet>("variables_set");
