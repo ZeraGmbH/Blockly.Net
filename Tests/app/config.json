@@ -590,6 +590,59 @@
       "type": "set_progress"
     },
     {
+      "message0": "text %1 %2 %3 case %4",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE",
+          "check": "String"
+        },
+        {
+          "type": "field_dropdown",
+          "name": "METHOD",
+          "options": [
+            [
+              "contains",
+              "CONTAINS"
+            ],
+            [
+              "startsWith",
+              "STARTSWITH"
+            ],
+            [
+              "endsWith",
+              "ENDSWITH"
+            ]
+          ]
+        },
+        {
+          "type": "input_value",
+          "name": "SEARCH",
+          "check": "String"
+        },
+        {
+          "type": "field_dropdown",
+          "name": "CASESENSITIVE",
+          "options": [
+            [
+              "insensitive",
+              "FALSE"
+            ],
+            [
+              "sensitive",
+              "TRUE"
+            ]
+          ]
+        }
+      ],
+      "inputsInline": "true",
+      "output": "Boolean",
+      "colour": "165",
+      "tooltip": "Create a string from anything.",
+      "helpUrl": "",
+      "type": "text_contains_starts_ends"
+    },
+    {
       "message0": "Throw %1 %2 %3",
       "args0": [
         {
@@ -1178,6 +1231,12 @@
               "_name": "SetProgress",
               "kind": "block",
               "type": "set_progress"
+            },
+            {
+              "_kind": "block",
+              "_name": "text",
+              "kind": "block",
+              "type": "text_contains_starts_ends"
             },
             {
               "inputs": {

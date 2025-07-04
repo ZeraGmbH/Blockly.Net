@@ -260,6 +260,7 @@ public static class BlocklyExtensions
         builder.AddBlock<RunParallel>();
         builder.AddBlock<RunScript>();
         builder.AddBlock<SetProgress>();
+        builder.AddBlock<TextContains>();
         builder.AddBlock<Throw>();
         builder.AddBlock<TryCatchFinally>();
         builder.AddBlock<UpdateModelProperty>();
