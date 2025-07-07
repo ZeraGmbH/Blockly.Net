@@ -42,6 +42,8 @@ public class OuterClass
 
     public SampleEnum What { get; set; }
 
+    public SampleEnum? NullableWhat { get; set; }
+
     public List<InnerClass> Inner { get; set; } = [];
 }
 

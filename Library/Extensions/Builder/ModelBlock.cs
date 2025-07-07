@@ -132,6 +132,13 @@ public class ModelBlock<T> : Block where T : class, new()
         // Enums are always good.
         if (type.IsEnum && models.Contains(type)) return true;
 
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            var innerType = type.GenericTypeArguments[0];
+
+            if (innerType.IsEnum && models.Contains(innerType)) return true;
+        }
+
         // Some of .NET base types.
         if (_supportedTypes.ContainsKey(type)) return true;
 
@@ -235,14 +242,18 @@ public class ModelBlock<T> : Block where T : class, new()
             });
 
             /* For enumerations provide a static selection list. */
-            if (prop.Type.IsEnum)
+            var enumType = prop.Type.IsGenericType && prop.Type.GetGenericTypeDefinition() == typeof(Nullable<>)
+                ? prop.Type.GenericTypeArguments[0]
+                : prop.Type;
+
+            if (enumType.IsEnum)
             {
                 /* Just add the reference. */
                 args.Add(new JsonObject
                 {
                     ["type"] = "input_value",
                     ["name"] = prop.Name,
-                    ["check"] = models[prop.Type]
+                    ["check"] = models[enumType]
                 });
 
                 continue;
