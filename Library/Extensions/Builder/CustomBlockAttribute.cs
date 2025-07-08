@@ -29,4 +29,10 @@ public class CustomBlockAttribute(string key, string category, string definition
     /// Optional toolbox defaults for the block.
     /// </summary>
     public readonly string Toolbox = toolbox;
+
+    /// <summary>
+    /// Block is hidden from customized area - must be
+    /// provided in some other way or just be internal.
+    /// </summary>
+    public bool Hidden = false;
 }

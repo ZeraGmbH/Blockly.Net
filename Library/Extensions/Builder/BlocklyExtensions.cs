@@ -87,6 +87,7 @@ public static class BlocklyExtensions
             var message0 = (string)blockJson["message0"]!;
             var part0 = message0?.Split(" ").FirstOrDefault(key);
 
+            toolbox["_hidden"] = blockAttribute.Hidden;
             toolbox["_kind"] = registerAs != null ? "model" : "block";
             toolbox["_name"] = part0;
             toolbox["kind"] = "block";
