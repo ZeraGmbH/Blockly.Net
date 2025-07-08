@@ -11,7 +11,7 @@ public abstract class XmlNodeOrFile
     /// Add an XML string to the XML
     /// </summary>
     /// <param name="content">The content to add.</param>
-    public void AppendXml(string content) => Node.InnerXml = content;
+    public void AppendXml(string content) => Node.InnerXml += content;
 
     /// <summary>
     /// Get the document attach to this instance.
