@@ -1101,6 +1101,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "Delay",
               "kind": "block",
@@ -1117,6 +1118,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "ExtractProperty",
               "kind": "block",
@@ -1133,12 +1135,14 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "FormatAsString",
               "kind": "block",
               "type": "format_as_string"
             },
             {
+              "_hidden": false,
               "_kind": "block",
               "_name": "GetLastException",
               "kind": "block",
@@ -1163,6 +1167,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "HTTP",
               "kind": "block",
@@ -1179,6 +1184,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "Now",
               "kind": "block",
@@ -1195,12 +1201,14 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "ParseJSON",
               "kind": "block",
               "type": "parse_json"
             },
             {
+              "_hidden": false,
               "_kind": "block",
               "_name": "ParseNumber",
               "kind": "block",
@@ -1217,6 +1225,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "ReadFromModel",
               "kind": "block",
@@ -1257,12 +1266,14 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "SetProgress",
               "kind": "block",
               "type": "set_progress"
             },
             {
+              "_hidden": true,
               "_kind": "block",
               "_name": "text",
               "kind": "block",
@@ -1279,12 +1290,14 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "Throw",
               "kind": "block",
               "type": "throw_exception"
             },
             {
+              "_hidden": false,
               "_kind": "block",
               "_name": "Try",
               "kind": "block",
@@ -1301,6 +1314,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "UpdateModelProperty",
               "kind": "block",
@@ -1313,6 +1327,7 @@
           "name": "$ExecutionGroups$",
           "contents": [
             {
+              "_hidden": false,
               "_kind": "block",
               "_name": "ExecutionGroup",
               "kind": "block",
@@ -1329,6 +1344,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "GetGroupStatus",
               "kind": "block",
@@ -1429,12 +1445,14 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "AwaitUserInteraction",
               "kind": "block",
               "type": "request_user_input"
             },
             {
+              "_hidden": false,
               "_kind": "block",
               "_name": "RunParallel",
               "kind": "block",
@@ -1459,6 +1477,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "RunScript",
               "kind": "block",
@@ -1475,6 +1494,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "ScriptParameter",
               "kind": "block",
@@ -1487,6 +1507,7 @@
           "name": "$XML$",
           "contents": [
             {
+              "_hidden": false,
               "_kind": "block",
               "_name": "AddToXmlParent",
               "kind": "block",
@@ -1509,6 +1530,7 @@
                   }
                 }
               },
+              "_hidden": false,
               "_kind": "block",
               "_name": "QueryXmlDocument",
               "kind": "block",
