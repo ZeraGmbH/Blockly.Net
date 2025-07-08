@@ -270,6 +270,7 @@ public static class BlocklyExtensions
         builder.AddModel<XmlAttribute>("xml_attribute", "XML DOM Attribute", "XML");
         builder.AddModel<XmlNode>("xml_node", "XML DOM Node", "XML");
         builder.AddModel<XmlFile>("xml_file", "XML DOM", "XML");
+        builder.AddBlock<AddToXmlParent>();
         builder.AddBlock<CreateXmlDocument>();
         builder.AddBlock<QueryXmlDocument>();
 

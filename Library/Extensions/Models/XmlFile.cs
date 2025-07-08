@@ -5,12 +5,12 @@ namespace BlocklyNet.Extensions.Models.Xml;
 /// <summary>
 /// Represents aa loaded XML file.
 /// </summary>
-public class XmlFile()
+public class XmlFile() : XmlNodeOrFile
 {
     /// <summary>
     /// The XML object representation.
     /// </summary>
-    private readonly XmlDocument _Document = new();
+    internal readonly XmlDocument _Document = new();
 
     /// <summary>
     /// Parse content string to an XML document.
@@ -20,6 +20,12 @@ public class XmlFile()
     {
         // Just parse the string representation and create the corresponding XML DOM.
         _Document.LoadXml(content);
+    }
+
+    /// <inheritdoc/>
+    public override void AddStringToXml(string content)
+    {
+        _Document.InnerXml += content;
     }
 
     /// <summary>
