@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using BlocklyNet.Scripting.Debugger;
 
 namespace BlocklyNet.Core.Model;

@@ -1,6 +1,6 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
-using BlocklyNet.Extensions.Models.Xml;
+using BlocklyNet.Extensions.Models;
 
 namespace BlocklyNet.Extensions;
 
@@ -45,13 +45,9 @@ public class AddToXmlParent : Block
         var content = await Values.EvaluateAsync("CONTENT", context);
 
         if (content is string contentString)
-        {
-            parent.AddStringToXml(contentString);
-        }
+            parent.AppendXml(contentString);
         else if (content is XmlNode contentNode)
-        {
-            contentNode.AddToParent(parent);
-        }
+            parent.AppendNode(contentNode);
         else
             throw new ArgumentException("Unrecognized input type");
 

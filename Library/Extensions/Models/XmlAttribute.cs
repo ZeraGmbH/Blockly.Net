@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Xml = System.Xml;
 
-namespace BlocklyNet.Extensions.Models.Xml;
+namespace BlocklyNet.Extensions.Models;
 
 /// <summary>
 /// Represents a single XML attribute on a node.
@@ -12,7 +13,7 @@ public class XmlAttribute()
     /// Create a new attribute representation.
     /// </summary>
     /// <param name="attribute">The underlying attribute.</param>
-    public XmlAttribute(System.Xml.XmlAttribute attribute) : this()
+    public XmlAttribute(Xml.XmlAttribute attribute) : this()
     {
         LocalName = attribute.LocalName;
         Name = attribute.Name;

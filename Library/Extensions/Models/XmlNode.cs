@@ -1,39 +1,32 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Xml;
+using Xml = System.Xml;
 
-namespace BlocklyNet.Extensions.Models.Xml;
-
-/// <summary>
-/// 
-/// </summary>
-public abstract class XmlNodeOrFile
-{
-    /// <summary>
-    /// Add an XML string to the XML
-    /// </summary>
-    /// <param name="content">The content to add.</param>
-    public abstract void AddStringToXml(string content);
-
-}
+namespace BlocklyNet.Extensions.Models;
 
 /// <summary>
 /// A single node from a query against an XML DOM.
 /// </summary>
 public class XmlNode() : XmlNodeOrFile
 {
-    /// <summary>
-    /// Attached node.
-    /// </summary>
-    internal System.Xml.XmlNode _Node = null!;
+    private Xml.XmlNode _Node = null!;
+
+    /// <inheritdoc/>
+    internal protected override Xml.XmlDocument Document => Node.OwnerDocument!;
+
+    /// <inheritdoc/>
+    internal protected override Xml.XmlNode Node => _Node;
+
+    internal void SetNode(Xml.XmlNode node)
+        => _Node = _Node == null ? node : throw new InvalidOperationException("Node is already part of an XML tree");
 
     /// <summary>
     /// Create a new node representation.
     /// </summary>
     /// <param name="node">The underlying node.</param>
-    public XmlNode(System.Xml.XmlNode node) : this()
+    public XmlNode(Xml.XmlNode node) : this()
     {
-        _Node = node;
+        SetNode(node);
 
         Content = node.InnerText;
         LocalName = node.LocalName;
@@ -76,64 +69,6 @@ public class XmlNode() : XmlNodeOrFile
     public string Content { get; set; } = null!;
 
     /// <inheritdoc/>
-    public override void AddStringToXml(string content)
-    {
-        _Node.InnerXml += content;
-    }
+    public override string ToString() => Node.OuterXml;
 
-    /// <summary>
-    /// Lookup child nodes.
-    /// </summary>
-    /// <param name="xpath">XPath query string.</param>
-    /// <returns>List of nodes found.</returns>
-    public List<XmlNode> Query(string xpath)
-    {
-        var nodes = new List<XmlNode>();
-        var list = _Node.SelectNodes(xpath);
-
-        if (list != null)
-            for (var i = 0; i < list.Count; i++)
-            {
-                var node = list[i];
-
-                if (node != null)
-                    nodes.Add(new(node));
-            }
-
-        return nodes;
-    }
-
-    internal void AddToParent(XmlNodeOrFile parent)
-    {
-        if (_Node != null) throw new InvalidOperationException("Node is already part of an XML tree");
-
-        XmlElement element = null!;
-
-        if (parent is XmlFile file)
-        {
-            if (file._Document.DocumentElement != null)
-                throw new InvalidOperationException("Document has already a root element.");
-
-            element = file._Document.CreateElement(Name, Namespace);
-
-            _Node = element;
-            file._Document.AppendChild(_Node);
-        }
-        else if (parent is XmlNode node)
-        {
-            if (node._Node.OwnerDocument == null)
-                throw new InvalidOperationException("Parent Node is not Part of an XML tree yet.");
-
-            element = node._Node.OwnerDocument!.CreateElement(Name, Namespace);
-
-            _Node = element;
-            node._Node.AppendChild(element);
-        }
-
-        foreach (var attr in Attributes)
-        {
-            element.SetAttribute(attr.Name, attr.Namespace, attr.Value);
-        }
-        element.InnerText = Content;
-    }
 }

@@ -1,6 +1,5 @@
 using System.Text.Json;
 using BlocklyNet.Extensions.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.Customization;

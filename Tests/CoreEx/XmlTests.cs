@@ -1,6 +1,6 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions;
-using BlocklyNet.Extensions.Models.Xml;
+using BlocklyNet.Extensions.Models;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.CoreEx;
@@ -157,9 +157,9 @@ public class XmlTests : TestEnvironment
         await block.EnterBlockAsync(Context);
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Name, Is.EqualTo("attrName"));
-            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Value, Is.EqualTo("attrValue"));
-            Assert.That(xmlFile._Document.FirstChild!.InnerText, Is.EqualTo("test2"));
+            Assert.That(xmlFile.Document.FirstChild!.Attributes![0].Name, Is.EqualTo("attrName"));
+            Assert.That(xmlFile.Document.FirstChild!.Attributes![0].Value, Is.EqualTo("attrValue"));
+            Assert.That(xmlFile.Document.FirstChild!.InnerText, Is.EqualTo("test2"));
         }
 
         XmlNode node = testNode;
@@ -176,9 +176,9 @@ public class XmlTests : TestEnvironment
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(xmlFile._Document.FirstChild!.LastChild!.Attributes![0].Name, Is.EqualTo("attrName"));
-            Assert.That(xmlFile._Document.FirstChild!.LastChild!.Attributes![0].Value, Is.EqualTo("attrValue"));
-            Assert.That(xmlFile._Document.FirstChild!.LastChild!.InnerText, Is.EqualTo("bar"));
+            Assert.That(xmlFile.Document.FirstChild!.LastChild!.Attributes![0].Name, Is.EqualTo("attrName"));
+            Assert.That(xmlFile.Document.FirstChild!.LastChild!.Attributes![0].Value, Is.EqualTo("attrValue"));
+            Assert.That(xmlFile.Document.FirstChild!.LastChild!.InnerText, Is.EqualTo("bar"));
         }
     }
 
@@ -201,9 +201,9 @@ public class XmlTests : TestEnvironment
         await block.EnterBlockAsync(Context);
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Name, Is.EqualTo("id"));
-            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Value, Is.EqualTo("123"));
-            Assert.That(xmlFile._Document.FirstChild!.InnerText, Is.EqualTo("hello world"));
+            Assert.That(xmlFile.Document.FirstChild!.Attributes![0].Name, Is.EqualTo("id"));
+            Assert.That(xmlFile.Document.FirstChild!.Attributes![0].Value, Is.EqualTo("123"));
+            Assert.That(xmlFile.Document.FirstChild!.InnerText, Is.EqualTo("hello world"));
         }
 
         var testNode = xmlFile.Query("//test")[0];
@@ -220,9 +220,9 @@ public class XmlTests : TestEnvironment
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(testNode._Node.LastChild!.Attributes![0].Value, Is.EqualTo("456"));
-            Assert.That(testNode._Node.LastChild!.Attributes![0].Name, Is.EqualTo("id2"));
-            Assert.That(testNode._Node.LastChild!.InnerText, Is.EqualTo("bar"));
+            Assert.That(testNode.Node.LastChild!.Attributes![0].Value, Is.EqualTo("456"));
+            Assert.That(testNode.Node.LastChild!.Attributes![0].Name, Is.EqualTo("id2"));
+            Assert.That(testNode.Node.LastChild!.InnerText, Is.EqualTo("bar"));
         }
     }
 }

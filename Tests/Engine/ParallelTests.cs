@@ -1,5 +1,4 @@
 using System.Collections;
-using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
-using BlocklyNet.Extensions.Models.Xml;
+using BlocklyNet.Extensions.Models;
 
 namespace BlocklyNet.Extensions;
 
