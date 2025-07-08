@@ -223,6 +223,7 @@ public class XmlTests : TestEnvironment
             Assert.That(testNode.Node.LastChild!.Attributes![0].Value, Is.EqualTo("456"));
             Assert.That(testNode.Node.LastChild!.Attributes![0].Name, Is.EqualTo("id2"));
             Assert.That(testNode.Node.LastChild!.InnerText, Is.EqualTo("bar"));
+            Assert.That(xmlFile.Document.OuterXml, Is.EqualTo("<test id=\"123\">hello world<foo id2=\"456\">bar</foo></test>"));
         }
     }
 }
