@@ -1,7 +1,5 @@
-using System.Reflection.Metadata.Ecma335;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions;
-using BlocklyNetTests;
 using NUnit.Framework;
 
 namespace BlocklyNetTests.CoreEx;

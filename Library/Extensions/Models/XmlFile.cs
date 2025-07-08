@@ -1,16 +1,17 @@
-using System.Xml;
+using Xml = System.Xml;
 
-namespace BlocklyNet.Extensions.Models.Xml;
+namespace BlocklyNet.Extensions.Models;
 
 /// <summary>
 /// Represents aa loaded XML file.
 /// </summary>
 public class XmlFile() : XmlNodeOrFile
 {
-    /// <summary>
-    /// The XML object representation.
-    /// </summary>
-    internal readonly XmlDocument _Document = new();
+    /// <inheritdoc/>
+    internal protected override Xml.XmlDocument Document { get; } = new();
+
+    /// <inheritdoc/>
+    internal protected override Xml.XmlNode Node => Document;
 
     /// <summary>
     /// Parse content string to an XML document.
@@ -19,34 +20,9 @@ public class XmlFile() : XmlNodeOrFile
     public XmlFile(string content) : this()
     {
         // Just parse the string representation and create the corresponding XML DOM.
-        _Document.LoadXml(content);
+        Document.LoadXml(content);
     }
 
     /// <inheritdoc/>
-    public override void AddStringToXml(string content)
-    {
-        _Document.InnerXml += content;
-    }
-
-    /// <summary>
-    /// Lookup nodes.
-    /// </summary>
-    /// <param name="xpath">XPath query string.</param>
-    /// <returns>List of nodes found.</returns>
-    public List<XmlNode> Query(string xpath)
-    {
-        var nodes = new List<XmlNode>();
-        var list = _Document.SelectNodes(xpath);
-
-        if (list != null)
-            for (var i = 0; i < list.Count; i++)
-            {
-                var node = list[i];
-
-                if (node != null)
-                    nodes.Add(new(node));
-            }
-
-        return nodes;
-    }
+    public override string ToString() => Document.InnerXml;
 }
