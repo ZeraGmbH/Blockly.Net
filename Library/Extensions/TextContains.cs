@@ -47,8 +47,8 @@ namespace BlocklyNet.Extensions;
         ""tooltip"": ""Create a string from anything."",
         ""helpUrl"": """"
     }",
-    @""
-    )]
+    @"",
+    Hidden = true)]
 public class TextContains : Block
 {
     /// <inheritdoc/>
