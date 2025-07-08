@@ -39,8 +39,8 @@ public class CreateXmlDocument : Block
     /// <inheritdoc/>
     protected override async Task<object?> EvaluateAsync(Context context)
     {
-        var content = await Values.EvaluateAsync<string>("CONTENT", context);
+        var content = await Values.EvaluateAsync<string?>("CONTENT", context);
 
-        return new XmlFile(content);
+        return string.IsNullOrEmpty(content) ? new XmlFile() : new XmlFile(content);
     }
 }
