@@ -24,5 +24,12 @@ public class XmlFile() : XmlNodeOrFile
     }
 
     /// <inheritdoc/>
-    public override string ToString() => Document.InnerXml;
+    public override string ToString()
+    {
+        using var writer = new StringWriter();
+
+        Document.Save(writer);
+
+        return writer.ToString();
+    }
 }
