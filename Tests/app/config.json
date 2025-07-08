@@ -743,6 +743,36 @@
       "type": "update_model_property"
     },
     {
+      "message0": "AddToXmlParent %1 Xml Parent %2 Content %3",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "input_value",
+          "name": "PARENT",
+          "check": [
+            "xml_file",
+            "xml_node"
+          ]
+        },
+        {
+          "type": "input_value",
+          "name": "CONTENT",
+          "check": [
+            "xml_node",
+            "String"
+          ]
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": "#107159",
+      "tooltip": "Append an XML Node or File to a parent",
+      "helpUrl": "",
+      "type": "xml_add_to_parent"
+    },
+    {
       "message0": "CreateXmlDocument %1 %2 %3",
       "args0": [
         {
@@ -1456,6 +1486,12 @@
           "kind": "category",
           "name": "$XML$",
           "contents": [
+            {
+              "_kind": "block",
+              "_name": "AddToXmlParent",
+              "kind": "block",
+              "type": "xml_add_to_parent"
+            },
             {
               "_kind": "block",
               "_name": "CreateXmlDocument",

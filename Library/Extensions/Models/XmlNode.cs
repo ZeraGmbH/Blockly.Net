@@ -1,17 +1,31 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml;
 
 namespace BlocklyNet.Extensions.Models.Xml;
 
 /// <summary>
+/// 
+/// </summary>
+public abstract class XmlNodeOrFile
+{
+    /// <summary>
+    /// Add an XML string to the XML
+    /// </summary>
+    /// <param name="content">The content to add.</param>
+    public abstract void AddStringToXml(string content);
+
+}
+
+/// <summary>
 /// A single node from a query against an XML DOM.
 /// </summary>
-public class XmlNode()
+public class XmlNode() : XmlNodeOrFile
 {
     /// <summary>
     /// Attached node.
     /// </summary>
-    private readonly System.Xml.XmlNode _Node = null!;
+    internal System.Xml.XmlNode _Node = null!;
 
     /// <summary>
     /// Create a new node representation.
@@ -61,6 +75,12 @@ public class XmlNode()
     [Required]
     public string Content { get; set; } = null!;
 
+    /// <inheritdoc/>
+    public override void AddStringToXml(string content)
+    {
+        _Node.InnerXml += content;
+    }
+
     /// <summary>
     /// Lookup child nodes.
     /// </summary>
@@ -81,5 +101,39 @@ public class XmlNode()
             }
 
         return nodes;
+    }
+
+    internal void AddToParent(XmlNodeOrFile parent)
+    {
+        if (_Node != null) throw new InvalidOperationException("Node is already part of an XML tree");
+
+        XmlElement element = null!;
+
+        if (parent is XmlFile file)
+        {
+            if (file._Document.DocumentElement != null)
+                throw new InvalidOperationException("Document has already a root element.");
+
+            element = file._Document.CreateElement(Name, Namespace);
+
+            _Node = element;
+            file._Document.AppendChild(_Node);
+        }
+        else if (parent is XmlNode node)
+        {
+            if (node._Node.OwnerDocument == null)
+                throw new InvalidOperationException("Parent Node is not Part of an XML tree yet.");
+
+            element = node._Node.OwnerDocument!.CreateElement(Name, Namespace);
+
+            _Node = element;
+            node._Node.AppendChild(element);
+        }
+
+        foreach (var attr in Attributes)
+        {
+            element.SetAttribute(attr.Name, attr.Namespace, attr.Value);
+        }
+        element.InnerText = Content;
     }
 }

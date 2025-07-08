@@ -8,6 +8,15 @@ namespace BlocklyNetTests.CoreEx;
 [TestFixture]
 public class XmlTests : TestEnvironment
 {
+    private Context Context = null!;
+
+    protected override void OnStartup()
+    {
+        Context = new Context(Site.Object);
+
+        base.OnStartup();
+    }
+
     private const string Sample1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
         <CATALOG>
             <CD mode=""oldie"">
@@ -126,5 +135,94 @@ public class XmlTests : TestEnvironment
         Assert.That(nodes[0].Namespace, Is.EqualTo(""));
         Assert.That(nodes[0].Content, Is.EqualTo("Bob Dylan"));
         Assert.That(nodes[0].Attributes, Has.Count.EqualTo(0));
+    }
+
+    [Test]
+    public async Task Can_Add_To_Parent_XmlFile_Async()
+    {
+        XmlFile xmlFile = new();
+        XmlAttribute testAttribute = new() { Name = "attrName", Value = "attrValue" };
+
+        var testNode = new XmlNode { Name = "test", Content = "test2", LocalName = "test3", Attributes = [testAttribute] };
+        /* Build block tree. */
+        var block = new AddToXmlParent
+        {
+            Values = {
+                new() { Name = "PARENT", Block = new AnyValueBlock(xmlFile)},
+                new() { Name = "CONTENT", Block = new AnyValueBlock(testNode)
+            }
+        }
+        };
+
+        await block.EnterBlockAsync(Context);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Name, Is.EqualTo("attrName"));
+            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Value, Is.EqualTo("attrValue"));
+            Assert.That(xmlFile._Document.FirstChild!.InnerText, Is.EqualTo("test2"));
+        }
+
+        XmlNode node = testNode;
+        var blockNode = new AddToXmlParent
+        {
+            Values = {
+                new() { Name = "PARENT", Block = new AnyValueBlock(node)},
+                new() { Name = "CONTENT", Block = new AnyValueBlock(new XmlNode{ Name = "foo", Content = "bar", LocalName = "foobar", Attributes = [testAttribute] })
+            }
+        }
+        };
+
+        await blockNode.EnterBlockAsync(Context);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(xmlFile._Document.FirstChild!.LastChild!.Attributes![0].Name, Is.EqualTo("attrName"));
+            Assert.That(xmlFile._Document.FirstChild!.LastChild!.Attributes![0].Value, Is.EqualTo("attrValue"));
+            Assert.That(xmlFile._Document.FirstChild!.LastChild!.InnerText, Is.EqualTo("bar"));
+        }
+    }
+
+    [Test]
+    public async Task Can_Add_To_Parent_String_Async()
+    {
+        XmlFile xmlFile = new();
+
+        var test = "<test id=\"123\">hello world</test>";
+        /* Build block tree. */
+        var block = new AddToXmlParent
+        {
+            Values = {
+                new() { Name = "PARENT", Block = new AnyValueBlock(xmlFile)},
+                new() { Name = "CONTENT", Block = CreateStringBlock(test)
+            }
+        }
+        };
+
+        await block.EnterBlockAsync(Context);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Name, Is.EqualTo("id"));
+            Assert.That(xmlFile._Document.FirstChild!.Attributes![0].Value, Is.EqualTo("123"));
+            Assert.That(xmlFile._Document.FirstChild!.InnerText, Is.EqualTo("hello world"));
+        }
+
+        var testNode = xmlFile.Query("//test")[0];
+        var blockNode = new AddToXmlParent
+        {
+            Values = {
+                new() { Name = "PARENT", Block = new AnyValueBlock(testNode)},
+                new() { Name = "CONTENT", Block = CreateStringBlock("<foo id2=\"456\">bar</foo>")
+            }
+        }
+        };
+
+        await blockNode.EnterBlockAsync(Context);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(testNode._Node.LastChild!.Attributes![0].Value, Is.EqualTo("456"));
+            Assert.That(testNode._Node.LastChild!.Attributes![0].Name, Is.EqualTo("id2"));
+            Assert.That(testNode._Node.LastChild!.InnerText, Is.EqualTo("bar"));
+        }
     }
 }
