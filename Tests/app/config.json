@@ -773,15 +773,10 @@
       "type": "xml_add_to_parent"
     },
     {
-      "message0": "CreateXmlDocument %1 %2 %3",
+      "message0": "CreateXmlDocument %1 XML Content %2",
       "args0": [
         {
           "type": "input_dummy"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "CONTENT",
-          "text": "XML Content"
         },
         {
           "type": "input_value",

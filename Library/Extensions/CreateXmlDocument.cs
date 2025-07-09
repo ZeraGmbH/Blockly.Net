@@ -11,15 +11,10 @@ namespace BlocklyNet.Extensions;
     "xml_create_document",
     "XML",
     @"{
-        ""message0"": ""CreateXmlDocument %1 %2 %3"",
+        ""message0"": ""CreateXmlDocument %1 XML Content %2"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
-            },
-            {
-                ""type"": ""field_label_serializable"",
-                ""name"": ""CONTENT"",
-                ""text"": ""XML Content""
             },
             {
                 ""type"": ""input_value"",
@@ -39,7 +34,7 @@ public class CreateXmlDocument : Block
     /// <inheritdoc/>
     protected override async Task<object?> EvaluateAsync(Context context)
     {
-        var content = await Values.EvaluateAsync<string?>("CONTENT", context);
+        var content = await Values.EvaluateAsync<string?>("CONTENT", context, false);
 
         return string.IsNullOrEmpty(content) ? new XmlFile() : new XmlFile(content);
     }
