@@ -12,13 +12,17 @@ public class ListsCreateWith : Block
   /// <inheritdoc/>
   protected override async Task<object?> EvaluateAsync(Context context)
   {
-    var list = new List<object>();
+    var list = new List<object?>();
 
-    foreach (var value in Values)
+    var count = int.Parse(Mutations.GetValue("items") ?? "0");
+
+    for (var i = 0; i < count; i++)
     {
       context.Cancellation.ThrowIfCancellationRequested();
 
-      list.Add((await value.EvaluateAsync(context))!);
+      var value = Values.TryGet($"ADD{i}");
+
+      list.Add(value == null ? null : await value.EvaluateAsync(context));
     }
 
     return list;
