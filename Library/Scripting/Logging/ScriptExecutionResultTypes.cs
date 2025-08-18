@@ -38,4 +38,9 @@ public enum ScriptExecutionResultTypes
     /// </summary>
     [Obsolete("no longer used - only Aborted is supported", false)]
     Paused = 5,
+
+    /// <summary>
+    /// No measurement outcome.
+    /// </summary>
+    Indifferent = 6,
 }
