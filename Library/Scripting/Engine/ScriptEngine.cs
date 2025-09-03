@@ -372,8 +372,22 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
         await UpdateResultLogEntryAsync(script, parent, true);
 
         /* Always propagate error. */
-        if (parent != null && parent.ResultForLogging.Result == ScriptExecutionResultTypes.Active && script.ResultForLogging.Result != ScriptExecutionResultTypes.Success)
-            await parent.SetResultAsync(ScriptExecutionResultTypes.Failure);
+        if (parent != null)
+            switch (script.ResultForLogging.Result)
+            {
+                case ScriptExecutionResultTypes.Aborted:
+                case ScriptExecutionResultTypes.Error:
+                case ScriptExecutionResultTypes.Failure:
+                    await parent.SetResultAsync(ScriptExecutionResultTypes.Failure);
+
+                    break;
+                case ScriptExecutionResultTypes.Indifferent:
+                case ScriptExecutionResultTypes.Success:
+                    if (parent.ResultForLogging.Result == ScriptExecutionResultTypes.Active)
+                        await parent.SetResultAsync(script.ResultForLogging.Result);
+
+                    break;
+            }
     }
 
     /// <summary>
