@@ -31,6 +31,12 @@ public class InnerClass
     public SampleEnum What { get; set; }
 
     public int Age { get; } = 33;
+
+    [JsonIgnore]
+    public int Ignore1 { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int Ignore2 { get; set; }
 }
 
 /// <summary>
@@ -331,6 +337,24 @@ public class ModelAndEnumTests : TestEnvironment
         var age = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "Age");
 
         Assert.That(age, Is.Null);
+    }
+
+    /// <summary>
+    /// An ignored property must not appear in the model.
+    /// </summary>
+    [Test]
+    public void Ignored_Property_Not_Be_In_Model()
+    {
+        var provider = GetService<IConfigurationService>();
+
+        /* The model block. */
+        var myModel = provider.Configuration["models"]!.AsArray().First(j => j!["type"]?.GetValue<string>() == "inner_class")!;
+        var args = (JsonArray)myModel["args0"]!;
+        var ignore1 = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "Ignore1");
+        var ignore2 = args.SingleOrDefault(j => j!["type"]!.GetValue<string>() == "input_value" && j!["name"]!.GetValue<string>() == "Ignore2");
+
+        Assert.That(ignore1, Is.Null);
+        Assert.That(ignore2, Is.Not.Null);
     }
 
     /// <summary>
