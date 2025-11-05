@@ -208,7 +208,7 @@ public class ModelBlock<T> : Block where T : class, new()
                 _props ??= typeof(T)
                     .GetProperties()
                     .Where(p => p.Name != nameof(List<object>.Capacity))
-                    .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
+                    .Where(p => (p.GetCustomAttribute<JsonIgnoreAttribute>() is not JsonIgnoreAttribute ign || ign.Condition != JsonIgnoreCondition.Always) && p.CanRead && p.CanWrite)
                     .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
                     .Select(p => new PropertyInformation(p))
                     .ToArray();
@@ -216,7 +216,7 @@ public class ModelBlock<T> : Block where T : class, new()
         /* Get all properties of supported types - including a generic list of supported types. */
         _props ??= typeof(T)
                 .GetProperties()
-                .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null && p.CanRead && p.CanWrite)
+                .Where(p => (p.GetCustomAttribute<JsonIgnoreAttribute>() is not JsonIgnoreAttribute ign || ign.Condition != JsonIgnoreCondition.Always) && p.CanRead && p.CanWrite)
                 .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
                 .Select(p => new PropertyInformation(p))
                 .ToArray();
