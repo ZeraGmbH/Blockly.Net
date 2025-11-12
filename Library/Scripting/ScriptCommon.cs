@@ -110,7 +110,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
         if (repeat)
         {
             /* Reconstruct extra information. */
-            var info = JsonSerializer.Deserialize<CustomGroupInformation>(status.CustomizerBlob!, JsonUtils.JsonSettings)!;
+            var info = BlockyUtils.Decompress<CustomGroupInformation>(status.CustomizerBlob)!;
 
             /* Re-apply all side effects on the logging. */
             foreach (var modifier in info.Modifiers)
@@ -129,7 +129,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
         info.Modifiers.AddRange(_Modifiers.Skip(info.ModifierIndex));
 
         /* Serialize in group. */
-        status.CustomizerBlob = JsonSerializer.Serialize(info, JsonUtils.JsonSettings);
+        status.CustomizerBlob = BlockyUtils.Compress(info);
 
         return Task.CompletedTask;
     }
