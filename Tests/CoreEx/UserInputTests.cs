@@ -65,7 +65,7 @@ public class UserInputTests : TestEnvironment
             }
         };
 
-        var start = DateTime.Now;
+        var start = DateTime.UtcNow;
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 
@@ -74,7 +74,7 @@ public class UserInputTests : TestEnvironment
         Assert.Multiple(() =>
         {
             Assert.That(input, Is.Null);
-            Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(750));
+            Assert.That((DateTime.UtcNow - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(750));
         });
 
         Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
@@ -93,7 +93,7 @@ public class UserInputTests : TestEnvironment
             }
         };
 
-        var start = DateTime.Now;
+        var start = DateTime.UtcNow;
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 

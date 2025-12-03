@@ -22,7 +22,7 @@ partial class ScriptEngine<TLogType>
                 if (parent == null) script.SetGroups(SerializeGroupStatus(true));
 
                 /* Mark as finished. */
-                if (final) script.ResultForLogging.Finished = DateTime.Now;
+                if (final) script.ResultForLogging.Finished = DateTime.UtcNow;
 
                 var id = await script.WriteToLogAsync();
 
