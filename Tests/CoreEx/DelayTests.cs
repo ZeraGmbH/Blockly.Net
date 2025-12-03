@@ -20,10 +20,10 @@ public class DelayTests : TestEnvironment
         };
 
         /* Run test and see if time advances for at least the given amount. */
-        var start = DateTime.Now;
+        var start = DateTime.UtcNow;
 
         await block.EnterBlockAsync(new Context(Site.Object));
 
-        Assert.That((DateTime.Now - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(490));
+        Assert.That((DateTime.UtcNow - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(490));
     }
 }
