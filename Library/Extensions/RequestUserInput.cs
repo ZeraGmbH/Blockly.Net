@@ -99,9 +99,8 @@ public class RequestUserInput : Block
     var delayTask = Task.Delay(TimeSpan.FromSeconds(secs), cancel.Token);
     var inputTask = context.Engine.GetUserInputAsync<object>(key, type, delay);
 
-    /* User has terminated the task. */
-#pragma warning disable VSTHRD103 // Call async methods when in an async method
-    if (Task.WaitAny(inputTask, delayTask) == 0)
+    /* See which task terminates first. */
+    if (inputTask == await Task.WhenAny(inputTask, delayTask))
     {
       /* Cancel timer. */
       await cancel.CancelAsync();
@@ -109,7 +108,6 @@ public class RequestUserInput : Block
       /* Report result. */
       return await inputTask;
     }
-#pragma warning restore VSTHRD103 // Call async methods when in an async method
 
     /* Simulate user input. */
     context.Engine.Engine.SetUserInput(null);
