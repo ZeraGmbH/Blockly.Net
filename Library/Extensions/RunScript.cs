@@ -15,15 +15,10 @@ namespace BlocklyNet.Extensions;
   "run_script_by_name",
   "Scripts",
   @"{
-      ""message0"": ""RunScript %1 %2 %3 %4 %5 %6 %7"",
+      ""message0"": ""RunScript %1 Display name %2 Id %3 Parameters %4 Do not execute %5"",
       ""args0"": [
           {
             ""type"": ""input_dummy""
-          },
-          {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""NAME"",
-              ""text"": ""Display name""
           },
           {
             ""type"": ""input_value"",
@@ -31,19 +26,14 @@ namespace BlocklyNet.Extensions;
             ""check"": ""String""
           },
           {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""ARGS"",
-              ""text"": ""Parameters""
+            ""type"": ""input_value"",
+            ""name"": ""ID"",
+            ""check"": ""String""
           },
           {
             ""type"": ""input_value"",
             ""name"": ""ARGS"",
             ""check"": [""Array(run_script_parameter)"", ""Array""]
-          },
-          {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""BUILDONLY"",
-              ""text"": ""Do not execute""
           },
           {
             ""type"": ""input_value"",
@@ -59,6 +49,14 @@ namespace BlocklyNet.Extensions;
   @"{
     ""inputs"": {
       ""NAME"": {
+        ""shadow"": {
+          ""type"": ""text"",
+          ""fields"": {
+            ""TEXT"": """"
+          }
+        }
+      },
+      ""ID"": {
         ""shadow"": {
           ""type"": ""text"",
           ""fields"": {
@@ -89,7 +87,12 @@ public class RunScript : Block
     /* Find the script by its name - character casing is ignored. */
     var store = context.ServiceProvider.GetRequiredService<IScriptDefinitionStorage>();
     var byName = await Values.EvaluateAsync<string>("NAME", context);
-    var script = await store.FindAsync(byName) ?? throw new ArgumentException($"script '{byName}' not found");
+    var byId = await Values.EvaluateAsync<string?>("ID", context, false);
+
+    var script =
+      (string.IsNullOrEmpty(byId) ? null : await store.GetAsync(byId))
+      ?? await store.FindAsync(byName)
+      ?? throw new ArgumentException($"script '{byName}' not found");
 
     /* Prepare to run generic script. */
     var config = context.ServiceProvider.GetService<IGenericScriptFactory>()?.Create() ?? new StartGenericScript();
