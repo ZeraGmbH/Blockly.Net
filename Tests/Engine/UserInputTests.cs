@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json;
 using BlocklyNet;
 using BlocklyNet.Core;
@@ -119,5 +120,72 @@ public class UserInputTests : TestEnvironment
 
         Assert.That(result.Result, Is.TypeOf<MyModel>());
         Assert.That(((MyModel)result.Result).Data, Is.EqualTo("Test me!"));
+    }
+
+    [Test]
+    public async Task Can_Provide_A_User_Input_Model_Array_Async()
+    {
+        /* Termination helper. */
+        var done = new TaskCompletionSource();
+
+        ((Sink)GetService<IScriptEngineNotifySink>()).OnEvent = (method, arg) =>
+        {
+            /* See if script is done. */
+            if (method == ScriptEngineNotifyMethods.Done)
+                done.SetResult();
+            else if (method == ScriptEngineNotifyMethods.Error)
+                done.SetResult();
+
+            /* See if user data is requested. */
+            else if (method == ScriptEngineNotifyMethods.InputRequest)
+            {
+                var value1 = new MyModel { Data = "Test me!" };
+                var value2 = new MyModel { Data = "Test me again" };
+
+                var request = (UserInputRequest)arg!;
+                var engine = GetService<IScriptEngine>();
+
+                /* Simulate serialization in real world scenario. */
+                var response = new UserInputResponse
+                {
+                    Key = request.Key,
+                    JobId = request.JobId,
+                    Value = JsonSerializer.Deserialize<object>(JsonSerializer.Serialize(new object[] { value1, 42, value2 }, JsonUtils.JsonSettings), JsonUtils.JsonSettings),
+                    ValueType = $"[]{MyModel.BlocklyName}⊕⊕{MyModel.BlocklyName}"
+                };
+
+                /* We may not do an immediate reply since this will run into a deadlock. */
+                ThreadPool.QueueUserWorkItem((_) => engine.SetUserInput(response));
+            }
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Will request user input", ScriptId = AddScript("SCRIPT", Script1) }, "");
+
+        /* Wait for the script to finish. */
+        await done.Task;
+
+        /* Check the result. */
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+        
+        // Convert JsonElement to array if necessary
+        var resultValue = result.Result;
+        if (resultValue is JsonElement jsonElement)
+        {
+            resultValue = JsonSerializer.Deserialize<object[]>(jsonElement.GetRawText(), JsonUtils.JsonSettings);
+        }
+        
+        var list = ((IEnumerable)resultValue!).Cast<object?>().ToArray();
+
+        Assert.That(list, Has.Length.EqualTo(3));
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(list[0], Is.TypeOf<MyModel>());
+            Assert.That(((MyModel)list[0]!).Data, Is.EqualTo("Test me!"));
+            Assert.That(list[1], Is.TypeOf<double>());
+            Assert.That((double)list[1]!, Is.EqualTo(42));
+            Assert.That(list[2], Is.TypeOf<MyModel>());
+            Assert.That(((MyModel)list[2]!).Data, Is.EqualTo("Test me again"));
+        }
     }
 }

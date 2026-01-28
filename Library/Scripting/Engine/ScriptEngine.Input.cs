@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using BlocklyNet.Extensions.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -111,16 +112,43 @@ partial class ScriptEngine<TLogType>
                 /* object? will be serialized as a JsonElement. */
                 var value = t.Result.Value;
 
-                if (value is JsonElement json)
-                    if (!string.IsNullOrEmpty(t.Result.ValueType) && ServiceProvider.GetRequiredService<IScriptModels>().Models.TryGetValue(t.Result.ValueType, out var model))
-                        /* Reconstruct to known model. */
-                        value = JsonSerializer.Deserialize(value.ToString() ?? "null", model.Type, JsonUtils.JsonSettings);
-                    else
-                        /* Just check for scalar. */
-                        value = json.ToJsonScalar();
+                /* Check for array of values - each with a dedicated type. */
+                if (value is JsonElement array && array.ValueKind == JsonValueKind.Array && t.Result.ValueType?.StartsWith("[]") == true)
+                {
+                    /* Number of elements must match. */
+                    var typeNames = t.Result.ValueType[2..].Split("⊕");
+
+                    if (typeNames.Length == array.GetArrayLength())
+                    {
+                        /* Convert each value. */
+                        var values = new List<object?>();
+
+                        for (var i = 0; i < typeNames.Length; i++)
+                            values.Add(UserInputValueFromJson(array[i], typeNames[i]));
+
+                        /* Blind convert - hopefully caller knows what he is doing. */
+                        return (T?)(object?)values.ToArray();
+                    }
+                }
+
+                /* Fallback mode. */
+                value = UserInputValueFromJson(value, t.Result.ValueType);
 
                 return value == null ? default : (T?)value;
             }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
+    }
+
+    private object? UserInputValueFromJson(object? value, string? type)
+    {
+        /* Not JSON. */
+        if (value is not JsonElement json) return value;
+
+        /* Reconstruct to known model. */
+        if (!string.IsNullOrEmpty(type) && ServiceProvider.GetRequiredService<IScriptModels>().Models.TryGetValue(type, out var model))
+            return JsonSerializer.Deserialize(value?.ToString() ?? "null", model.Type, JsonUtils.JsonSettings);
+
+        /* Just check for scalar. */
+        return json.ToJsonScalar();
     }
 }
