@@ -11,7 +11,7 @@ namespace BlocklyNet.Extensions;
   "request_user_input",
   "Scripts",
   @"{
-      ""message0"": ""AwaitUserInteraction %1 Key %2 Type %3 Auto close after (s) %4 Exception on auto close %5 Required %6"",
+      ""message0"": ""AwaitUserInteraction %1 Key %2 Type %3 Required %4 Auto close after (s) %5 Exception on auto close %6"",
       ""args0"": [
           {
             ""type"": ""input_dummy""
@@ -20,24 +20,24 @@ namespace BlocklyNet.Extensions;
             ""type"": ""input_value"",
             ""name"": ""KEY"",
             ""check"": ""String""
-          },
+          },          
           {
             ""type"": ""input_value"",
             ""name"": ""TYPE""
           },
           {
             ""type"": ""input_value"",
+            ""name"": ""REQUIRED"",
+            ""check"": ""Boolean""
+          },          
+          {
+            ""type"": ""input_value"",
             ""name"": ""DELAY"",
             ""check"": ""Number""
           },
           {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""THROWMESSAGE"",
-              ""text"": ""Exception on auto close""
-          },
-          {
             ""type"": ""input_value"",
-            ""name"": ""REQUIRED"",
+            ""name"": ""THROWMESSAGE"",
             ""check"": ""String""
           }
       ],
