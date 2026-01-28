@@ -418,15 +418,10 @@
       "type": "read_model_property"
     },
     {
-      "message0": "AwaitUserInteraction %1 %2 %3 %4 %5 %6 %7 %8 %9",
+      "message0": "AwaitUserInteraction %1 Key %2 Type %3 Auto close after (s) %4 Exception on auto close %5 Required %6",
       "args0": [
         {
           "type": "input_dummy"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "KEY",
-          "text": "Key"
         },
         {
           "type": "input_value",
@@ -434,18 +429,8 @@
           "check": "String"
         },
         {
-          "type": "field_label_serializable",
-          "name": "TYPE",
-          "text": "Type"
-        },
-        {
           "type": "input_value",
           "name": "TYPE"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "DELAY",
-          "text": "Auto close after (s)"
         },
         {
           "type": "input_value",
@@ -459,7 +444,7 @@
         },
         {
           "type": "input_value",
-          "name": "THROWMESSAGE",
+          "name": "REQUIRED",
           "check": "String"
         }
       ],

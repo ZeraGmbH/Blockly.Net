@@ -122,8 +122,8 @@ partial class ScriptEngine<TLogType>
             => _engine.StartChildAsync<TResult>(request, CurrentScript, options, _depth, _groupManager);
 
         /// <inheritdoc/>
-        public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
-            => _engine.GetUserInputAsync<T>(key, type, delay);
+        public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null, bool? required = null)
+            => _engine.GetUserInputAsync<T>(key, type, delay, required);
 
         /// <inheritdoc/>
         public void ReportProgress(object info, double? progress, string? name, bool? addEstimation)

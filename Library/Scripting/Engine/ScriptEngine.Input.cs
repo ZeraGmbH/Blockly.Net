@@ -66,7 +66,7 @@ partial class ScriptEngine<TLogType>
     }
 
     /// <inheritdoc/>
-    public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null)
+    public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null, bool? required = null)
     {
         using (Lock.Wait())
         {
@@ -87,6 +87,7 @@ partial class ScriptEngine<TLogType>
                 {
                     JobId = _active.JobId,
                     Key = key,
+                    Required = required,
                     SecondsToAutoClose = _inputDelay,
                     StartedAt = _inputStarted,
                     ValueType = type,

@@ -27,6 +27,12 @@ public class UserInputRequestBase
     /// report something without requesting a value.
     /// </summary>
     public string? ValueType { get; set; }
+
+    /// <summary>
+    /// If set the script the frontend is advised to 
+    /// require some input.
+    /// </summary>
+    public bool? Required { get; set; }
 }
 
 /// <summary>
