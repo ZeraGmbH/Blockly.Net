@@ -56,14 +56,6 @@ namespace BlocklyNet.Extensions;
           }
         }
       },
-      ""ID"": {
-        ""shadow"": {
-          ""type"": ""text"",
-          ""fields"": {
-            ""TEXT"": """"
-          }
-        }
-      },
       ""BUILDONLY"": {
         ""shadow"": {
           ""type"": ""logic_boolean"",
