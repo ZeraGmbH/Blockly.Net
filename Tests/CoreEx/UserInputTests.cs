@@ -13,7 +13,7 @@ public class UserInputTests : TestEnvironment
     {
         if (delay == null)
         {
-            site.Setup(s => s.GetUserInputAsync<T>("the.key", "string", It.IsAny<double?>())).ReturnsAsync((T?)value);
+            site.Setup(s => s.GetUserInputAsync<T>("the.key", "string", It.IsAny<double?>(), It.IsAny<bool?>())).ReturnsAsync((T?)value);
 
             return;
         }
@@ -26,7 +26,7 @@ public class UserInputTests : TestEnvironment
         site.SetupGet(s => s.Engine).Returns(engine.Object);
 
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-        site.Setup(s => s.GetUserInputAsync<T>("the.key", "string", It.IsAny<double?>())).Returns(() => task.Task);
+        site.Setup(s => s.GetUserInputAsync<T>("the.key", "string", It.IsAny<double?>(), It.IsAny<bool?>())).Returns(() => task.Task);
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
     }
 
@@ -50,7 +50,7 @@ public class UserInputTests : TestEnvironment
 
         Assert.That(input, Is.EqualTo(42));
 
-        Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
+        Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>(), It.IsAny<bool?>()), Times.Once);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class UserInputTests : TestEnvironment
             Assert.That((DateTime.UtcNow - start).TotalMilliseconds, Is.GreaterThanOrEqualTo(750));
         });
 
-        Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>()), Times.Once);
+        Site.Verify(e => e.GetUserInputAsync<object?>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<double?>(), It.IsAny<bool?>()), Times.Once);
     }
 
     [Test]

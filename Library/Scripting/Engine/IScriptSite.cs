@@ -62,10 +62,11 @@ public interface IScriptSite
     /// <param name="key"></param>
     /// <param name="type"></param>
     /// <param name="delay"></param>
+    /// <param name="required"></param>
     /// <typeparam name="T">Expected type of the response.</typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null);
+    Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null, bool? required = false);
 
     /// <summary>
     /// Call just before a block is executed.

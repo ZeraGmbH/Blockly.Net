@@ -11,15 +11,10 @@ namespace BlocklyNet.Extensions;
   "request_user_input",
   "Scripts",
   @"{
-      ""message0"": ""AwaitUserInteraction %1 %2 %3 %4 %5 %6 %7 %8 %9"",
+      ""message0"": ""AwaitUserInteraction %1 Key %2 Type %3 Auto close after (s) %4 Exception on auto close %5 Required %6"",
       ""args0"": [
           {
             ""type"": ""input_dummy""
-          },
-          {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""KEY"",
-              ""text"": ""Key""
           },
           {
             ""type"": ""input_value"",
@@ -27,18 +22,8 @@ namespace BlocklyNet.Extensions;
             ""check"": ""String""
           },
           {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""TYPE"",
-              ""text"": ""Type""
-          },
-          {
             ""type"": ""input_value"",
             ""name"": ""TYPE""
-          },
-          {
-              ""type"": ""field_label_serializable"",
-              ""name"": ""DELAY"",
-              ""text"": ""Auto close after (s)""
           },
           {
             ""type"": ""input_value"",
@@ -52,7 +37,7 @@ namespace BlocklyNet.Extensions;
           },
           {
             ""type"": ""input_value"",
-            ""name"": ""THROWMESSAGE"",
+            ""name"": ""REQUIRED"",
             ""check"": ""String""
           }
       ],
@@ -87,17 +72,18 @@ public class RequestUserInput : Block
   /// <inheritdoc/>
   protected override async Task<object?> EvaluateAsync(Context context)
   {
-    var key = await Values.EvaluateAsync<string>("KEY", context);
-    var type = await Values.EvaluateAsync<string>("TYPE", context, false);
     var delay = await Values.EvaluateAsync<double?>("DELAY", context, false);
+    var key = await Values.EvaluateAsync<string>("KEY", context);
+    var required = await Values.EvaluateAsync<bool?>("REQUIRED", context, false);
     var secs = delay.GetValueOrDefault(0);
+    var type = await Values.EvaluateAsync<string>("TYPE", context, false);
 
     /* No delay necessary - just wait for the reply to be available. */
-    if (secs <= 0) return await context.Engine.GetUserInputAsync<object>(key, type);
+    if (secs <= 0) return await context.Engine.GetUserInputAsync<object>(key, type, required: required);
 
     var cancel = new CancellationTokenSource();
     var delayTask = Task.Delay(TimeSpan.FromSeconds(secs), cancel.Token);
-    var inputTask = context.Engine.GetUserInputAsync<object>(key, type, delay);
+    var inputTask = context.Engine.GetUserInputAsync<object>(key, type, delay, required);
 
     /* See which task terminates first. */
     if (inputTask == await Task.WhenAny(inputTask, delayTask))
