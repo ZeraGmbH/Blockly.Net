@@ -527,7 +527,7 @@
       "type": "run_script_by_name"
     },
     {
-      "message0": "SetProgress %1 Name of the progress %2 Progress (%%) %3 Extra data %4 Type of extra data %5 Add Time Estimation %6",
+      "message0": "SetProgress %1 Name of the progress %2 Progress (%%) %3 Extra data %4 Type of extra data %5 Add Time Estimation %6 Do not visualize %7",
       "args0": [
         {
           "type": "input_dummy"
@@ -554,6 +554,11 @@
         {
           "type": "input_value",
           "name": "ADDESTIMATION",
+          "check": "Boolean"
+        },
+        {
+          "type": "input_value",
+          "name": "NOVISUALIZATION",
           "check": "Boolean"
         }
       ],
@@ -1228,6 +1233,14 @@
                   }
                 },
                 "ADDESTIMATION": {
+                  "shadow": {
+                    "type": "logic_boolean",
+                    "fields": {
+                      "BOOL": "FALSE"
+                    }
+                  }
+                },
+                "NOVISUALIZATION": {
                   "shadow": {
                     "type": "logic_boolean",
                     "fields": {
