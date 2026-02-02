@@ -45,13 +45,14 @@ public class ProgressManager
     /// <param name="progress">Progress value between 0 and 1.</param>
     /// <param name="name">Optional name of the progress.</param>
     /// <param name="addEstimation">Set to add time to finish estimation - if possible.</param>
-    public void Update(object info, double? progress, string? name, bool? addEstimation)
+    /// <param name="noVisualisation">Set to hide progress from beeing shown.</param>
+    public void Update(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
     {
         // This is the very first.
         if (Latest == null) _startProgress = null;
 
         // Update as requested.
-        Latest = new() { Progress = progress ?? 0, Name = name, Info = info };
+        Latest = new() { Progress = progress ?? 0, Name = name, Info = info, NoVisualisation = noVisualisation };
 
         // Can not estimate at all.
         if (Latest.Progress < 0 || Latest.Progress > 1) return;

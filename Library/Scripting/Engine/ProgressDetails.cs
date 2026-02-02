@@ -25,4 +25,9 @@ public class ProgressDetails
     /// get to a progress of 1 - in seconds.
     /// </summary>
     public double? EstimatedRemainingSeconds { get; set; }
+
+    /// <summary>
+    /// Set to hide this progress from the frontend.
+    /// </summary>
+    public bool? NoVisualisation { get; set; }
 }

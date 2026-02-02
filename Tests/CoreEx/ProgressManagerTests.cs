@@ -17,7 +17,7 @@ public class ProgressManagerTests
 
         Assert.That(progress.Latest, Is.Null);
 
-        progress.Update(false, initial, null, true);
+        progress.Update(false, initial, null, true, null);
 
         Assert.That(progress.Latest, Is.Not.Null);
 
@@ -29,7 +29,7 @@ public class ProgressManagerTests
 
         now = now.AddSeconds(3);
 
-        progress.Update(false, next, null, true);
+        progress.Update(false, next, null, true, null);
 
         Assert.That(progress.Latest, Is.Not.Null);
 
