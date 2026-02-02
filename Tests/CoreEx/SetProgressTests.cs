@@ -26,8 +26,8 @@ public class SetProgressTests : TestEnvironment
         GenericProgress? progress = null;
 
         Site
-            .Setup(e => e.ReportProgress(It.IsAny<object>(), 0.299d, "ZERA", true))
-            .Callback((object? p, double? rel, string? name, bool? add) => progress = (GenericProgress)p!);
+            .Setup(e => e.ReportProgress(It.IsAny<object>(), 0.299d, "ZERA", true, false))
+            .Callback((object? p, double? rel, string? name, bool? add, bool? invisible) => progress = (GenericProgress)p!);
 
         await block.EnterBlockAsync(new Context(Site.Object));
 

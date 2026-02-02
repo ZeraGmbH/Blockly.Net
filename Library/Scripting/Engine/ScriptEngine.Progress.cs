@@ -15,9 +15,9 @@ partial class ScriptEngine<TLogType>
     private readonly ProgressManager _progress = new();
 
     /// <inheritdoc/>
-    public void ReportProgress(object info, double? progress, string? name, bool? addEstimation)
+    public void ReportProgress(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
     {
-        _progress.Update(info, progress, name, addEstimation);
+        _progress.Update(info, progress, name, addEstimation, noVisualisation);
 
         ReportProgress(info, 0);
     }

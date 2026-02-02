@@ -37,7 +37,8 @@ public interface IScriptSite
     /// <param name="progress">Progress as a number between 0 and 1.</param>
     /// <param name="name">Optional display name of the progress.</param>
     /// <param name="addEstimation">If set add time to end estimtation if possible.</param>
-    void ReportProgress(object info, double? progress, string? name, bool? addEstimation);
+    /// <param name="noVisualisation">If set frontend should not display this progress.</param>
+    void ReportProgress(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation);
 
     /// <summary>
     ///  Execute Blockly XML Script and report variables.

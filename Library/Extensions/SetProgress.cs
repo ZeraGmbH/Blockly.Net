@@ -105,12 +105,10 @@ public class SetProgress : Block
         var script = context.Engine.MainScript as IGenericScript;
         var progress = await Values.EvaluateAsync<double>("PROGRESS", context);
         var name = await Values.EvaluateAsync<string?>("NAME", context, false);
-        var invisible = await Values.EvaluateAsync<bool?>("NOVISUALIZATION", context, false);
 
         context.Engine.ReportProgress(
             new GenericProgress
             {
-                NoVisualisation = invisible,
                 Payload = await Values.EvaluateAsync("PAYLOAD", context, false),
                 PayloadType = await Values.EvaluateAsync<string>("PAYLOADTYPE", context, false),
                 Percentage = progress,
@@ -118,7 +116,8 @@ public class SetProgress : Block
             },
             progress / 100d,
             name,
-            await Values.EvaluateAsync<bool?>("ADDESTIMATION", context, false) == true
+            await Values.EvaluateAsync<bool?>("ADDESTIMATION", context, false) == true,
+            await Values.EvaluateAsync<bool?>("NOVISUALIZATION", context, false) == true
         );
 
         return await base.EvaluateAsync(context);

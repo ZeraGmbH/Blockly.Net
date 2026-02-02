@@ -29,9 +29,4 @@ public class GenericProgress
     /// </summary>
     [Required, NotNull]
     public string? ScriptId { get; set; }
-
-    /// <summary>
-    /// Set to hide this progress from the frontend.
-    /// </summary>
-    public bool? NoVisualisation { get; set; }
 }

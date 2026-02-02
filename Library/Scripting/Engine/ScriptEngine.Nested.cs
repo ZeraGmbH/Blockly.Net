@@ -126,10 +126,10 @@ partial class ScriptEngine<TLogType>
             => _engine.GetUserInputAsync<T>(key, type, delay, required);
 
         /// <inheritdoc/>
-        public void ReportProgress(object info, double? progress, string? name, bool? addEstimation)
+        public void ReportProgress(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
         {
             /* Remember and propagate. */
-            _progress.Update(info, progress, name, addEstimation);
+            _progress.Update(info, progress, name, addEstimation, noVisualisation);
 
             _engine.ReportProgress(info, _depth);
         }
