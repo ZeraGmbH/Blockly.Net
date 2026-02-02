@@ -11,7 +11,7 @@ namespace BlocklyNet.Extensions;
     "set_progress",
     "",
     @"{
-        ""message0"": ""SetProgress %1 Name of the progress %2 Progress (%%) %3 Extra data %4 Type of extra data %5 Add Time Estimation %6"",
+        ""message0"": ""SetProgress %1 Name of the progress %2 Progress (%%) %3 Extra data %4 Type of extra data %5 Add Time Estimation %6 Do not visualize %7"",
         ""args0"": [
             {
                 ""type"": ""input_dummy""
@@ -38,6 +38,11 @@ namespace BlocklyNet.Extensions;
             {
                 ""type"": ""input_value"",
                 ""name"": ""ADDESTIMATION"",
+                ""check"": ""Boolean""
+            },
+            {
+                ""type"": ""input_value"",
+                ""name"": ""NOVISUALIZATION"",
                 ""check"": ""Boolean""
             }
         ],
@@ -80,6 +85,14 @@ namespace BlocklyNet.Extensions;
                     ""BOOL"": ""FALSE""
                 }
                 }
+            },
+            ""NOVISUALIZATION"": {
+                ""shadow"": {
+                ""type"": ""logic_boolean"",
+                ""fields"": {
+                    ""BOOL"": ""FALSE""
+                }
+                }
             }
         }
     }"
@@ -92,14 +105,16 @@ public class SetProgress : Block
         var script = context.Engine.MainScript as IGenericScript;
         var progress = await Values.EvaluateAsync<double>("PROGRESS", context);
         var name = await Values.EvaluateAsync<string?>("NAME", context, false);
+        var invisible = await Values.EvaluateAsync<bool?>("NOVISUALIZATION", context, false);
 
         context.Engine.ReportProgress(
             new GenericProgress
             {
+                NoVisualisation = invisible,
                 Payload = await Values.EvaluateAsync("PAYLOAD", context, false),
                 PayloadType = await Values.EvaluateAsync<string>("PAYLOADTYPE", context, false),
                 Percentage = progress,
-                ScriptId = script?.Request.ScriptId
+                ScriptId = script?.Request.ScriptId,
             },
             progress / 100d,
             name,
