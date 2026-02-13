@@ -1,6 +1,5 @@
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Logging;
-using System.Text.Json;
 
 namespace BlocklyNet.Scripting;
 
@@ -104,18 +103,20 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// </summary>
     private readonly Stack<CustomGroupInformation> _ActiveGroups = [];
 
+    /// <summary>
+    /// Decode list of modifiers on this script.
+    /// </summary>
+    /// <param name="status">Some status information.</param>
+    /// <returns>List of modifiers.</returns>
+    protected IEnumerable<TModifierType> GetModifiers(GroupStatus status)
+        => BlockyUtils.Decompress<CustomGroupInformation>(status.CustomizerBlob)?.Modifiers ?? Enumerable.Empty<TModifierType>();
+
     /// <inheritdoc/>
     public override async Task BeginGroupExecutionAsync(GroupStatus status, bool repeat)
     {
         if (repeat)
-        {
-            /* Reconstruct extra information. */
-            var info = BlockyUtils.Decompress<CustomGroupInformation>(status.CustomizerBlob)!;
-
-            /* Re-apply all side effects on the logging. */
-            foreach (var modifier in info.Modifiers)
+            foreach (var modifier in GetModifiers(status))
                 await modifier.ApplyAsync(this, false);
-        }
         else
             _ActiveGroups.Push(new() { ModifierIndex = _Modifiers.Count });
     }
