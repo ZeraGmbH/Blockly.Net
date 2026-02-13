@@ -108,7 +108,7 @@ public abstract class Script<TOption, TLogType, TModifierType> : Script, IScript
     /// </summary>
     /// <param name="status">Some status information.</param>
     /// <returns>List of modifiers.</returns>
-    protected IEnumerable<TModifierType> GetModifiers(GroupStatus status)
+    protected IEnumerable<TModifierType> GetModifiers<TChild>(GroupStatus<TChild> status) where TChild : GroupStatus<TChild>
         => BlockyUtils.Decompress<CustomGroupInformation>(status.CustomizerBlob)?.Modifiers ?? Enumerable.Empty<TModifierType>();
 
     /// <inheritdoc/>
