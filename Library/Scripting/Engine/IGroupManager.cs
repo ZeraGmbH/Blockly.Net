@@ -58,6 +58,11 @@ public interface IGroupManager : ISiteGroupManager
     /// </summary>
     /// <returns>List of results if any are present.</returns>
     List<object?>? CreateFlatResults();
+
+    /// <summary>
+    /// Report the current repeat information kept in this group.
+    /// </summary>
+    List<GroupRepeat> RepeatInformation { get; }
 }
 
 /// <summary>

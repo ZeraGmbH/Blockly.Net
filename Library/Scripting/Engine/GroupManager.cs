@@ -84,6 +84,9 @@ public class GroupManager : IGroupManager
     private Previous? _previous;
 
     /// <inheritdoc/>
+    public List<GroupRepeat> RepeatInformation => JsonSerializer.Deserialize<List<GroupRepeat>>(JsonSerializer.Serialize(_previous?.Groups ?? [], JsonUtils.JsonSettings), JsonUtils.JsonSettings)!;
+
+    /// <inheritdoc/>
     public void Reset(IEnumerable<GroupRepeat>? previous)
     {
         lock (_groups)
