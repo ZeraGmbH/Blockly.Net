@@ -65,6 +65,42 @@ partial class ScriptEngine<TLogType>
         inputResponse.SetResult(response);
     }
 
+    /// <summary>
+    /// Decode user input from raw value and value type.
+    /// </summary>
+    /// <param name="value">Some value - may be null.</param>
+    /// <param name="valueType">Type of the value - can be null.</param>
+    /// <param name="services">Dependency injection to use.</param>
+    /// <typeparam name="T">Expected type of the result.</typeparam>
+    /// <returns>Decoded value accoring to type or value itself if
+    /// decoding is not possible.</returns>
+    public static T? DecodeUserInput<T>(object? value, string? valueType, IServiceProvider services)
+    {
+        /* Check for array of values - each with a dedicated type. */
+        if (value is JsonElement array && array.ValueKind == JsonValueKind.Array && valueType?.StartsWith("[]") == true)
+        {
+            /* Number of elements must match. */
+            var typeNames = valueType[2..].Split("⊕");
+
+            if (typeNames.Length == array.GetArrayLength())
+            {
+                /* Convert each value. */
+                var values = new List<object?>();
+
+                for (var i = 0; i < typeNames.Length; i++)
+                    values.Add(UserInputValueFromJson(array[i], typeNames[i], services));
+
+                /* Blind convert - hopefully caller knows what he is doing. */
+                return (T?)(object?)values.ToArray();
+            }
+        }
+
+        /* Fallback mode. */
+        value = UserInputValueFromJson(value, valueType, services);
+
+        return value == null ? default : (T?)value;
+    }
+
     /// <inheritdoc/>
     public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null, bool? required = null)
     {
@@ -87,7 +123,6 @@ partial class ScriptEngine<TLogType>
                 {
                     JobId = _active.JobId,
                     Key = key,
-                    Required = required,
                     SecondsToAutoClose = _inputDelay,
                     StartedAt = _inputStarted,
                     ValueType = type,
@@ -106,45 +141,24 @@ partial class ScriptEngine<TLogType>
             /* Report a promise on the result. */
             Logger.LogTrace("Script {JobId} is requesting input for {Key}.", _active.JobId, key);
 
-            return _inputResponse.Task.ContinueWith(t =>
-            {
-                /* object? will be serialized as a JsonElement. */
-                var value = t.Result.Value;
-
-                /* Check for array of values - each with a dedicated type. */
-                if (value is JsonElement array && array.ValueKind == JsonValueKind.Array && t.Result.ValueType?.StartsWith("[]") == true)
-                {
-                    /* Number of elements must match. */
-                    var typeNames = t.Result.ValueType[2..].Split("⊕");
-
-                    if (typeNames.Length == array.GetArrayLength())
-                    {
-                        /* Convert each value. */
-                        var values = new List<object?>();
-
-                        for (var i = 0; i < typeNames.Length; i++)
-                            values.Add(UserInputValueFromJson(array[i], typeNames[i]));
-
-                        /* Blind convert - hopefully caller knows what he is doing. */
-                        return (T?)(object?)values.ToArray();
-                    }
-                }
-
-                /* Fallback mode. */
-                value = UserInputValueFromJson(value, t.Result.ValueType);
-
-                return value == null ? default : (T?)value;
-            }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+            return _inputResponse
+                .Task
+                .ContinueWith(
+                    t => DecodeUserInput<T>(t.Result.Value, t.Result.ValueType, ServiceProvider),
+                    CancellationToken.None,
+                    TaskContinuationOptions.OnlyOnRanToCompletion,
+                    TaskScheduler.Current
+                );
         }
     }
 
-    private object? UserInputValueFromJson(object? value, string? type)
+    private static object? UserInputValueFromJson(object? value, string? type, IServiceProvider services)
     {
         /* Not JSON. */
         if (value is not JsonElement json) return value;
 
         /* Reconstruct to known model. */
-        if (!string.IsNullOrEmpty(type) && ServiceProvider.GetRequiredService<IScriptModels>().Models.TryGetValue(type, out var model))
+        if (!string.IsNullOrEmpty(type) && services.GetRequiredService<IScriptModels>().Models.TryGetValue(type, out var model))
             return JsonSerializer.Deserialize(value?.ToString() ?? "null", model.Type, JsonUtils.JsonSettings);
 
         /* Just check for scalar. */
