@@ -56,8 +56,9 @@ public static class BlocklyExtensions
         /// </summary>
         /// <param name="registerAs">Set if this block should be handled like a model.</param>
         /// <param name="category">Toolbox category to use.</param>
+        /// <param name="name">Optional display name of the block.</param>
         /// <typeparam name="TBlock">Type of the block.</typeparam>
-        public void AddBlock<TBlock>(Type? registerAs = null, string? category = null) where TBlock : Block, new()
+        public void AddBlock<TBlock>(Type? registerAs = null, string? category = null, string? name = null) where TBlock : Block, new()
         {
             /* Attribute indicator is required. */
             var blockAttribute = typeof(TBlock).GetCustomAttributes<CustomBlockAttribute>().Single();
@@ -89,7 +90,7 @@ public static class BlocklyExtensions
 
             toolbox["_hidden"] = blockAttribute.Hidden;
             toolbox["_kind"] = registerAs != null ? "model" : "block";
-            toolbox["_name"] = part0;
+            toolbox["_name"] = name ?? part0;
             toolbox["kind"] = "block";
             toolbox["type"] = key;
 
