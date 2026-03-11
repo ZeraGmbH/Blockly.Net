@@ -90,7 +90,7 @@ public static class BlocklyExtensions
 
             toolbox["_hidden"] = blockAttribute.Hidden;
             toolbox["_kind"] = registerAs != null ? "model" : "block";
-            toolbox["_name"] = name ?? part0;
+            toolbox["_name"] = part0;
             toolbox["kind"] = "block";
             toolbox["type"] = key;
 
@@ -105,7 +105,7 @@ public static class BlocklyExtensions
             if (registerAs.IsValueType) _models.Add(typeof(Nullable<>).MakeGenericType(registerAs), key);
 
             /* Register. */
-            models.SetModel(registerAs, key, part0 ?? key, category);
+            models.SetModel(registerAs, key, name ?? part0 ?? key, category);
         }
 
         /// <summary>
