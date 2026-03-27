@@ -76,6 +76,9 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
             if (param.Required == true && preset == null)
                 throw new ArgumentException($"Required parameter {param.Name} not set.");
 
+            /* Apply default value - please remark that required will be checked first. */
+            preset ??= param.DefaultValue?.Value;
+
             /* See if conversion is possible. */
             if (preset is string enumString)
             {
