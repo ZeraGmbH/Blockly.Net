@@ -109,16 +109,19 @@ public abstract class TestEnvironment
         protected override Task<object?> EvaluateAsync(Context context) => Task.FromResult(_value);
     }
 
-    protected class Parameter(string name, string type, bool? required = null) : IScriptParameter
+    protected class Parameter(string name, string type, bool? required = null, ScriptParameterDefaultValue? defaultValue = null) : IScriptParameter
     {
         /// <inheritdoc/>
-        public string Type => type;
+        public string Type { get; } = type;
 
         /// <inheritdoc/>
-        public string Name => name;
+        public string Name { get; } = name;
 
         /// <inheritdoc/>
-        public bool? Required => required;
+        public bool? Required { get; } = required;
+
+        /// <inheritdoc/>
+        public ScriptParameterDefaultValue? DefaultValue { get; } = defaultValue;
     }
 
     /// <summary>

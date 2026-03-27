@@ -20,4 +20,9 @@ public interface IScriptParameter
     /// Set to indicate that the parameter is required.
     /// </summary>
     public bool? Required { get; }
+
+    /// <summary>
+    /// Optional default value of the parameter.
+    /// </summary>
+    public ScriptParameterDefaultValue? DefaultValue { get; }
 }
