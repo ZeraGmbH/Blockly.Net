@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting.Definition;
 using BlocklyNet.Scripting.Engine;
@@ -77,7 +78,8 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
                 throw new ArgumentException($"Required parameter {param.Name} not set.");
 
             /* Apply default value - please remark that required will be checked first. */
-            preset ??= param.DefaultValue?.Value;
+            if (preset == null && !string.IsNullOrEmpty(param.DefaultValue?.JsonValue))
+                preset = JsonSerializer.Deserialize<object?>(param.DefaultValue.JsonValue, JsonUtils.JsonSettings);
 
             /* See if conversion is possible. */
             if (preset is string enumString)
