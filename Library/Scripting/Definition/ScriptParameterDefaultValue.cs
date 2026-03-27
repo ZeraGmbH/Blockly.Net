@@ -6,10 +6,10 @@ namespace BlocklyNet.Scripting.Definition;
 public class ScriptParameterDefaultValue
 {
     /// <summary>
-    /// The value to use when no actual parameter is given.
+    /// The value to use when no actual parameter is given
+    /// serialized as a JSON String.
     /// </summary>
-    /// <value></value>
-    public object? Value { get; set; }
+    public string? JsonValue { get; set; }
 
     /// <summary>
     /// Placeholder value - ToString() of value will be used
