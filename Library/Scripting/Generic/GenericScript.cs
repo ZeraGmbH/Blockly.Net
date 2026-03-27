@@ -81,6 +81,7 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
             if (preset == null && !string.IsNullOrEmpty(param.DefaultValue?.JsonValue))
                 preset = JsonSerializer.Deserialize<object?>(param.DefaultValue.JsonValue, JsonUtils.JsonSettings);
 
+
             /* See if conversion is possible. */
             if (preset is string enumString)
             {
@@ -103,14 +104,12 @@ public class GenericScript<TLogType, TModifierType>(StartGenericScript request, 
                     /* Do convert if we get raw json. */
                     presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), scalarType.MakeArrayType(), JsonUtils.JsonSettings);
                 }
-                else
-                {
-                    /* Check for converter. */
-                    if (!models.Models.TryGetValue(param.Type, out var modelInfo)) continue;
-
-                    /* Do convert if we get raw json. */
+                /* Check for converter. */
+                else if (models.Models.TryGetValue(param.Type, out var modelInfo))
                     presets[param.Name] = JsonSerializer.Deserialize(json.ToString(), modelInfo.Type, JsonUtils.JsonSettings);
-                }
+                /* Check for elementary type. */
+                else
+                    presets[param.Name] = json.ToJsonScalar();
         }
 
         /* Create log entry. */
