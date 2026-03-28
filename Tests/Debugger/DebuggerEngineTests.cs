@@ -1,0 +1,201 @@
+using BlocklyNet.Scripting.Debugger;
+using BlocklyNet.Scripting.Engine;
+using BlocklyNet.Scripting.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+
+namespace BlocklyNetTests.Debugger;
+
+[TestFixture]
+public class DebuggerEngineTests : TestEnvironment
+{
+    private class DebuggerSink : ScriptDebugger, IScriptEngineNotifySink
+    {
+        private readonly TaskCompletionSource _done = new();
+
+        public Task DoneTask => _done.Task;
+
+        public Task SendAsync(ScriptEngineNotifyMethods method, object? arg1)
+        {
+            if (method == ScriptEngineNotifyMethods.Done || method == ScriptEngineNotifyMethods.Error)
+                _done.SetResult();
+
+            return Task.CompletedTask;
+        }
+
+        public Action<ScriptDebugContext, IScriptBreakpoint>? OnHit;
+
+        public Action<ScriptDebugContext>? OnStep;
+
+        public Action<ScriptDebugContext>? OnStart;
+
+        protected override Task OnBreakpointHitAsync(IScriptBreakpoint bp)
+        {
+            OnHit?.Invoke(Context, bp);
+
+            return base.OnBreakpointHitAsync(bp);
+        }
+
+        protected override Task OnSingleStepAsync()
+        {
+            OnStep?.Invoke(Context);
+
+            return base.OnSingleStepAsync();
+        }
+
+        protected override Task OnFirstBlockAsync()
+        {
+            OnStart?.Invoke(Context);
+
+            return base.OnFirstBlockAsync();
+        }
+    }
+
+    private DebuggerSink Debugger = null!;
+
+    protected override void OnSetup(IServiceCollection services)
+    {
+        base.OnSetup(services);
+
+        services.AddSingleton<IScriptEngineNotifySink, DebuggerSink>();
+    }
+
+    protected override void OnStartup()
+    {
+        Debugger = (DebuggerSink)GetService<IScriptEngineNotifySink>();
+
+        ((IScriptSite)Engine).SetDebugger(Debugger);
+
+        base.OnStartup();
+    }
+
+    [Test]
+    public async Task Can_Run_Without_Debugger()
+    {
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = AddScript("SCRIPT", SampleScripts.DebugScript1) }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+    }
+
+    [TestCase(null)]
+    [TestCase(10)]
+    public async Task Can_Break_On_Block_And_Continue_Debugger(int? stopAt)
+    {
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
+
+        Debugger.Breakpoints.Add(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
+
+        var hits = 0;
+
+        Debugger.OnHit = (context, bp) =>
+        {
+            if (++hits == stopAt) Debugger.Breakpoints.Remove(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+        Assert.That(hits, Is.EqualTo(stopAt ?? 1000));
+    }
+
+    [TestCase(null)]
+    [TestCase(3000)]
+    public async Task Can_Single_Step_Debugger(int? stopAt)
+    {
+        Debugger.SingleStep = true;
+
+        var hits = 0;
+
+        Debugger.OnStep = (context) =>
+        {
+            if (++hits == stopAt) Debugger.SingleStep = false;
+        };
+
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+        Assert.That(hits, Is.EqualTo(stopAt ?? 4006));
+    }
+
+    [Test]
+    public async Task Can_Stop_On_Start()
+    {
+        Debugger.StopOnStart = true;
+
+        var hitFirst = false;
+
+        Debugger.OnStart = (context) =>
+        {
+            Assert.That(context.Block.Id, Is.EqualTo("~-@g:c_wcw/=l7I4Z$X9"));
+
+            hitFirst = true;
+        };
+
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+        Assert.That(hitFirst, Is.True);
+    }
+
+    [TestCase(300)]
+    public async Task Can_Inspect_Variables_Debugger(int testAt)
+    {
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
+
+        Debugger.Breakpoints.Add(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
+
+        var hits = 0;
+
+        Debugger.OnHit = (context, bp) =>
+        {
+            if (++hits != testAt) return;
+
+            Debugger.Breakpoints.Remove(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
+
+            var variables = context.GetVariables();
+
+            Assert.That(variables, Has.Count.EqualTo(1));
+
+            var scope = variables[0];
+
+            Assert.That(scope, Has.Count.EqualTo(2));
+
+            var iVar = scope.Single(v => v.Name == "i");
+            var rVar = scope.Single(v => v.Name == "result");
+
+            Assert.That(iVar.Type, Is.Null);
+            Assert.That(context.Context.Variables[iVar.Name], Is.EqualTo(300));
+            Assert.That(rVar.Type, Is.Null);
+            Assert.That(context.Context.Variables[rVar.Name], Is.EqualTo(44850));
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+        Assert.That(hits, Is.EqualTo(testAt));
+    }
+}
