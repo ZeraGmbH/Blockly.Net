@@ -11,6 +11,8 @@ public class DebuggerEngineTests : TestEnvironment
 {
     private class DebuggerSink : ScriptDebugger, IScriptEngineNotifySink
     {
+        public readonly List<ScriptDebugContext> Breaks = [];
+
         private readonly TaskCompletionSource _done = new();
 
         public Task DoneTask => _done.Task;
@@ -29,8 +31,12 @@ public class DebuggerEngineTests : TestEnvironment
 
         public Action<ScriptDebugContext>? OnStart;
 
+        public Action<ScriptDebugContext>? OnVolatile;
+
         protected override Task OnBreakpointHitAsync(IScriptBreakpoint bp)
         {
+            Breaks.Add(Context);
+
             OnHit?.Invoke(Context, bp);
 
             return base.OnBreakpointHitAsync(bp);
@@ -38,6 +44,8 @@ public class DebuggerEngineTests : TestEnvironment
 
         protected override Task OnSingleStepAsync()
         {
+            Breaks.Add(Context);
+
             OnStep?.Invoke(Context);
 
             return base.OnSingleStepAsync();
@@ -45,9 +53,20 @@ public class DebuggerEngineTests : TestEnvironment
 
         protected override Task OnFirstBlockAsync()
         {
+            Breaks.Add(Context);
+
             OnStart?.Invoke(Context);
 
             return base.OnFirstBlockAsync();
+        }
+
+        protected override Task OnVolatileStopAsync()
+        {
+            Breaks.Add(Context);
+
+            OnVolatile?.Invoke(Context);
+
+            return base.OnVolatileStopAsync();
         }
     }
 
@@ -70,7 +89,7 @@ public class DebuggerEngineTests : TestEnvironment
     }
 
     [Test]
-    public async Task Can_Run_Without_Debugger()
+    public async Task Can_Run_Without_Debugger_Async()
     {
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = AddScript("SCRIPT", SampleScripts.DebugScript1) }, "");
 
@@ -83,7 +102,7 @@ public class DebuggerEngineTests : TestEnvironment
 
     [TestCase(null)]
     [TestCase(10)]
-    public async Task Can_Break_On_Block_And_Continue_Debugger(int? stopAt)
+    public async Task Can_Break_On_Block_And_Continue_Debugger_Async(int? stopAt)
     {
         var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
 
@@ -108,7 +127,7 @@ public class DebuggerEngineTests : TestEnvironment
 
     [TestCase(null)]
     [TestCase(3000)]
-    public async Task Can_Single_Step_Debugger(int? stopAt)
+    public async Task Can_Single_Step_Debugger_Async(int? stopAt)
     {
         Debugger.SingleStep = true;
 
@@ -132,7 +151,7 @@ public class DebuggerEngineTests : TestEnvironment
     }
 
     [Test]
-    public async Task Can_Stop_On_Start()
+    public async Task Can_Stop_On_Start_Async()
     {
         Debugger.StopOnStart = true;
 
@@ -158,7 +177,7 @@ public class DebuggerEngineTests : TestEnvironment
     }
 
     [TestCase(300)]
-    public async Task Can_Inspect_Variables_Debugger(int testAt)
+    public async Task Can_Inspect_Variables_Debugger_Async(int testAt)
     {
         var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
 
@@ -197,5 +216,34 @@ public class DebuggerEngineTests : TestEnvironment
 
         Assert.That(result.Result, Is.EqualTo(500500));
         Assert.That(hits, Is.EqualTo(testAt));
+    }
+
+    [Test]
+    public async Task Can_Stop_On_Volative_Async()
+    {
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
+
+        Debugger.Breakpoints.Add(scriptId, "~-@g:c_wcw/=l7I4Z$X9");
+
+        Debugger.OnHit = (context, bp) =>
+        {
+            Assert.That(context.Block.Id, Is.EqualTo("~-@g:c_wcw/=l7I4Z$X9"));
+
+            Debugger.RunTo(scriptId, context.Block.Next!.Id);
+        };
+
+        Debugger.OnVolatile = (context) =>
+        {
+            Assert.That(context.Block.Id, Is.EqualTo("Kb__-_**cI=OxUIZg9yW"));
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+        Assert.That(Debugger.Breaks, Has.Count.EqualTo(2));
     }
 }

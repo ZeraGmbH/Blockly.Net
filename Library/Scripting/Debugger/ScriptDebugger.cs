@@ -60,6 +60,18 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// </summary>
     public bool StopOnStart { get; set; } = false;
 
+    /// <summary>
+    /// Volatile breakpoint used for step over and run to block.
+    /// </summary>
+    private IScriptBreakpoint? _volatile;
+
+    /// <summary>
+    /// Stop at the indicated block.
+    /// </summary>
+    /// <param name="scriptId">Script to use.</param>
+    /// <param name="blockId">Block to stop at.</param>
+    public void RunTo(string scriptId, string blockId) => _volatile = new ScriptBreakpoint(scriptId, blockId);
+
     /// <inheritdoc/>
     public virtual async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
     {
@@ -79,17 +91,44 @@ public abstract class ScriptDebugger : IScriptDebugger
                         {
                             if (StopOnStart)
                             {
+                                _volatile = null;
+
                                 StopOnStart = false;
 
                                 await OnFirstBlockAsync();
-                            }
-                            else if (SingleStep)
-                                await OnSingleStepAsync();
-                            else
-                            {
-                                var hit = _breakpoints[script.Request.ScriptId, block.Id];
 
-                                if (hit != null) await OnBreakpointHitAsync(hit);
+                                break;
+                            }
+
+                            var volatileBp = _volatile;
+
+                            if (volatileBp != null && volatileBp.ScriptId == script.Request.ScriptId && volatileBp.BlockId == block.Id)
+                            {
+                                _volatile = null;
+
+                                await OnVolatileStopAsync();
+
+                                break;
+                            }
+
+                            if (SingleStep)
+                            {
+                                _volatile = null;
+
+                                await OnSingleStepAsync();
+
+                                break;
+                            }
+
+                            var hit = _breakpoints[script.Request.ScriptId, block.Id];
+
+                            if (hit != null)
+                            {
+                                _volatile = null;
+
+                                await OnBreakpointHitAsync(hit);
+
+                                break;
                             }
 
                             break;
@@ -119,6 +158,11 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// Called on the first block of a script.
     /// </summary>
     protected virtual Task OnFirstBlockAsync() => Task.CompletedTask;
+
+    /// <summary>
+    /// Hit some volatile breakpoint.
+    /// </summary>
+    protected virtual Task OnVolatileStopAsync() => Task.CompletedTask;
 
     /// <inheritdoc/>
     public virtual void ScriptFinished(Exception? exception)
