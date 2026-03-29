@@ -21,6 +21,8 @@ public abstract class ScriptDebugger : IScriptDebugger
             }
         }
 
+        public bool BreakOnExceptions { get; set; }
+
         public void Add(string scriptId, string blockId)
         {
             var bp = new ScriptBreakpoint(scriptId, blockId);
@@ -94,78 +96,89 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// <param name="blockId">Block to stop at.</param>
     private void RunTo(string scriptId, string blockId) => _volatile = new ScriptBreakpoint(scriptId, blockId);
 
-    /// <inheritdoc/>
-    public virtual async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
+    /// <summary>
+    /// Install an operating context.
+    /// </summary>
+    /// <param name="block">Current block.</param>
+    /// <param name="context">Current execution context.</param>
+    /// <param name="reason">Reason for the debugger to be called.</param>
+    /// <returns>Set if processing should continue.</returns>
+    private bool CreateContext(Block block, Context context, ScriptDebuggerStopReason reason)
     {
         /* We are not active. */
-        if (!Enabled) return;
+        if (!Enabled) return false;
+
+        /* Ignore all blocky internal warmup blocks. */
+        if (block.Type == null) return false;
 
         /* Must be a well known script. */
-        if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return;
+        if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return false;
 
         /* Simplify overloads by providing some execution context. */
         _context = new(script.Request.ScriptId, block, reason, context);
 
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
+    {
+        /* See if we could handle the exception. */
+        if (!CreateContext(block, context, reason)) return;
+
         try
         {
-            if (block.Type != null)
-                switch (reason)
+            /* Before execution a block check for a breakpoint. */
+            if (reason == ScriptDebuggerStopReason.Enter)
+            {
+                if (StopOnStart)
                 {
-                    /* Before execution a block check for a breakpoint. */
-                    case ScriptDebuggerStopReason.Enter:
-                        {
-                            if (StopOnStart)
-                            {
-                                _volatile = null;
+                    _volatile = null;
 
-                                StopOnStart = false;
+                    StopOnStart = false;
 
-                                await OnFirstBlockAsync();
+                    await OnFirstBlockAsync();
 
-                                break;
-                            }
-
-                            var volatileBp = _volatile;
-
-                            if (volatileBp != null && volatileBp.ScriptId == script.Request.ScriptId && volatileBp.BlockId == block.Id)
-                            {
-                                _volatile = null;
-
-                                await OnVolatileStopAsync();
-
-                                break;
-                            }
-
-                            if (SingleStep)
-                            {
-                                _volatile = null;
-
-                                await OnSingleStepAsync();
-
-                                break;
-                            }
-
-                            var hit = _breakpoints[script.Request.ScriptId, block.Id];
-
-                            if (hit != null)
-                            {
-                                _volatile = null;
-
-                                await OnBreakpointHitAsync(hit);
-
-                                break;
-                            }
-
-                            break;
-                        }
+                    return;
                 }
+
+                var volatileBp = _volatile;
+
+                if (volatileBp != null && volatileBp.ScriptId == _context.ScriptId && volatileBp.BlockId == block.Id)
+                {
+                    _volatile = null;
+
+                    await OnVolatileStopAsync();
+
+                    return;
+                }
+
+                if (SingleStep)
+                {
+                    _volatile = null;
+
+                    await OnSingleStepAsync();
+
+                    return;
+                }
+
+                var hit = _breakpoints[_context.ScriptId, block.Id];
+
+                if (hit != null)
+                {
+                    _volatile = null;
+
+                    await OnBreakpointHitAsync(hit);
+
+                    return;
+                }
+            }
         }
         finally
         {
             /* This inspection is finished - get rid of context. */
             _context = null!;
         }
-
     }
 
     /// <summary>
@@ -189,11 +202,38 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// </summary>
     protected virtual Task OnVolatileStopAsync() => Task.CompletedTask;
 
+    /// <summary>
+    /// Process incoming exception.
+    /// </summary>
+    /// <param name="original">Exception seen</param>
+    /// <returns>Exception to process, null to ignoree</returns>
+    protected virtual Task<Exception?> OnExceptionDetectedAsync(Exception original) => Task.FromResult<Exception?>(original);
+
     /// <inheritdoc/>
-    public virtual void ScriptFinished(Exception? exception)
+    public void ScriptFinished(Exception? exception)
     {
     }
 
     /// <inheritdoc/>
     public List<ScriptDebugVariableScope>? GetVariables() => Context?.GetVariables();
+
+    /// <inheritdoc/>
+    public async Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
+    {
+        /* No interested in exceptions. */
+        if (!_breakpoints.BreakOnExceptions) return original;
+
+        /* See if we could handle the exception. */
+        if (!CreateContext(block, context, ScriptDebuggerStopReason.Exception)) return original;
+
+        try
+        {
+            return await OnExceptionDetectedAsync(original);
+        }
+        finally
+        {
+            /* This inspection is finished - get rid of context. */
+            _context = null!;
+        }
+    }
 }

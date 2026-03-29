@@ -58,7 +58,7 @@ public abstract class Block
     /// <inheritdoc/>
     protected virtual async Task<object?> EvaluateAsync(Context context)
     {
-        /* Wait for debugger to allow execution - the current block as finished its work. */
+        /* Wait for debugger to allow execution - the current block has finished its work. */
         await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Leave);
 
         /* Always check for cancel before proceeding with the execution of the next block in chain. */
@@ -88,7 +88,23 @@ public abstract class Block
         await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Enter);
 
         /* Execute the block itself. */
-        var result = await EvaluateAsync(context);
+        object? result = null;
+
+        try
+        {
+            result = await EvaluateAsync(context);
+        }
+        catch (Exception e)
+        {
+            /* Run exception throw debugger. */
+            var exception = await context.Engine.CatchExceptionAsync(this, context, e);
+
+            if (exception != null)
+                if (exception == e)
+                    throw;
+                else
+                    throw exception;
+        }
 
         /* Wait for debugger to allow execution - the current block as finished its work. */
         await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Finish);

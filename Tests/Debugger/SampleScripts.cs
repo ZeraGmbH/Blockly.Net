@@ -62,4 +62,42 @@ public static class SampleScripts
             </next>
         </block>
     </xml>";
+
+    public const string DebugScript2 = @"<xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable id=""g8@EO|Q%.jJ-#fcj/cV-"">result</variable>
+        </variables>
+        <block type=""variables_set"" id=""75}(pHFe:wTIN?;vgpgZ"" x=""125"" y=""125"">
+            <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+            <value name=""VALUE"">
+                <block type=""math_number"" id=""lI7Vl*}FOzY-%/Wp0Cbg"">
+                    <field name=""NUM"">1</field>
+                </block>
+            </value>
+            <next>
+                <block type=""try_catch_finally"" id=""z0E/Pd-PhE9C#g7~TNWM"">
+                    <statement name=""TRY"">
+                        <block type=""throw_exception"" id=""Nt@G*FyEEVj86b~q}]b1"">
+                            <field name=""MESSAGE"">Message</field>
+                            <value name=""MESSAGE"">
+                                <shadow type=""text"" id=""gm#?~gYGCD^o,=./PB,/"">
+                                    <field name=""TEXT"">Force to 2</field>
+                                </shadow>
+                            </value>
+                        </block>
+                    </statement>
+                    <statement name=""CATCH"">
+                        <block type=""variables_set"" id=""oJmYgMp$8Zfj`ql2ww}1"">
+                            <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+                            <value name=""VALUE"">
+                                <block type=""math_number"" id=""fhaFDwxQh_ktNO/FFWBO"">
+                                    <field name=""NUM"">2</field>
+                                </block>
+                            </value>
+                        </block>
+                    </statement>
+                </block>
+            </next>
+        </block>
+    </xml>";
 }

@@ -78,6 +78,15 @@ public interface IScriptSite
     Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason);
 
     /// <summary>
+    /// Process an exception during execution of a block.
+    /// </summary>
+    /// <param name="block">The block to execute.</param>
+    /// <param name="context">Script execution environment.</param>
+    /// <param name="original">Original exception seen.</param>
+    /// <returns>Exception to propagate or null to ignore - ignore with extreme care!</returns>
+    Task<Exception?> CatchExceptionAsync(Block block, Context context, Exception original);
+
+    /// <summary>
     /// Start the execution of a new group.
     /// </summary>
     /// <param name="key">Unique identifier of the group.</param>

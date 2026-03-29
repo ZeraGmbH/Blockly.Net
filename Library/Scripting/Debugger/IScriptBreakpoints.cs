@@ -37,4 +37,9 @@ public interface IScriptBreakpoints
     /// Retrieve all breakpoints.
     /// </summary>
     IScriptBreakpoint[] GetAll();
+
+    /// <summary>
+    /// Set to break on each exception.
+    /// </summary>
+    bool BreakOnExceptions { get; set; }
 }

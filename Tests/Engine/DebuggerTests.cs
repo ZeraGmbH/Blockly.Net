@@ -32,6 +32,8 @@ public class DebuggerTests : TestEnvironment
             return Task.CompletedTask;
         }
 
+        public Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original) => Task.FromResult<Exception?>(original);
+
         public void ScriptFinished(Exception? e)
         {
             Actions.Add($"DONE {e?.Message}");

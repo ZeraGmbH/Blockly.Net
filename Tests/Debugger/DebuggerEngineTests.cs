@@ -33,6 +33,8 @@ public class DebuggerEngineTests : TestEnvironment
 
         public Action<ScriptDebugContext>? OnVolatile;
 
+        public Func<ScriptDebugContext, Exception, Exception?>? OnException;
+
         protected override Task OnBreakpointHitAsync(IScriptBreakpoint bp)
         {
             Breaks.Add(Context);
@@ -67,6 +69,13 @@ public class DebuggerEngineTests : TestEnvironment
             OnVolatile?.Invoke(Context);
 
             return base.OnVolatileStopAsync();
+        }
+
+        protected override Task<Exception?> OnExceptionDetectedAsync(Exception original)
+        {
+            if (OnException != null) return Task.FromResult(OnException(Context, original));
+
+            return base.OnExceptionDetectedAsync(original);
         }
     }
 
@@ -248,5 +257,29 @@ public class DebuggerEngineTests : TestEnvironment
 
         Assert.That(result.Result, Is.EqualTo(500500));
         Assert.That(Debugger.Breaks, Has.Count.EqualTo(2));
+    }
+
+    [TestCase(false, 2)]
+    [TestCase(true, 1)]
+    public async Task Can_Intercept_Exception_Async(bool ignore, int expected)
+    {
+        Debugger.Breakpoints.BreakOnExceptions = true;
+
+        Debugger.OnException = (context, original) =>
+        {
+            Assert.That(original.Message, Is.EqualTo("Force to 2"));
+
+            return ignore ? null : original;
+        };
+
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript2);
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(expected));
     }
 }
