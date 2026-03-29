@@ -25,4 +25,11 @@ public interface IScriptBreakpoints
     /// <param name="scriptId">Script identifier.</param>
     /// <param name="blockId">Block identifier in block.</param>
     IScriptBreakpoint? this[string scriptId, string blockId] { get; }
+
+    /// <summary>
+    /// Stop at the indicated block.
+    /// </summary>
+    /// <param name="scriptId">Script to use.</param>
+    /// <param name="blockId">Block to stop at.</param>
+    void RunTo(string scriptId, string blockId);
 }

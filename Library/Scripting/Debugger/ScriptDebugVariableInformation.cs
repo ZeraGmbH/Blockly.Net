@@ -18,4 +18,10 @@ public class ScriptDebugVariableInformation
     /// Type of the variable.
     /// </summary>
     public string? Type { get; set; }
+
+    /// <summary>
+    /// Value in JSON representation ready to be transferred.
+    /// </summary>
+    /// <value></value>
+    public string? Value { get; set; }
 }

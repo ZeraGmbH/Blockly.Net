@@ -8,7 +8,7 @@ namespace BlocklyNet.Scripting.Debugger;
 /// </summary>
 public abstract class ScriptDebugger : IScriptDebugger
 {
-    private class BreakpointList : IScriptBreakpoints
+    private class BreakpointList(ScriptDebugger debugger) : IScriptBreakpoints
     {
         private readonly Dictionary<ScriptBreakpoint, ScriptBreakpoint> _breakpoints = [];
 
@@ -34,6 +34,8 @@ public abstract class ScriptDebugger : IScriptDebugger
             lock (_breakpoints)
                 _breakpoints.Remove(new ScriptBreakpoint(scriptId, blockId));
         }
+
+        public void RunTo(string scriptId, string blockId) => debugger.RunTo(scriptId, blockId);
     }
 
     /// <summary>
@@ -41,7 +43,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// </summary>
     public IScriptBreakpoints Breakpoints => _breakpoints;
 
-    private readonly BreakpointList _breakpoints = new();
+    private readonly BreakpointList _breakpoints;
 
     /// <summary>
     /// Current execution context.
@@ -66,11 +68,19 @@ public abstract class ScriptDebugger : IScriptDebugger
     private IScriptBreakpoint? _volatile;
 
     /// <summary>
+    /// Initialize a new debugger.
+    /// </summary>
+    protected ScriptDebugger()
+    {
+        _breakpoints = new(this);
+    }
+
+    /// <summary>
     /// Stop at the indicated block.
     /// </summary>
     /// <param name="scriptId">Script to use.</param>
     /// <param name="blockId">Block to stop at.</param>
-    public void RunTo(string scriptId, string blockId) => _volatile = new ScriptBreakpoint(scriptId, blockId);
+    private void RunTo(string scriptId, string blockId) => _volatile = new ScriptBreakpoint(scriptId, blockId);
 
     /// <inheritdoc/>
     public virtual async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
@@ -168,4 +178,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     public virtual void ScriptFinished(Exception? exception)
     {
     }
+
+    /// <inheritdoc/>
+    public List<ScriptDebugVariableScope>? GetVariables() => Context?.GetVariables();
 }

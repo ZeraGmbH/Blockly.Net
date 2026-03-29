@@ -1,4 +1,6 @@
+using System.Text.Json;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Generic;
 
 namespace BlocklyNet.Scripting.Debugger;
 
@@ -30,20 +32,26 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
     /// <summary>
     /// Retrieve all variables.
     /// </summary>
-    public List<List<ScriptDebugVariableInformation>> GetVariables()
+    internal List<ScriptDebugVariableScope> GetVariables()
     {
-        List<List<ScriptDebugVariableInformation>> list = [];
+        List<ScriptDebugVariableScope> list = [];
 
-        for (var context = Context; context != null; context = context.Parent)
-            list.Add([..
-                context
-                    .Variables
-                    .Select(vi =>
-                        new ScriptDebugVariableInformation
-                        {
-                            Name = vi.Key,
-                            Type = context.VariableTypes.TryGetValue(vi.Key, out var type) ? type : null
-                        })]);
+        if (Context.Engine.CurrentScript is IGenericScript script && !string.IsNullOrEmpty(script.Request.ScriptId))
+            for (var context = Context; context != null; context = context.Parent)
+                list.Add(new()
+                {
+                    ScriptId = script.Request.ScriptId,
+                    Variables = [
+                        ..context
+                            .Variables
+                            .Select(vi =>
+                                new ScriptDebugVariableInformation
+                                {
+                                    Name = vi.Key,
+                                    Type = context.VariableTypes.TryGetValue(vi.Key, out var type) ? type : null,
+                                    Value = vi.Value == null ? null : JsonSerializer.Serialize(vi.Value, JsonUtils.JsonSettings),
+                                })]
+                });
 
         return list;
     }

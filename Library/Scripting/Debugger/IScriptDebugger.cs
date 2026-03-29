@@ -20,4 +20,14 @@ public interface IScriptDebugger
     /// </summary>
     /// <param name="exception">Exception observed</param>
     void ScriptFinished(Exception? exception);
+
+    /// <summary>
+    /// Access to the breakpoint management.
+    /// </summary>
+    IScriptBreakpoints Breakpoints { get; }
+
+    /// <summary>
+    /// Retrieve all variables in current scope.
+    /// </summary>
+    List<ScriptDebugVariableScope>? GetVariables();
 }

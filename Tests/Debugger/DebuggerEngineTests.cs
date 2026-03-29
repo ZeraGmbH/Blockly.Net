@@ -191,21 +191,22 @@ public class DebuggerEngineTests : TestEnvironment
 
             Debugger.Breakpoints.Remove(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
 
-            var variables = context.GetVariables();
+            var variables = Debugger.GetVariables();
 
             Assert.That(variables, Has.Count.EqualTo(1));
 
             var scope = variables[0];
 
-            Assert.That(scope, Has.Count.EqualTo(2));
+            Assert.That(scope.ScriptId, Is.EqualTo(scriptId));
+            Assert.That(scope.Variables, Has.Count.EqualTo(2));
 
-            var iVar = scope.Single(v => v.Name == "i");
-            var rVar = scope.Single(v => v.Name == "result");
+            var iVar = scope.Variables.Single(v => v.Name == "i");
+            var rVar = scope.Variables.Single(v => v.Name == "result");
 
             Assert.That(iVar.Type, Is.Null);
-            Assert.That(context.Context.Variables[iVar.Name], Is.EqualTo(300));
+            Assert.That(iVar.Value, Is.EqualTo("300"));
             Assert.That(rVar.Type, Is.Null);
-            Assert.That(context.Context.Variables[rVar.Name], Is.EqualTo(44850));
+            Assert.That(rVar.Value, Is.EqualTo("44850"));
         };
 
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
@@ -229,7 +230,7 @@ public class DebuggerEngineTests : TestEnvironment
         {
             Assert.That(context.Block.Id, Is.EqualTo("~-@g:c_wcw/=l7I4Z$X9"));
 
-            Debugger.RunTo(scriptId, context.Block.Next!.Id);
+            Debugger.Breakpoints.RunTo(scriptId, context.Block.Next!.Id);
         };
 
         Debugger.OnVolatile = (context) =>

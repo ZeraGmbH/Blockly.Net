@@ -14,6 +14,10 @@ public class DebuggerTests : TestEnvironment
     {
         public readonly List<string> Actions = [];
 
+        public IScriptBreakpoints Breakpoints => throw new NotImplementedException("Breakpoints");
+
+        public List<ScriptDebugVariableScope>? GetVariables() => throw new NotImplementedException("GetVariables");
+
         public Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
         {
             Actions.Add($"{reason} {block.Id}");
