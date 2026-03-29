@@ -74,11 +74,6 @@ partial class ScriptEngine<TLogType>
         private object? _result;
 
         /// <summary>
-        /// Debugger attached to this script.
-        /// </summary>
-        private IScriptDebugger? _debugger;
-
-        /// <summary>
         /// The main script engine.
         /// </summary>
         private readonly ScriptEngine<TLogType> _engine;
@@ -212,7 +207,7 @@ partial class ScriptEngine<TLogType>
             finally
             {
                 /* Inform debugger if still active. */
-                _debugger?.ScriptFinished(_error);
+                _engine._debugger?.ScriptFinished(_error);
 
                 /* Customize. */
                 await _engine.OnScriptDoneAsync(script, Parent);
@@ -229,11 +224,11 @@ partial class ScriptEngine<TLogType>
 
         /// <inheritdoc/>
         public Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason)
-            => _debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
+            => _engine._debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
 
         /// <inheritdoc/>
         public Task<Exception?> CatchExceptionAsync(Block block, Context context, Exception original)
-            => _debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
+            => _engine._debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
 
         /// <inheritdoc/>
         public virtual Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
@@ -243,9 +238,6 @@ partial class ScriptEngine<TLogType>
 
         /// <inheritdoc/>
         public Task UpdateLogAsync() => CurrentScript == null ? Task.CompletedTask : _engine.UpdateResultLogEntryAsync(CurrentScript, Parent, false);
-
-        /// <inheritdoc/>
-        public void SetDebugger(IScriptDebugger? debugger) => _debugger = debugger;
     }
 
     /// <summary>

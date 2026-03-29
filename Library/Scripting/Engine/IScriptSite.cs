@@ -122,12 +122,6 @@ public interface IScriptSite
     /// Update the current log entry.
     /// </summary>
     Task UpdateLogAsync();
-
-    /// <summary>
-    /// Attach or detach the debugger associated with this script site.
-    /// </summary>
-    /// <param name="debugger">Debugger to use or null to detach.</param>
-    void SetDebugger(IScriptDebugger? debugger);
 }
 
 /// <summary>
