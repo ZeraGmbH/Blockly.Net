@@ -7,17 +7,18 @@ namespace BlocklyNet.Scripting.Debugger;
 /// <summary>
 /// Describes the current debug context.
 /// </summary>
-public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStopReason reason, Context context)
+public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStopReason reason, Context context) : IScriptPosition
 {
-    /// <summary>
-    /// Executing script normally primary key from definition in database.
-    /// </summary>
-    public readonly string ScriptId = scriptId;
+    /// <inheritdoc/>
+    public string ScriptId { get; } = scriptId;
 
     /// <summary>
     /// Current block.
     /// </summary>
     public readonly Block Block = block;
+
+    /// <inheritdoc/>
+    public string BlockId { get; } = block.Id;
 
     /// <summary>
     /// Reason of the interception.
@@ -32,7 +33,7 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
     /// <summary>
     /// Retrieve all variables.
     /// </summary>
-    internal List<ScriptDebugVariableScope> GetVariables()
+    public List<ScriptDebugVariableScope> GetVariables()
     {
         List<ScriptDebugVariableScope> list = [];
 
@@ -40,6 +41,7 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
             for (var context = Context; context != null; context = context.Parent)
                 list.Add(new()
                 {
+                    Context = context,
                     ScriptId = script.Request.ScriptId,
                     Variables = [
                         ..context

@@ -22,6 +22,11 @@ public interface IScriptDebugger
     void ScriptFinished(Exception? exception);
 
     /// <summary>
+    /// Set if debugger is enabled.
+    /// </summary>
+    bool Enabled { get; set; }
+
+    /// <summary>
     /// Access to the breakpoint management.
     /// </summary>
     IScriptBreakpoints Breakpoints { get; }
@@ -30,4 +35,9 @@ public interface IScriptDebugger
     /// Retrieve all variables in current scope.
     /// </summary>
     List<ScriptDebugVariableScope>? GetVariables();
+
+    /// <summary>
+    /// Current position in script - null while executing.
+    /// </summary>
+    IScriptPosition? CurrentPosition { get; }
 }

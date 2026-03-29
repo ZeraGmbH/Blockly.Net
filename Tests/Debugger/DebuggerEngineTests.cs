@@ -83,6 +83,8 @@ public class DebuggerEngineTests : TestEnvironment
     {
         Debugger = (DebuggerSink)GetService<IScriptEngineNotifySink>();
 
+        Debugger.Enabled = true;
+
         ((IScriptSite)Engine).SetDebugger(Debugger);
 
         base.OnStartup();

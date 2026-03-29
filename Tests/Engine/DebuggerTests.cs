@@ -14,7 +14,11 @@ public class DebuggerTests : TestEnvironment
     {
         public readonly List<string> Actions = [];
 
+        public bool Enabled { get; set; }
+
         public IScriptBreakpoints Breakpoints => throw new NotImplementedException("Breakpoints");
+
+        public IScriptPosition? CurrentPosition => throw new NotImplementedException("CurrentPosition");
 
         public List<ScriptDebugVariableScope>? GetVariables() => throw new NotImplementedException("GetVariables");
 

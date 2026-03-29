@@ -29,6 +29,12 @@ public abstract class ScriptDebugger : IScriptDebugger
                 _breakpoints[bp] = bp;
         }
 
+        public IScriptBreakpoint[] GetAll()
+        {
+            lock (_breakpoints)
+                return [.. _breakpoints.Values];
+        }
+
         public void Remove(string scriptId, string blockId)
         {
             lock (_breakpoints)
@@ -62,6 +68,12 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// </summary>
     public bool StopOnStart { get; set; } = false;
 
+    /// <inheritdoc/>
+    public bool Enabled { get; set; } = false;
+
+    /// <inheritdoc/>
+    public IScriptPosition? CurrentPosition => _context;
+
     /// <summary>
     /// Volatile breakpoint used for step over and run to block.
     /// </summary>
@@ -85,6 +97,9 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// <inheritdoc/>
     public virtual async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
     {
+        /* We are not active. */
+        if (!Enabled) return;
+
         /* Must be a well known script. */
         if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return;
 

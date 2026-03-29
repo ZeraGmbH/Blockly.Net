@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+using BlocklyNet.Core.Model;
 
 namespace BlocklyNet.Scripting.Debugger;
 
@@ -8,6 +10,12 @@ namespace BlocklyNet.Scripting.Debugger;
 /// </summary>
 public class ScriptDebugVariableScope
 {
+    /// <summary>
+    /// Context the variable is taken from.
+    /// </summary>
+    [JsonIgnore]
+    internal Context? Context { get; set; }
+
     /// <summary>
     /// Corresponding script.
     /// </summary>
