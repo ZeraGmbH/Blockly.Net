@@ -80,10 +80,9 @@ public class DebuggerTests : TestEnvironment
     [Test]
     public async Task Can_Debug_Script_Async()
     {
-        var debuggerSite = (IScriptSite)Engine;
         var debugger = new Debugger();
 
-        debuggerSite.SetDebugger(debugger);
+        Engine.SetDebugger(debugger);
 
         try
         {
@@ -108,7 +107,7 @@ public class DebuggerTests : TestEnvironment
         }
         finally
         {
-            debuggerSite.SetDebugger(null);
+            Engine.SetDebugger(null);
         }
 
         Assert.That(debugger.Actions, Is.EqualTo([

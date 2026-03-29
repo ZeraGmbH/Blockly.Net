@@ -1,3 +1,4 @@
+using BlocklyNet.Scripting.Debugger;
 using BlocklyNet.Scripting.Parsing;
 
 namespace BlocklyNet.Scripting.Engine;
@@ -66,4 +67,10 @@ public interface IScriptEngine
     /// <param name="code">Some script.</param>
     /// <returns>Group structure of the script.</returns>
     Task<List<GroupInfo>> GetGroupsForScriptAsync(string code);
+
+    /// <summary>
+    /// Attach or detach the debugger associated with this script site.
+    /// </summary>
+    /// <param name="debugger">Debugger to use or null to detach.</param>
+    void SetDebugger(IScriptDebugger? debugger);
 }

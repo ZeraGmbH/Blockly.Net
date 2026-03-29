@@ -94,7 +94,7 @@ public class DebuggerEngineTests : TestEnvironment
 
         Debugger.Enabled = true;
 
-        ((IScriptSite)Engine).SetDebugger(Debugger);
+        Engine.SetDebugger(Debugger);
 
         base.OnStartup();
     }
