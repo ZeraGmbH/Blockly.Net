@@ -218,6 +218,8 @@ public class DebuggerEngineTests : TestEnvironment
             Assert.That(iVar.Value, Is.EqualTo("300"));
             Assert.That(rVar.Type, Is.Null);
             Assert.That(rVar.Value, Is.EqualTo("44850"));
+
+            scope.SetVariable("result", "0");
         };
 
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
@@ -226,7 +228,7 @@ public class DebuggerEngineTests : TestEnvironment
 
         var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
-        Assert.That(result.Result, Is.EqualTo(500500));
+        Assert.That(result.Result, Is.EqualTo(500500 - 44850));
         Assert.That(hits, Is.EqualTo(testAt));
     }
 
