@@ -235,6 +235,10 @@ public abstract class TestEnvironment
         Site.Setup(s => s.Cancellation).Returns(Cancel.Token);
         Site.SetupGet(s => s.ServiceProvider).Returns(() => di);
 
+        Site
+            .Setup(s => s.CatchExceptionAsync(It.IsAny<Block>(), It.IsAny<Context>(), It.IsAny<Exception>()))
+            .ReturnsAsync((Block block, Context context, Exception original) => original);
+
         /* Setup dependency injection. */
         var services = new ServiceCollection();
 

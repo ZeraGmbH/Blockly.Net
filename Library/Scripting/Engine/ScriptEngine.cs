@@ -528,6 +528,10 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
         => _debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
 
     /// <inheritdoc/>
+    public Task<Exception?> CatchExceptionAsync(Block block, Context context, Exception original)
+        => _debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
+
+    /// <inheritdoc/>
     public void SetDebugger(IScriptDebugger? debugger) => _debugger = debugger;
 
     /// <inheritdoc/>

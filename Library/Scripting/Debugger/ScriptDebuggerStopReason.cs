@@ -19,7 +19,12 @@ public enum ScriptDebuggerStopReason
     Leave = 1,
 
     /// <summary>
-    /// /// Block tree has finished.
+    /// Block tree has finished.
     /// </summary>
     Finish = 2,
+
+    /// <summary>
+    /// Detected an exception.
+    /// </summary>
+    Exception = 3,
 }

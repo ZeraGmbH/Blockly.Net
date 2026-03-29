@@ -3,7 +3,7 @@ using BlocklyNet.Scripting.Parsing;
 namespace BlocklyNet.Scripting.Engine;
 
 /// <summary>
-/// 
+/// Interface for the Blockly.NET script engine.
 /// </summary>
 public interface IScriptEngine
 {

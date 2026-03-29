@@ -14,6 +14,14 @@ public class DebuggerTests : TestEnvironment
     {
         public readonly List<string> Actions = [];
 
+        public bool Enabled { get; set; }
+
+        public IScriptBreakpoints Breakpoints => throw new NotImplementedException("Breakpoints");
+
+        public IScriptPosition? CurrentPosition => throw new NotImplementedException("CurrentPosition");
+
+        public List<ScriptDebugVariableScope>? GetVariables() => throw new NotImplementedException("GetVariables");
+
         public Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
         {
             Actions.Add($"{reason} {block.Id}");
@@ -23,6 +31,8 @@ public class DebuggerTests : TestEnvironment
 
             return Task.CompletedTask;
         }
+
+        public Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original) => Task.FromResult<Exception?>(original);
 
         public void ScriptFinished(Exception? e)
         {
