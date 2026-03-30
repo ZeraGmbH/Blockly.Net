@@ -84,16 +84,39 @@ public abstract class ScriptDebugger : IScriptDebugger
     private ScriptDebugContext? _context = null;
 
     /// <inheritdoc/>
-    public bool Enabled { get; set; } = false;
+    public bool Enabled
+    {
+        get => _enabled;
+        set
+        {
+            if (value == _enabled) return;
+
+            _enabled = value;
+
+            Restart();
+        }
+    }
+
+    private bool _enabled = false;
 
     /// <inheritdoc/>
     public IScriptPosition? CurrentPosition => _context;
 
-    /// <inheritdoc/>
-    public void RunTo(string scriptId, string blockId) => _operationMode = new(false, stopAtBlock: new ScriptBreakpoint(scriptId, blockId));
+    /// <summary>
+    /// Helper to manage engine stops.
+    /// </summary>
+    private TaskCompletionSource _stop = new();
 
     /// <inheritdoc/>
-    public void Continue(ScriptDebugContinueModes mode)
+    public virtual void RunTo(string scriptId, string blockId)
+    {
+        _operationMode = new(false, stopAtBlock: new ScriptBreakpoint(scriptId, blockId));
+
+        Restart();
+    }
+
+    /// <inheritdoc/>
+    public virtual void Continue(ScriptDebugContinueModes mode)
     {
         var context = StoppedAt;
 
@@ -132,6 +155,8 @@ public abstract class ScriptDebugger : IScriptDebugger
             default:
                 throw new ArgumentException($"Unsupported debug mode {mode}", nameof(mode));
         }
+
+        Restart();
     }
 
     /// <summary>
@@ -225,5 +250,27 @@ public abstract class ScriptDebugger : IScriptDebugger
             /* This inspection is finished - get rid of context. */
             _context = null;
         }
+    }
+
+    /// <summary>
+    /// Stop execution and wait.
+    /// </summary>
+    protected Task StopAsync()
+    {
+        var newStopper = new TaskCompletionSource();
+
+        Interlocked.Exchange(ref _stop, newStopper)?.SetCanceled();
+
+        return newStopper.Task;
+    }
+
+    /// <summary>
+    /// Restart regular execution.
+    /// </summary>
+    protected void Restart()
+    {
+        var stop = _stop;
+
+        if (stop.Task.IsCompleted) _stop.SetResult();
     }
 }
