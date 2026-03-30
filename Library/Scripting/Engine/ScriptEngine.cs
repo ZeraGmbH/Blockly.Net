@@ -112,6 +112,9 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// </summary>
     public IScriptParser Parser { get; private set; }
 
+    /// <inheritdoc />
+    public IScriptSite? ParentSite { get; } = null;
+
     private string _codeHash = null!;
 
     /// <summary>

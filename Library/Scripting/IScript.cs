@@ -28,6 +28,11 @@ public interface IScript
     /// Report the related request.
     /// </summary>
     StartScript Request { get; }
+
+    /// <summary>
+    /// Engine executing this script.
+    /// </summary>
+    IScriptSite Engine { get; }
 }
 
 /// <summary>

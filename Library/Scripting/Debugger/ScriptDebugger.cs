@@ -51,14 +51,8 @@ public abstract class ScriptDebugger : IScriptDebugger
 
     private readonly BreakpointList _breakpoints = new();
 
-    private class CurrentOperationMode(bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null)
+    private class CurrentOperationMode(bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null, string? stopAtScript = null)
     {
-        public readonly bool StopAtNextBlock = stopAtNextBlock;
-
-        public readonly IScriptBreakpoint? StopAtBlock = stopAtBlock;
-
-        public readonly Context? StopAtParent = stopAtParent;
-
         /// <summary>
         /// See if we should stop at the current context - can
         /// be either step into, step out, step over or stop at.
@@ -68,11 +62,11 @@ public abstract class ScriptDebugger : IScriptDebugger
         public bool MustStop(ScriptDebugContext context)
         {
             /* Step into, step over or stop at. */
-            if (StopAtNextBlock || StopAtBlock == context.Position)
+            if (stopAtNextBlock || stopAtBlock == context.Position || stopAtScript == context.ScriptId)
                 return true;
 
             /* Step out. */
-            for (var test = StopAtParent; test != null; test = test.Parent)
+            for (var test = stopAtParent; test != null; test = test.Parent)
                 if (context.Context == test)
                     return true;
 
@@ -126,6 +120,15 @@ public abstract class ScriptDebugger : IScriptDebugger
                 _operationMode = new(false, stopAtParent: context.Context.Parent);
 
                 break;
+            case ScriptDebugContinueModes.LeaveNested:
+                if (context == null) throw new InvalidOperationException("debugger not active");
+
+                if (context.Context.Engine.ParentSite?.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId))
+                    throw new InvalidOperationException("not a nested script");
+
+                _operationMode = new(false, stopAtScript: script.Request.ScriptId);
+
+                break;
             default:
                 throw new ArgumentException($"Unsupported debug mode {mode}", nameof(mode));
         }
@@ -156,7 +159,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     }
 
     /// <inheritdoc/>
-    public async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
+    public virtual async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
     {
         /* See if we could handle the exception. */
         var stoppedAt = CreateContext(block, context, reason);
@@ -197,7 +200,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     protected virtual Task<Exception?> OnExceptionDetectedAsync(Exception original) => Task.FromResult<Exception?>(original);
 
     /// <inheritdoc/>
-    public void ScriptFinished(Exception? exception)
+    public virtual void ScriptFinished(Exception? exception)
     {
     }
 
@@ -205,7 +208,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     public List<ScriptDebugVariableScope>? GetVariables() => StoppedAt?.GetVariables();
 
     /// <inheritdoc/>
-    public async Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
+    public virtual async Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
     {
         /* No interested in exceptions. */
         if (!_breakpoints.BreakOnExceptions) return original;

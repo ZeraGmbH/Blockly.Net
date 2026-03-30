@@ -52,6 +52,9 @@ partial class ScriptEngine<TLogType>
         /// </summary>
         protected readonly IScript<TLogType>? Parent;
 
+        /// <inheritdoc/>
+        public IScriptSite? ParentSite => Parent?.Engine;
+
         /// <summary>
         /// Synchronize access to the result.
         /// </summary>

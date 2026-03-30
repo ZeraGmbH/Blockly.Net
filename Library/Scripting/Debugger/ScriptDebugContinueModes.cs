@@ -28,4 +28,9 @@ public enum ScriptDebugContinueModes
     /// Stop when the current context is left.
     /// </summary>
     StepOut = 3,
+
+    /// <summary>
+    /// Leave a nested script.
+    /// </summary>
+    LeaveNested = 4,
 }

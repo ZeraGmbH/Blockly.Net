@@ -21,6 +21,9 @@ public abstract class Script : IScriptInstance, IScript
     /// <inheritdoc/>
     public abstract StartScript GetRequest();
 
+    /// <inheritdoc/>
+    public abstract IScriptSite Engine { get; }
+
     /// <summary>
     /// Can be used to check for early termination.
     /// </summary>
