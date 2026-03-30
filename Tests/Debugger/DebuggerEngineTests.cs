@@ -253,4 +253,34 @@ public class DebuggerEngineTests : TestEnvironment
 
         Assert.That(result.Result, Is.EqualTo(expected));
     }
+
+    [Test]
+    public async Task Can_Step_Out_Of_Procedure_Async()
+    {
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript3);
+
+        Debugger.Breakpoints.Add(scriptId, "G5]l)A/yzjQbrq)Cr57t");
+
+        Debugger.OnBreak = Context =>
+        {
+            if (Context.Position.BlockId == "G5]l)A/yzjQbrq)Cr57t")
+            {
+                Debugger.Breakpoints[scriptId, "G5]l)A/yzjQbrq)Cr57t"]!.Enabled = false;
+
+                Debugger.Continue(ScriptDebugContinueModes.StepOut);
+            }
+            else if (Context.Position.BlockId == ";g!0eq5)ITw{V(s*tSW/")
+                Debugger.Continue(ScriptDebugContinueModes.StepOut);
+            else
+                Assert.That(Context.Position.BlockId, Is.EqualTo("sNfTZ[N@*YOpXCOZUZEc"));
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(1610));
+    }
 }
