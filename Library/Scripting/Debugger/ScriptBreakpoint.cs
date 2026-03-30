@@ -3,7 +3,7 @@ namespace BlocklyNet.Scripting.Debugger;
 /// <summary>
 /// Defines a single breakpoint.
 /// </summary>
-internal class ScriptBreakpoint(string scriptId, string blockId) : IScriptBreakpoint
+internal class ScriptBreakpoint(string scriptId, string blockId, string? description = null) : IScriptBreakpoint
 {
     /// <inheritdoc/>
     public bool Enabled { get; set; } = true;
@@ -13,6 +13,9 @@ internal class ScriptBreakpoint(string scriptId, string blockId) : IScriptBreakp
 
     /// <inheritdoc/>
     public string BlockId { get; } = blockId;
+
+    /// <inheritdoc/>
+    public string? Description { get; } = description;
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)

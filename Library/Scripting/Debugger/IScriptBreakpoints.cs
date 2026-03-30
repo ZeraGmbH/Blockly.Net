@@ -10,7 +10,8 @@ public interface IScriptBreakpoints
     /// </summary>
     /// <param name="scriptId">Script identifier.</param>
     /// <param name="blockId">Block identifier in block.</param>
-    void Add(string scriptId, string blockId);
+    /// <param name="description">Optional description to display to the user.</param>
+    void Add(string scriptId, string blockId, string? description = null);
 
     /// <summary>
     /// Remove ALL breakpoints defined on a single block.
