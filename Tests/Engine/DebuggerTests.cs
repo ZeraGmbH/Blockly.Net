@@ -20,6 +20,10 @@ public class DebuggerTests : TestEnvironment
 
         public IScriptPosition? CurrentPosition => throw new NotImplementedException("CurrentPosition");
 
+        public ScriptDebugContext? StoppedAt => throw new NotImplementedException("StoppedAt");
+
+        public void Continue(ScriptDebugContinueModes mode) => throw new NotImplementedException("Continue");
+
         public List<ScriptDebugVariableScope>? GetVariables() => throw new NotImplementedException("GetVariables");
 
         public Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
@@ -33,6 +37,8 @@ public class DebuggerTests : TestEnvironment
         }
 
         public Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original) => Task.FromResult<Exception?>(original);
+
+        public void RunTo(string scriptId, string blockId) => throw new NotImplementedException("RunTo");
 
         public void ScriptFinished(Exception? e)
         {

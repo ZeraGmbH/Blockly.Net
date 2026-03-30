@@ -28,13 +28,6 @@ public interface IScriptBreakpoints
     IScriptBreakpoint? this[string scriptId, string blockId] { get; }
 
     /// <summary>
-    /// Stop at the indicated block.
-    /// </summary>
-    /// <param name="scriptId">Script to use.</param>
-    /// <param name="blockId">Block to stop at.</param>
-    void RunTo(string scriptId, string blockId);
-
-    /// <summary>
     /// Retrieve all breakpoints.
     /// </summary>
     IScriptBreakpoint[] GetAll();

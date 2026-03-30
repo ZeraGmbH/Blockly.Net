@@ -49,4 +49,23 @@ public interface IScriptDebugger
     /// Current position in script - null while executing.
     /// </summary>
     IScriptPosition? CurrentPosition { get; }
+
+    /// <summary>
+    /// Stop at the indicated block.
+    /// </summary>
+    /// <param name="scriptId">Script to use.</param>
+    /// <param name="blockId">Block to stop at.</param>
+    void RunTo(string scriptId, string blockId);
+
+    /// <summary>
+    /// Prepare to run the script.
+    /// </summary>
+    /// <param name="mode">How to continue;</param>
+    void Continue(ScriptDebugContinueModes mode);
+
+    /// <summary>
+    /// Information on the current position in script - 
+    /// available only when stoppen.
+    /// </summary>
+    ScriptDebugContext? StoppedAt { get; }
 }

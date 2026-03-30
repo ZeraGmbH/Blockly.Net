@@ -11,8 +11,6 @@ public class DebuggerEngineTests : TestEnvironment
 {
     private class DebuggerSink : ScriptDebugger, IScriptEngineNotifySink
     {
-        public readonly List<ScriptDebugContext> Breaks = [];
-
         private readonly TaskCompletionSource _done = new();
 
         public Task DoneTask => _done.Task;
@@ -25,55 +23,24 @@ public class DebuggerEngineTests : TestEnvironment
             return Task.CompletedTask;
         }
 
-        public Action<ScriptDebugContext, IScriptBreakpoint>? OnHit;
+        public Action<ScriptDebugContext>? OnBreak;
 
-        public Action<ScriptDebugContext>? OnStep;
-
-        public Action<ScriptDebugContext>? OnStart;
-
-        public Action<ScriptDebugContext>? OnVolatile;
 
         public Func<ScriptDebugContext, Exception, Exception?>? OnException;
 
-        protected override Task OnBreakpointHitAsync(IScriptBreakpoint bp)
+
+        protected override Task OnBreakAsync()
         {
-            Breaks.Add(Context);
+            OnBreak?.Invoke(StoppedAt!);
 
-            OnHit?.Invoke(Context, bp);
-
-            return base.OnBreakpointHitAsync(bp);
-        }
-
-        protected override Task OnSingleStepAsync()
-        {
-            Breaks.Add(Context);
-
-            OnStep?.Invoke(Context);
-
-            return base.OnSingleStepAsync();
-        }
-
-        protected override Task OnFirstBlockAsync()
-        {
-            Breaks.Add(Context);
-
-            OnStart?.Invoke(Context);
-
-            return base.OnFirstBlockAsync();
-        }
-
-        protected override Task OnVolatileStopAsync()
-        {
-            Breaks.Add(Context);
-
-            OnVolatile?.Invoke(Context);
-
-            return base.OnVolatileStopAsync();
+            return base.OnBreakAsync();
         }
 
         protected override Task<Exception?> OnExceptionDetectedAsync(Exception original)
         {
-            if (OnException != null) return Task.FromResult(OnException(Context, original));
+            var onException = OnException;
+
+            if (onException != null) return Task.FromResult(onException(StoppedAt!, original));
 
             return base.OnExceptionDetectedAsync(original);
         }
@@ -121,7 +88,7 @@ public class DebuggerEngineTests : TestEnvironment
 
         var hits = 0;
 
-        Debugger.OnHit = (context, bp) =>
+        Debugger.OnBreak = (context) =>
         {
             if (++hits == stopAt) Debugger.Breakpoints.Remove(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
         };
@@ -140,13 +107,13 @@ public class DebuggerEngineTests : TestEnvironment
     [TestCase(3000)]
     public async Task Can_Single_Step_Debugger_Async(int? stopAt)
     {
-        Debugger.SingleStep = true;
+        Debugger.Continue(ScriptDebugContinueModes.StepInto);
 
         var hits = 0;
 
-        Debugger.OnStep = (context) =>
+        Debugger.OnBreak = (context) =>
         {
-            if (++hits == stopAt) Debugger.SingleStep = false;
+            if (++hits != stopAt) Debugger.Continue(ScriptDebugContinueModes.StepInto);
         };
 
         var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
@@ -164,11 +131,11 @@ public class DebuggerEngineTests : TestEnvironment
     [Test]
     public async Task Can_Stop_On_Start_Async()
     {
-        Debugger.StopOnStart = true;
+        Debugger.Continue(ScriptDebugContinueModes.StepInto);
 
         var hitFirst = false;
 
-        Debugger.OnStart = (context) =>
+        Debugger.OnBreak = (context) =>
         {
             Assert.That(context.Block.Id, Is.EqualTo("~-@g:c_wcw/=l7I4Z$X9"));
 
@@ -196,7 +163,7 @@ public class DebuggerEngineTests : TestEnvironment
 
         var hits = 0;
 
-        Debugger.OnHit = (context, bp) =>
+        Debugger.OnBreak = (context) =>
         {
             if (++hits != testAt) return;
 
@@ -232,23 +199,26 @@ public class DebuggerEngineTests : TestEnvironment
         Assert.That(hits, Is.EqualTo(testAt));
     }
 
-    [Test]
-    public async Task Can_Stop_On_Volative_Async()
+    [TestCase(ScriptDebugContinueModes.StepInto, "lIvo!.Jrw(mvKuaEVo2=")]
+    [TestCase(ScriptDebugContinueModes.StepOver, "Kb__-_**cI=OxUIZg9yW")]
+    public async Task Can_Stop_On_Volative_Async(ScriptDebugContinueModes mode, string nextBlockId)
     {
         var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
 
         Debugger.Breakpoints.Add(scriptId, "~-@g:c_wcw/=l7I4Z$X9");
 
-        Debugger.OnHit = (context, bp) =>
-        {
-            Assert.That(context.Block.Id, Is.EqualTo("~-@g:c_wcw/=l7I4Z$X9"));
+        string? next = null;
 
-            Debugger.Breakpoints.RunTo(scriptId, context.Block.Next!.Id);
-        };
-
-        Debugger.OnVolatile = (context) =>
+        Debugger.OnBreak = (context) =>
         {
-            Assert.That(context.Block.Id, Is.EqualTo("Kb__-_**cI=OxUIZg9yW"));
+            if (next != null)
+                Assert.That(context.Block.Id, Is.EqualTo(nextBlockId));
+            else if (context.Block.Id == "~-@g:c_wcw/=l7I4Z$X9")
+            {
+                Debugger.Continue(mode);
+
+                next = nextBlockId;
+            }
         };
 
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
@@ -258,7 +228,6 @@ public class DebuggerEngineTests : TestEnvironment
         var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That(result.Result, Is.EqualTo(500500));
-        Assert.That(Debugger.Breaks, Has.Count.EqualTo(2));
     }
 
     [TestCase(false, 2)]
