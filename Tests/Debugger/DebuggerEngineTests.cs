@@ -61,7 +61,7 @@ public class DebuggerEngineTests : TestEnvironment
 
         Debugger.Enabled = true;
 
-        Engine.SetDebugger(Debugger);
+        Engine.Debugger = Debugger;
 
         base.OnStartup();
     }

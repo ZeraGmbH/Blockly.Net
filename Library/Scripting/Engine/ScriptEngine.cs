@@ -69,11 +69,8 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// </summary>
     protected bool Done { get; private set; } = false;
 
-
-    /// <summary>
-    /// Debugger attached to this script.
-    /// </summary>
-    private IScriptDebugger? _debugger;
+    /// <inheritdoc/>
+    public IScriptDebugger? Debugger { get; set; }
 
     /// <summary>
     /// Exception observed during execution - only valid when _done is set.
@@ -339,7 +336,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
             _error = error;
 
             /* Inform debugger. */
-            _debugger?.ScriptFinished(_error);
+            Debugger?.ScriptFinished(_error);
 
             /* Customize. */
             await OnScriptDoneAsync(script, null);
@@ -525,14 +522,11 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
 
     /// <inheritdoc/>
     public Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason)
-        => _debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
+        => Debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
 
     /// <inheritdoc/>
     public Task<Exception?> CatchExceptionAsync(Block block, Context context, Exception original)
-        => _debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
-
-    /// <inheritdoc/>
-    public void SetDebugger(IScriptDebugger? debugger) => _debugger = debugger;
+        => Debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
 
     /// <inheritdoc/>
     public Task<GroupStatus?> BeginGroupAsync(string key, string? name, string? details) => _groupManager.StartAsync(key, name, details);
