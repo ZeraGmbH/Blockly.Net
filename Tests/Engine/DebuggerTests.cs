@@ -88,7 +88,7 @@ public class DebuggerTests : TestEnvironment
     {
         var debugger = new Debugger();
 
-        Engine.SetDebugger(debugger);
+        Engine.Debugger = debugger;
 
         try
         {
@@ -113,7 +113,7 @@ public class DebuggerTests : TestEnvironment
         }
         finally
         {
-            Engine.SetDebugger(null);
+            Engine.Debugger = null;
         }
 
         Assert.That(debugger.Actions, Is.EqualTo([

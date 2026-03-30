@@ -71,6 +71,5 @@ public interface IScriptEngine
     /// <summary>
     /// Attach or detach the debugger associated with this script site.
     /// </summary>
-    /// <param name="debugger">Debugger to use or null to detach.</param>
-    void SetDebugger(IScriptDebugger? debugger);
+    IScriptDebugger? Debugger { get; set; }
 }

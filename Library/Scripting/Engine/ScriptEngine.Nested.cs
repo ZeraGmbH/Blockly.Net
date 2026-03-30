@@ -207,7 +207,7 @@ partial class ScriptEngine<TLogType>
             finally
             {
                 /* Inform debugger if still active. */
-                _engine._debugger?.ScriptFinished(_error);
+                _engine.Debugger?.ScriptFinished(_error);
 
                 /* Customize. */
                 await _engine.OnScriptDoneAsync(script, Parent);
@@ -224,11 +224,11 @@ partial class ScriptEngine<TLogType>
 
         /// <inheritdoc/>
         public Task SingleStepAsync(Block block, Context context, ScriptDebuggerStopReason reason)
-            => _engine._debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
+            => _engine.Debugger?.InterceptAsync(block, context, reason) ?? Task.CompletedTask;
 
         /// <inheritdoc/>
         public Task<Exception?> CatchExceptionAsync(Block block, Context context, Exception original)
-            => _engine._debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
+            => _engine.Debugger?.InterceptExceptionAsync(block, context, original) ?? Task.FromResult<Exception?>(original);
 
         /// <inheritdoc/>
         public virtual Task BeginExecuteGroupAsync(GroupStatus status, bool recover) => Task.CompletedTask;
