@@ -65,7 +65,19 @@ public abstract class ScriptDebugger : IScriptDebugger
         /// </summary>
         /// <param name="context">Current execution context.</param>
         /// <returns>Set if we should stop execution.</returns>
-        public bool MustStop(ScriptDebugContext context) => StopAtNextBlock || StopAtParent == context.Context || StopAtBlock == context.Position;
+        public bool MustStop(ScriptDebugContext context)
+        {
+            /* Step into, step over or stop at. */
+            if (StopAtNextBlock || StopAtBlock == context.Position)
+                return true;
+
+            /* Step out. */
+            for (var test = StopAtParent; test != null; test = test.Parent)
+                if (context.Context == test)
+                    return true;
+
+            return false;
+        }
     }
 
     private CurrentOperationMode _operationMode = new(false);

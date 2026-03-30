@@ -12,7 +12,7 @@ public interface IScriptBreakpoint : IScriptLocation
     /// Set if breakpoint is enabled.
     /// </summary>
     [NotNull, Required]
-    bool Enabled { get; }
+    bool Enabled { get; set; }
 
     /// <summary>
     /// Optional description of the breakpoint - what 
