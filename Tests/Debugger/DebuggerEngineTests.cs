@@ -283,4 +283,33 @@ public class DebuggerEngineTests : TestEnvironment
 
         Assert.That(result.Result, Is.EqualTo(1610));
     }
+
+    [Test]
+    public async Task Can_Step_Out_Of_Nested_Script_Async()
+    {
+        var innerId = AddScript("SCRIPTI", SampleScripts.DebugScript4Inner);
+        var outerId = AddScript("SCRIPTO", SampleScripts.DebugScript4Outer(innerId));
+
+        Debugger.Breakpoints.Add(innerId, "Z*dM$.4KJX*@?2L#Ll~^");
+
+        Debugger.OnBreak = context =>
+        {
+            if (context.BlockId == "Z*dM$.4KJX*@?2L#Ll~^")
+            {
+                Debugger.Breakpoints[innerId, "Z*dM$.4KJX*@?2L#Ll~^"]!.Enabled = false;
+
+                Debugger.Continue(ScriptDebugContinueModes.LeaveNested);
+            }
+            else
+                Assert.That(context.BlockId, Is.EqualTo("+%/-8RI^@6ZZo+~J#rV*"));
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = outerId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(-55));
+    }
 }

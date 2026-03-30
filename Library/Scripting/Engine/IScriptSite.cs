@@ -122,6 +122,11 @@ public interface IScriptSite
     /// Update the current log entry.
     /// </summary>
     Task UpdateLogAsync();
+
+    /// <summary>
+    /// Site of the parent script.
+    /// </summary>
+    IScriptSite? ParentSite { get; }
 }
 
 /// <summary>

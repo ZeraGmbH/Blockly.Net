@@ -29,10 +29,8 @@ public abstract class Script<TRequest, TResult, TOption, TLogType, TModifierType
     /// <inheritdoc/>
     public override StartScript GetRequest() => Request;
 
-    /// <summary>
-    /// Engine executing this script.
-    /// </summary>
-    public readonly IScriptSite Engine = engine;
+    /// <inheritdoc/>
+    public override IScriptSite Engine { get; } = engine;
 
     /// <summary>
     /// Test for cancel.

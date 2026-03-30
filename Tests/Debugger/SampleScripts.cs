@@ -290,4 +290,119 @@ public static class SampleScripts
             </value>
         </block>
     </xml>";
+
+    public const string DebugScript4Inner = @"<xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable id=""g8@EO|Q%.jJ-#fcj/cV-"">result</variable>
+            <variable id=""Z`Yuiu%`oz*2FC7;0Y`E"">i</variable>
+        </variables>
+        <block type=""variables_set"" id=""zwqv-n16yb;rL[HE:.:`"" x=""125"" y=""275"">
+            <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+            <value name=""VALUE"">
+            <block type=""math_number"" id=""Yx(j1I#|[HL@xSnu}6{~"">
+                <field name=""NUM"">0</field>
+            </block>
+            </value>
+            <next>
+            <block type=""controls_for"" id=""q]XUupsj?9w|}qKS2=cC"">
+                <field name=""VAR"" id=""Z`Yuiu%`oz*2FC7;0Y`E"">i</field>
+                <value name=""FROM"">
+                <shadow type=""math_number"" id=""Cm|I/mWNC(vvy4CWlRbQ"">
+                    <field name=""NUM"">1</field>
+                </shadow>
+                </value>
+                <value name=""TO"">
+                <shadow type=""math_number"" id=""Gx,I7II[3i^-x{aw;f.R"">
+                    <field name=""NUM"">10</field>
+                </shadow>
+                </value>
+                <value name=""BY"">
+                <shadow type=""math_number"" id=""I(ciQFMhWo}KxS*S[Ify"">
+                    <field name=""NUM"">1</field>
+                </shadow>
+                </value>
+                <statement name=""DO"">
+                <block type=""variables_set"" id=""cO%UQrHgNG6FZ2TBA34B"">
+                    <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+                    <value name=""VALUE"">
+                    <block type=""math_arithmetic"" id=""y)r_+0y{i2P5,[dcI[q+"">
+                        <field name=""OP"">ADD</field>
+                        <value name=""A"">
+                        <shadow type=""math_number"" id=""g0{k^ZA:p?e*V;BVJDhs"">
+                            <field name=""NUM"">1</field>
+                        </shadow>
+                        <block type=""variables_get"" id=""xkD99LE]XI:;%f=u}1o@"">
+                            <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+                        </block>
+                        </value>
+                        <value name=""B"">
+                        <shadow type=""math_number"" id=""arSUQk+kGOzhLiv4}rBO"">
+                            <field name=""NUM"">1</field>
+                        </shadow>
+                        <block type=""variables_get"" id=""Z*dM$.4KJX*@?2L#Ll~^"">
+                            <field name=""VAR"" id=""Z`Yuiu%`oz*2FC7;0Y`E"">i</field>
+                        </block>
+                        </value>
+                    </block>
+                    </value>
+                </block>
+                </statement>
+            </block>
+            </next>
+        </block>
+    </xml>";
+
+    public static string DebugScript4Outer(string innerId) => @"<xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable id=""g8@EO|Q%.jJ-#fcj/cV-"">result</variable>
+        </variables>
+        <block type=""variables_set"" id=""zwqv-n16yb;rL[HE:.:`"" x=""125"" y=""275"">
+            <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+            <value name=""VALUE"">
+            <block type=""run_script_by_name"" id=""~^a*CB=),uB)qxsq!9iV"">
+                <value name=""NAME"">
+                <shadow type=""text"" id=""%oD~%SU-LZyer%n[mi=#"">
+                    <field name=""TEXT""></field>
+                </shadow>
+                <block type=""text"" id=""E;;0,WhDABCh|lNX@]$j"">
+                    <field name=""TEXT"">Jochen - Debug Demo 4 (Inner)</field>
+                </block>
+                </value>
+                <value name=""ID"">
+                <block type=""text"" id="":zl6UX-1KwCn)W%pwf14"">
+                    <field name=""TEXT"">$$InnerId$$</field>
+                </block>
+                </value>
+                <value name=""BUILDONLY"">
+                <shadow type=""logic_boolean"" id=""[2:$%^!R.[helM-LWT!S"">
+                    <field name=""BOOL"">FALSE</field>
+                </shadow>
+                </value>
+            </block>
+            </value>
+            <next>
+            <block type=""variables_set"" id=""+%/-8RI^@6ZZo+~J#rV*"">
+                <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+                <value name=""VALUE"">
+                <block type=""math_arithmetic"" id=""Y[h*g-iK^9{djQrK(B}V"">
+                    <field name=""OP"">MINUS</field>
+                    <value name=""A"">
+                    <shadow type=""math_number"" id=""6V_SdNuvGZou7U(zK`(v"">
+                        <field name=""NUM"">0</field>
+                    </shadow>
+                    </value>
+                    <value name=""B"">
+                    <shadow type=""math_number"" id=""9lVQw3`z$aa!2y.Emt14"">
+                        <field name=""NUM"">1</field>
+                    </shadow>
+                    <block type=""variables_get"" id=""Pl9^[(*$BJ,0.p[n5;.E"">
+                        <field name=""VAR"" id=""g8@EO|Q%.jJ-#fcj/cV-"">result</field>
+                    </block>
+                    </value>
+                </block>
+                </value>
+            </block>
+            </next>
+        </block>
+    </xml>".Replace("$$InnerId$$", innerId);
 }
