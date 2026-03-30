@@ -23,9 +23,9 @@ public abstract class ScriptDebugger : IScriptDebugger
 
         public bool BreakOnExceptions { get; set; }
 
-        public void Add(string scriptId, string blockId)
+        public void Add(string scriptId, string blockId, string? description = null)
         {
-            var bp = new ScriptBreakpoint(scriptId, blockId);
+            var bp = new ScriptBreakpoint(scriptId, blockId, description);
 
             lock (_breakpoints)
                 _breakpoints[bp] = bp;
@@ -164,7 +164,7 @@ public abstract class ScriptDebugger : IScriptDebugger
 
                 var hit = _breakpoints[_context.ScriptId, block.Id];
 
-                if (hit != null)
+                if (hit?.Enabled == true)
                 {
                     _volatile = null;
 

@@ -25,4 +25,10 @@ public interface IScriptBreakpoint
     /// </summary>
     [NotNull, Required]
     string BlockId { get; }
+
+    /// <summary>
+    /// Optional description of the breakpoint - what 
+    /// the user sees.
+    /// </summary>
+    string? Description { get; }
 }
