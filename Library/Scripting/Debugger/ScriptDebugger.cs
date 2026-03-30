@@ -6,7 +6,7 @@ namespace BlocklyNet.Scripting.Debugger;
 /// <summary>
 /// Helper class to implement debuggers.
 /// </summary>
-public abstract class ScriptDebugger : IScriptDebugger
+public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 {
     private class BreakpointList : IScriptBreakpoints
     {
@@ -259,7 +259,9 @@ public abstract class ScriptDebugger : IScriptDebugger
     {
         var newStopper = new TaskCompletionSource();
 
-        Interlocked.Exchange(ref _stop, newStopper)?.SetCanceled();
+        var stop = Interlocked.Exchange(ref _stop, newStopper);
+
+        if (!stop.Task.IsCompleted) stop.SetCanceled();
 
         return newStopper.Task;
     }
@@ -271,6 +273,12 @@ public abstract class ScriptDebugger : IScriptDebugger
     {
         var stop = _stop;
 
-        if (stop.Task.IsCompleted) _stop.SetResult();
+        if (!stop.Task.IsCompleted) _stop.SetResult();
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Restart();
     }
 }
