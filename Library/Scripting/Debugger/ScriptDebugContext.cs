@@ -9,6 +9,11 @@ namespace BlocklyNet.Scripting.Debugger;
 /// </summary>
 public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStopReason reason, Context context) : IScriptPosition
 {
+    /// <summary>
+    /// Current position.
+    /// </summary>
+    public IScriptLocation Position = new ScriptBreakpoint(scriptId, block.Id);
+
     /// <inheritdoc/>
     public string ScriptId { get; } = scriptId;
 

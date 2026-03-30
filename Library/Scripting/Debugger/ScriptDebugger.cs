@@ -8,7 +8,7 @@ namespace BlocklyNet.Scripting.Debugger;
 /// </summary>
 public abstract class ScriptDebugger : IScriptDebugger
 {
-    private class BreakpointList(ScriptDebugger debugger) : IScriptBreakpoints
+    private class BreakpointList : IScriptBreakpoints
     {
         private readonly Dictionary<ScriptBreakpoint, ScriptBreakpoint> _breakpoints = [];
 
@@ -42,8 +42,6 @@ public abstract class ScriptDebugger : IScriptDebugger
             lock (_breakpoints)
                 _breakpoints.Remove(new ScriptBreakpoint(scriptId, blockId));
         }
-
-        public void RunTo(string scriptId, string blockId) => debugger.RunTo(scriptId, blockId);
     }
 
     /// <summary>
@@ -51,24 +49,33 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// </summary>
     public IScriptBreakpoints Breakpoints => _breakpoints;
 
-    private readonly BreakpointList _breakpoints;
+    private readonly BreakpointList _breakpoints = new();
+
+    private class CurrentOperationMode(bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null)
+    {
+        public readonly bool StopAtNextBlock = stopAtNextBlock;
+
+        public readonly IScriptBreakpoint? StopAtBlock = stopAtBlock;
+
+        public readonly Context? StopAtParent = stopAtParent;
+
+        /// <summary>
+        /// See if we should stop at the current context - can
+        /// be either step into, step out, step over or stop at.
+        /// </summary>
+        /// <param name="context">Current execution context.</param>
+        /// <returns>Set if we should stop execution.</returns>
+        public bool MustStop(ScriptDebugContext context) => StopAtNextBlock || StopAtParent == context.Context || StopAtBlock == context.Position;
+    }
+
+    private CurrentOperationMode _operationMode = new(false);
 
     /// <summary>
     /// Current execution context.
     /// </summary>
-    protected ScriptDebugContext Context => _context;
+    public ScriptDebugContext? StoppedAt => _context;
 
-    private ScriptDebugContext _context = null!;
-
-    /// <summary>
-    /// Single step each block.
-    /// </summary>
-    public bool SingleStep { get; set; } = false;
-
-    /// <summary>
-    /// Stop on first real block.
-    /// </summary>
-    public bool StopOnStart { get; set; } = false;
+    private ScriptDebugContext? _context = null;
 
     /// <inheritdoc/>
     public bool Enabled { get; set; } = false;
@@ -76,25 +83,41 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// <inheritdoc/>
     public IScriptPosition? CurrentPosition => _context;
 
-    /// <summary>
-    /// Volatile breakpoint used for step over and run to block.
-    /// </summary>
-    private IScriptBreakpoint? _volatile;
+    /// <inheritdoc/>
+    public void RunTo(string scriptId, string blockId) => _operationMode = new(false, stopAtBlock: new ScriptBreakpoint(scriptId, blockId));
 
-    /// <summary>
-    /// Initialize a new debugger.
-    /// </summary>
-    protected ScriptDebugger()
+    /// <inheritdoc/>
+    public void Continue(ScriptDebugContinueModes mode)
     {
-        _breakpoints = new(this);
-    }
+        var context = StoppedAt;
 
-    /// <summary>
-    /// Stop at the indicated block.
-    /// </summary>
-    /// <param name="scriptId">Script to use.</param>
-    /// <param name="blockId">Block to stop at.</param>
-    private void RunTo(string scriptId, string blockId) => _volatile = new ScriptBreakpoint(scriptId, blockId);
+        switch (mode)
+        {
+            case ScriptDebugContinueModes.Normal:
+                _operationMode = new(false);
+                break;
+            case ScriptDebugContinueModes.StepInto:
+                _operationMode = new(true);
+                break;
+            case ScriptDebugContinueModes.StepOver:
+                if (context == null) throw new InvalidOperationException("debugger not active");
+
+                if (context.Block.Next == null)
+                    _operationMode = new(false);
+                else
+                    _operationMode = new(false, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
+
+                break;
+            case ScriptDebugContinueModes.StepOut:
+                if (context == null) throw new InvalidOperationException("debugger not active");
+
+                _operationMode = new(false, stopAtParent: context.Context.Parent);
+
+                break;
+            default:
+                throw new ArgumentException($"Unsupported debug mode {mode}", nameof(mode));
+        }
+    }
 
     /// <summary>
     /// Install an operating context.
@@ -103,104 +126,56 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// <param name="context">Current execution context.</param>
     /// <param name="reason">Reason for the debugger to be called.</param>
     /// <returns>Set if processing should continue.</returns>
-    private bool CreateContext(Block block, Context context, ScriptDebuggerStopReason reason)
+    private ScriptDebugContext? CreateContext(Block block, Context context, ScriptDebuggerStopReason reason)
     {
         /* We are not active. */
-        if (!Enabled) return false;
+        if (!Enabled) return null;
 
         /* Ignore all blocky internal warmup blocks. */
-        if (block.Type == null) return false;
+        if (block.Type == null) return null;
 
         /* Must be a well known script. */
-        if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return false;
+        if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return null;
 
         /* Simplify overloads by providing some execution context. */
         _context = new(script.Request.ScriptId, block, reason, context);
 
-        return true;
+        return _context;
     }
 
     /// <inheritdoc/>
     public async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
     {
         /* See if we could handle the exception. */
-        if (!CreateContext(block, context, reason)) return;
+        var stoppedAt = CreateContext(block, context, reason);
+
+        if (stoppedAt == null) return;
 
         try
         {
             /* Before execution a block check for a breakpoint. */
             if (reason == ScriptDebuggerStopReason.Enter)
             {
-                if (StopOnStart)
+                /* Volatile stop or active breakpoint hit. */
+                if (_operationMode.MustStop(stoppedAt) || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
                 {
-                    _volatile = null;
+                    Continue(ScriptDebugContinueModes.Normal);
 
-                    StopOnStart = false;
-
-                    await OnFirstBlockAsync();
-
-                    return;
-                }
-
-                var volatileBp = _volatile;
-
-                if (volatileBp != null && volatileBp.ScriptId == _context.ScriptId && volatileBp.BlockId == block.Id)
-                {
-                    _volatile = null;
-
-                    await OnVolatileStopAsync();
-
-                    return;
-                }
-
-                if (SingleStep)
-                {
-                    _volatile = null;
-
-                    await OnSingleStepAsync();
-
-                    return;
-                }
-
-                var hit = _breakpoints[_context.ScriptId, block.Id];
-
-                if (hit?.Enabled == true)
-                {
-                    _volatile = null;
-
-                    await OnBreakpointHitAsync(hit);
-
-                    return;
+                    await OnBreakAsync();
                 }
             }
         }
         finally
         {
             /* This inspection is finished - get rid of context. */
-            _context = null!;
+            _context = null;
         }
     }
 
     /// <summary>
-    /// Called when a breakpoint hit is detected.
+    /// Called when we stopped for some reason other than a breakpoint or an exception.
     /// </summary>
-    /// <param name="bp">Breakpoint hit.</param>
-    protected virtual Task OnBreakpointHitAsync(IScriptBreakpoint bp) => Task.CompletedTask;
-
-    /// <summary>
-    /// Called in single step mode.
-    /// </summary>
-    protected virtual Task OnSingleStepAsync() => Task.CompletedTask;
-
-    /// <summary>
-    /// Called on the first block of a script.
-    /// </summary>
-    protected virtual Task OnFirstBlockAsync() => Task.CompletedTask;
-
-    /// <summary>
-    /// Hit some volatile breakpoint.
-    /// </summary>
-    protected virtual Task OnVolatileStopAsync() => Task.CompletedTask;
+    protected virtual Task OnBreakAsync() => Task.CompletedTask;
 
     /// <summary>
     /// Process incoming exception.
@@ -215,7 +190,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     }
 
     /// <inheritdoc/>
-    public List<ScriptDebugVariableScope>? GetVariables() => Context?.GetVariables();
+    public List<ScriptDebugVariableScope>? GetVariables() => StoppedAt?.GetVariables();
 
     /// <inheritdoc/>
     public async Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
@@ -224,7 +199,7 @@ public abstract class ScriptDebugger : IScriptDebugger
         if (!_breakpoints.BreakOnExceptions) return original;
 
         /* See if we could handle the exception. */
-        if (!CreateContext(block, context, ScriptDebuggerStopReason.Exception)) return original;
+        if (CreateContext(block, context, ScriptDebuggerStopReason.Exception) == null) return original;
 
         try
         {
@@ -233,7 +208,7 @@ public abstract class ScriptDebugger : IScriptDebugger
         finally
         {
             /* This inspection is finished - get rid of context. */
-            _context = null!;
+            _context = null;
         }
     }
 }
