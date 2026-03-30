@@ -255,7 +255,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// <summary>
     /// Stop execution and wait.
     /// </summary>
-    protected Task StopAsync()
+    protected virtual Task StopAsync()
     {
         var newStopper = new TaskCompletionSource();
 
@@ -267,7 +267,7 @@ public abstract class ScriptDebugger : IScriptDebugger
     /// <summary>
     /// Restart regular execution.
     /// </summary>
-    protected void Restart()
+    protected virtual void Restart()
     {
         var stop = _stop;
 
