@@ -269,7 +269,8 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <summary>
     /// Restart regular execution.
     /// </summary>
-    protected virtual void Restart()
+    /// <param name="disposing">Set when restart is called during dispose.</param>
+    protected virtual void Restart(bool disposing = false)
     {
         var stop = _stop;
 
@@ -279,6 +280,6 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        Restart();
+        Restart(true);
     }
 }
