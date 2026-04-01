@@ -72,7 +72,7 @@ public class RequestUserInput : Block
   /// <inheritdoc/>
   protected override async Task<object?> EvaluateAsync(Context context)
   {
-    var delay = await Values.EvaluateAsync<double?>("DELAY", context, false);
+    var delay = await Values.EvaluateOptionalDoubleAsync("DELAY", context);
     var key = await Values.EvaluateAsync<string>("KEY", context);
     var required = await Values.EvaluateAsync<bool?>("REQUIRED", context, false);
     var secs = delay.GetValueOrDefault(0);

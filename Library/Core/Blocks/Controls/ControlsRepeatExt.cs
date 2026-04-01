@@ -17,7 +17,7 @@ public class ControlsRepeatExt : Block
       return await base.EvaluateAsync(context);
 
     /* Number of times to execute the inner block. */
-    for (var i = await Values.EvaluateAsync<double>("TIMES", context); i-- > 0;)
+    for (var i = await Values.EvaluateDoubleAsync("TIMES", context); i-- > 0;)
     {
       /* Execute the inner block. */
       context.Cancellation.ThrowIfCancellationRequested();

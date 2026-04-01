@@ -15,7 +15,7 @@ public class ColourBlend : Block
     var colour1 = (await Values.EvaluateAsync("COLOUR1", context) ?? "").ToString();
     var colour2 = (await Values.EvaluateAsync("COLOUR2", context) ?? "").ToString();
 
-    var ratio = System.Math.Min(System.Math.Max(await Values.EvaluateAsync<double>("RATIO", context), 0), 1);
+    var ratio = System.Math.Min(System.Math.Max(await Values.EvaluateDoubleAsync("RATIO", context), 0), 1);
 
     if (string.IsNullOrWhiteSpace(colour1) || colour1.Length != 7)
       return null!;

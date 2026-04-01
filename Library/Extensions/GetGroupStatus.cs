@@ -49,7 +49,7 @@ public class GetGroupStatus : Block
     /// <inheritdoc/>
     protected override async Task<object?> EvaluateAsync(Context context)
     {
-        var index = (int)await Values.EvaluateAsync<double>("INDEX", context);
+        var index = (int)await Values.EvaluateDoubleAsync("INDEX", context);
 
         return context.Engine.GetGroupStatus(index - 1);
     }

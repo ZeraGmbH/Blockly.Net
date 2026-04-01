@@ -20,20 +20,7 @@ public class MathOnList : Block
     var op = Fields["OP"];
     var list = await Values.EvaluateAsync<IEnumerable<object>>("LIST", context);
 
-    var doubleList = list.Select(raw =>
-    {
-      if (cvt == null) return (double)raw;
-
-      /* Run converter - report cast error on mismatch. */
-      try
-      {
-        return cvt.GetNumber(raw);
-      }
-      catch (Exception)
-      {
-        return (double)raw;
-      }
-    }).ToArray();
+    var doubleList = list.Select(raw => Values.TryConvertToDouble(raw, context, out var num) ? num : (double)raw).ToArray();
 
     return op switch
     {

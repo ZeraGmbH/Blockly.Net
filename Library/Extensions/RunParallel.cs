@@ -58,7 +58,7 @@ public class RunParallel : Block
     {
       /* Load array of scripts. */
       var scripts = await Values.EvaluateAsync<IEnumerable>("SCRIPTS", context);
-      var leading = await Values.EvaluateAsync<double?>("LEADINGSCRIPT", context, false);
+      var leading = await Values.EvaluateOptionalDoubleAsync("LEADINGSCRIPT", context);
 
       /* Request configuration for all scripts - allow empty array elements. */
       var configs = scripts.Cast<StartScript>().ToList();
