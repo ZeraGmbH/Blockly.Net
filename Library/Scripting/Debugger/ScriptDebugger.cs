@@ -166,52 +166,48 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <param name="block">Current block.</param>
     /// <param name="context">Current execution context.</param>
     /// <param name="reason">Reason for the debugger to be called.</param>
-    /// <returns>Set if processing should continue.</returns>
-    private ScriptDebugContext? CreateContext(Block block, Context context, ScriptDebuggerStopReason reason)
+    /// <param name="handler">What to do.</param>
+    private async Task<T> RunAsync<T>(Block block, Context context, ScriptDebuggerStopReason reason, Func<ScriptDebugContext, Task<T>> handler)
     {
         /* We are not active. */
-        if (!Enabled) return null;
+        if (!Enabled) return default!;
 
         /* Ignore all blocky internal warmup blocks. */
-        if (block.Type == null) return null;
+        if (block.Type == null) return default!;
 
         /* Must be a well known script. */
-        if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return null;
+        if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return default!;
 
         /* Simplify overloads by providing some execution context. */
         _context = new(script.Request.ScriptId, block, reason, context);
 
-        return _context;
-    }
-
-    /// <inheritdoc/>
-    public virtual async Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
-    {
-        /* See if we could handle the exception. */
-        var stoppedAt = CreateContext(block, context, reason);
-
-        if (stoppedAt == null) return;
-
         try
         {
-            /* Before execution a block check for a breakpoint. */
-            if (reason == ScriptDebuggerStopReason.Enter)
-            {
-                /* Volatile stop or active breakpoint hit. */
-                if (_operationMode.MustStop(stoppedAt) || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
-                {
-                    Continue(ScriptDebugContinueModes.Normal);
-
-                    await OnBreakAsync();
-                }
-            }
+            return await handler(_context);
         }
         finally
         {
-            /* This inspection is finished - get rid of context. */
             _context = null;
         }
     }
+
+    /// <inheritdoc/>
+    public virtual Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
+        => RunAsync(block, context, reason, async stoppedAt =>
+            {
+                if (reason == ScriptDebuggerStopReason.Enter)
+                {
+                    /* Volatile stop or active breakpoint hit. */
+                    if (_operationMode.MustStop(stoppedAt) || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
+                    {
+                        Continue(ScriptDebugContinueModes.Normal);
+
+                        await OnBreakAsync();
+                    }
+                }
+
+                return true;
+            });
 
     /// <summary>
     /// Called when we stopped for some reason other than a breakpoint or an exception.
@@ -234,24 +230,10 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     public List<ScriptDebugVariableScope>? GetVariables() => StoppedAt?.GetVariables();
 
     /// <inheritdoc/>
-    public virtual async Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
-    {
-        /* No interested in exceptions. */
-        if (!_breakpoints.BreakOnExceptions) return original;
-
-        /* See if we could handle the exception. */
-        if (CreateContext(block, context, ScriptDebuggerStopReason.Exception) == null) return original;
-
-        try
-        {
-            return await OnExceptionDetectedAsync(original);
-        }
-        finally
-        {
-            /* This inspection is finished - get rid of context. */
-            _context = null;
-        }
-    }
+    public virtual Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
+        => _breakpoints.BreakOnExceptions
+            ? RunAsync(block, context, ScriptDebuggerStopReason.Exception, (stoppedAt) => OnExceptionDetectedAsync(original))
+            : Task.FromResult<Exception?>(original);
 
     /// <summary>
     /// Stop execution and wait.
