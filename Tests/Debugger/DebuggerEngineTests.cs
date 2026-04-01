@@ -269,6 +269,20 @@ public class DebuggerEngineTests : TestEnvironment
         {
             if (Context.Position.BlockId == "G5]l)A/yzjQbrq)Cr57t")
             {
+                var variables = Context.GetVariables();
+
+                Assert.That(variables, Has.Count.EqualTo(3));
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(variables[0].ScriptId, Is.EqualTo(scriptId));
+                    Assert.That(variables[0].Procedure, Is.EqualTo("generate"));
+                    Assert.That(variables[1].ScriptId, Is.EqualTo(scriptId));
+                    Assert.That(variables[1].Procedure, Is.EqualTo("sumTo"));
+                    Assert.That(variables[2].ScriptId, Is.EqualTo(scriptId));
+                    Assert.That(variables[2].Procedure, Is.Null);
+                }
+
                 Debugger.Breakpoints[scriptId, "G5]l)A/yzjQbrq)Cr57t"]!.Enabled = false;
 
                 Debugger.Continue(ScriptDebugContinueModes.StepOut);

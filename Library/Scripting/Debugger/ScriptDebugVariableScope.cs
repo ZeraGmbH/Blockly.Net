@@ -26,6 +26,11 @@ public class ScriptDebugVariableScope
     public string ScriptId { get; set; } = null!;
 
     /// <summary>
+    /// Optional name of the related procedure.
+    /// </summary>
+    public string? Procedure { get; set; }
+
+    /// <summary>
     /// All variables in this scope.
     /// </summary>
     [NotNull, Required]

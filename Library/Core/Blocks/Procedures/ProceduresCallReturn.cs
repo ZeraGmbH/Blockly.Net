@@ -19,7 +19,7 @@ public class ProceduresCallReturn : ProceduresCallNoReturn
     if (!context.Functions.TryGetValue(name, out var statement))
       throw new MissingMethodException($"Method '{name}' not defined");
 
-    var funcContext = new Context(context);
+    var funcContext = new ProcedureContext(name, context);
 
     var counter = 0;
 
