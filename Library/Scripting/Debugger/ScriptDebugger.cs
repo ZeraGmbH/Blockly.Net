@@ -81,9 +81,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <summary>
     /// Current execution context.
     /// </summary>
-    public ScriptDebugContext? StoppedAt => _context;
-
-    private ScriptDebugContext? _context = null;
+    public ScriptDebugContext? StoppedAt { get; private set; }
 
     /// <inheritdoc/>
     public bool Enabled
@@ -104,7 +102,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     private bool _enabled = false;
 
     /// <inheritdoc/>
-    public IScriptPosition? CurrentPosition => _context;
+    public IScriptPosition? CurrentPosition => StoppedAt;
 
     /// <summary>
     /// Helper to manage engine stops.
@@ -136,9 +134,9 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     }
 
     /// <inheritdoc/>
-    public virtual void Continue(ScriptDebugContinueModes mode)
+    public virtual void Continue(ScriptDebugContinueModes mode, ScriptDebugContext? stoppedAt = null)
     {
-        var context = StoppedAt;
+        var context = stoppedAt ?? StoppedAt;
 
         switch (mode)
         {
@@ -217,23 +215,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
         /* In parallel mode a single break stops anything. */
         using (_sync.Wait())
-        {
-            /* Simplify overloads by providing some execution context. */
-            _context = new(script.Request.ScriptId, block, reason, context, this);
-
-            SomethingChanged();
-
-            try
-            {
-                return await handler(_context);
-            }
-            finally
-            {
-                _context = null;
-
-                SomethingChanged();
-            }
-        }
+            return await handler(new ScriptDebugContext(script.Request.ScriptId, block, reason, context, this));
     }
 
     /// <inheritdoc/>
@@ -252,7 +234,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                                 Continue(ScriptDebugContinueModes.Normal);
 
-                                await OnBreakAsync();
+                                await OnBreakAsync(stoppedAt);
 
                                 return true;
                             }
@@ -265,7 +247,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
                             {
                                 Logger.LogTrace("Stop at end of script {Breakpoint}", stoppedAt.Position);
 
-                                await OnBreakAsync();
+                                await OnBreakAsync(stoppedAt);
 
                                 return true;
                             }
@@ -280,22 +262,21 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <summary>
     /// Called when we stopped for some reason other than a breakpoint or an exception.
     /// </summary>
-    protected virtual Task OnBreakAsync() => Task.CompletedTask;
+    /// <param name="context">Current script execution context for further inspection.</param>
+    protected virtual Task OnBreakAsync(ScriptDebugContext context) => Task.CompletedTask;
 
     /// <summary>
     /// Process incoming exception.
     /// </summary>
     /// <param name="original">Exception seen</param>
+    /// <param name="context">Current script execution context for further inspection.</param>
     /// <returns>Exception to process, null to ignoree</returns>
-    protected virtual Task<Exception?> OnExceptionDetectedAsync(Exception original) => Task.FromResult<Exception?>(original);
+    protected virtual Task<Exception?> OnExceptionDetectedAsync(Exception original, ScriptDebugContext context) => Task.FromResult<Exception?>(original);
 
     /// <inheritdoc/>
     public virtual void ScriptFinished(Exception? exception)
     {
     }
-
-    /// <inheritdoc/>
-    public List<ScriptDebugVariableScope>? GetVariables() => StoppedAt?.GetVariables();
 
     /// <inheritdoc/>
     public virtual Task<Exception?> InterceptExceptionAsync(Block block, Context context, Exception original)
@@ -304,14 +285,14 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
             {
                 Logger.LogTrace("Stop at exception {Exception}", original.Message);
 
-                return OnExceptionDetectedAsync(original);
+                return OnExceptionDetectedAsync(original, stoppedAt);
             })
             : Task.FromResult<Exception?>(original);
 
     /// <summary>
     /// Stop execution and wait.
     /// </summary>
-    protected virtual Task StopAsync()
+    protected virtual Task StopAsync(ScriptDebugContext context)
     {
         Logger.LogTrace("Script execution paused");
 
@@ -320,6 +301,10 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
         var stop = Interlocked.Exchange(ref _stop, newStopper);
 
         if (!stop.Task.IsCompleted) stop.SetCanceled();
+
+        StoppedAt = context;
+
+        SomethingChanged();
 
         return newStopper.Task;
     }
@@ -330,11 +315,15 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <param name="disposing">Set when restart is called during dispose.</param>
     protected virtual void Restart(bool disposing = false)
     {
+        StoppedAt = null;
+
         if (!disposing) Logger.LogTrace("Script execution resumed");
 
         var stop = _stop;
 
         if (!stop.Task.IsCompleted) _stop.SetResult();
+
+        if (!disposing) SomethingChanged();
     }
 
     /// <inheritdoc/>
