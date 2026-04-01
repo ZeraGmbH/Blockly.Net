@@ -18,5 +18,5 @@ public interface IScriptBreakpoint : IScriptLocation
     /// Optional description of the breakpoint - what 
     /// the user sees.
     /// </summary>
-    string? Description { get; }
+    string? Description { get; set; }
 }

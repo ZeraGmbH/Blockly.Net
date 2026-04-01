@@ -405,4 +405,260 @@ public static class SampleScripts
             </next>
         </block>
     </xml>".Replace("$$InnerId$$", innerId);
+
+    public const string DebugScript5Inner = @"<xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable id=""ZDIXGT%Z(UJRi^~RieuB"">list</variable>
+            <variable id=""QkoPNb%d.!LDp_agPt.M"">i</variable>
+            <variable id=""^_orT3]zalQ%?q/~0:]/"">result</variable>
+            <variable id=""_zee4C|@;2X{Y{olR-pn"">Hint</variable>
+        </variables>
+        <block type=""variables_set"" id=""JT46ucwLa)Xoz56MX(0:"" x=""75"" y=""25"">
+            <field name=""VAR"" id=""ZDIXGT%Z(UJRi^~RieuB"">list</field>
+            <value name=""VALUE"">
+            <block type=""lists_create_with"" id=""vB++~W19HPA[7#/+xfv]"">
+                <mutation items=""0""></mutation>
+            </block>
+            </value>
+            <next>
+            <block type=""controls_for"" id=""OMc.(TC4$T])}RWF5_(~"">
+                <field name=""VAR"" id=""QkoPNb%d.!LDp_agPt.M"">i</field>
+                <value name=""FROM"">
+                <shadow type=""math_number"" id=""[m^?eC#+q=DXU.H%N0H-"">
+                    <field name=""NUM"">1</field>
+                </shadow>
+                </value>
+                <value name=""TO"">
+                <shadow type=""math_number"" id=""JB#ojhlCK*8~#K!lS-hM"">
+                    <field name=""NUM"">10</field>
+                </shadow>
+                </value>
+                <value name=""BY"">
+                <shadow type=""math_number"" id=""IU)@2W.*bfZKgp;c,[|]"">
+                    <field name=""NUM"">1</field>
+                </shadow>
+                </value>
+                <statement name=""DO"">
+                <block type=""delay"" id=""agBwLazbhV]OqKBs;P5W"">
+                    <field name=""DELAY"">Delay (ms)</field>
+                    <value name=""DELAY"">
+                    <shadow type=""math_number"" id=""8xm@!Own(_,$~eG93s4l"">
+                        <field name=""NUM"">50</field>
+                    </shadow>
+                    </value>
+                    <next>
+                    <block type=""lists_setIndex"" id=""/:N_iDv3|JbFCX`Ac/+?"">
+                        <mutation at=""false""></mutation>
+                        <field name=""MODE"">INSERT</field>
+                        <field name=""WHERE"">LAST</field>
+                        <value name=""LIST"">
+                        <block type=""variables_get"" id=""X:L[u%E+8DS?PbmdW:@@"">
+                            <field name=""VAR"" id=""ZDIXGT%Z(UJRi^~RieuB"">list</field>
+                        </block>
+                        </value>
+                        <value name=""TO"">
+                        <block type=""variables_get"" id=""|0z,wnSn+T1vpz;0FXSY"">
+                            <field name=""VAR"" id=""_zee4C|@;2X{Y{olR-pn"">Hint</field>
+                        </block>
+                        </value>
+                    </block>
+                    </next>
+                </block>
+                </statement>
+                <next>
+                <block type=""variables_set"" id=""d,w=A^5HnYk8^0bU=D`x"">
+                    <field name=""VAR"" id=""^_orT3]zalQ%?q/~0:]/"">result</field>
+                    <value name=""VALUE"">
+                    <block type=""lists_split"" id=""TYtoRRUp|+-VEi,fePY$"">
+                        <mutation mode=""JOIN""></mutation>
+                        <field name=""MODE"">JOIN</field>
+                        <value name=""INPUT"">
+                        <block type=""variables_get"" id=""d:HA)*XZysEDzx]D8K}^"">
+                            <field name=""VAR"" id=""ZDIXGT%Z(UJRi^~RieuB"">list</field>
+                        </block>
+                        </value>
+                        <value name=""DELIM"">
+                        <shadow type=""text"" id=""9NT)y?GJ_X[#uUM1Nv*g"">
+                            <field name=""TEXT""> ** </field>
+                        </shadow>
+                        </value>
+                    </block>
+                    </value>
+                </block>
+                </next>
+            </block>
+            </next>
+        </block>
+    </xml>";
+
+    public static string DebugScript5Outer(string innerId) => @"<xml xmlns=""https://developers.google.com/blockly/xml"">
+        <variables>
+            <variable id=""SG?L?f`u1D@r|U=pZf#4"">parallel</variable>
+            <variable id=""Zmt}Hg1LuhcknI~,:o2$"">result</variable>
+        </variables>
+        <block type=""variables_set"" id=""lgk6.v@;_hO}aX0V}l*V"" x=""125"" y=""125"">
+            <field name=""VAR"" id=""SG?L?f`u1D@r|U=pZf#4"">parallel</field>
+            <value name=""VALUE"">
+            <block type=""run_script_in_parallel"" id=""ty]qMj_s4k[XtNU31j0-"">
+                <field name=""SCRIPTS"">scripts</field>
+                <field name=""LEADINGSCRIPT"">leading</field>
+                <value name=""SCRIPTS"">
+                <block type=""lists_create_with"" id=""L##^|esHF$Q,*H,Vj(|7"">
+                    <mutation items=""3""></mutation>
+                    <value name=""ADD0"">
+                    <block type=""run_script_by_name"" id=""!)S%-$%nBUzR!#-]x!P="">
+                        <value name=""NAME"">
+                        <shadow type=""text"" id=""O3F,ir/FqRk;Aa#.V5_Q"">
+                            <field name=""TEXT""></field>
+                        </shadow>
+                        <block type=""text"" id=""f22^WNq#pPo7pW^MG)4T"">
+                            <field name=""TEXT"">Jochen - Debug Demo 5 (Inner)</field>
+                        </block>
+                        </value>
+                        <value name=""ID"">
+                        <block type=""text"" id=""AEYW^H]-=nE=HJ#Q5*6}"">
+                            <field name=""TEXT"">$$InnerId$$</field>
+                        </block>
+                        </value>
+                        <value name=""ARGS"">
+                        <block type=""lists_create_with"" id=""uoig`Uzntz6~$MX~L{2a"">
+                            <mutation items=""1""></mutation>
+                            <value name=""ADD0"">
+                            <block type=""create_script_parameter"" id=""Ezs4^6$`Oy4Z(bZK)EB_"">
+                                <field name=""NAME"">Variable name</field>
+                                <field name=""VALUE"">Value</field>
+                                <value name=""NAME"">
+                                <block type=""text"" id=""Wj@{h=K,@P}B(,8[oLn~"">
+                                    <field name=""TEXT"">Hint</field>
+                                </block>
+                                </value>
+                                <value name=""VALUE"">
+                                <block type=""text"" id=""h1xB86S`o}wUU9MF#C^8"">
+                                    <field name=""TEXT"">A</field>
+                                </block>
+                                </value>
+                            </block>
+                            </value>
+                        </block>
+                        </value>
+                        <value name=""BUILDONLY"">
+                        <shadow type=""logic_boolean"" id=""eXT-!uufRp0!6NV7yJFK"">
+                            <field name=""BOOL"">FALSE</field>
+                        </shadow>
+                        </value>
+                    </block>
+                    </value>
+                    <value name=""ADD1"">
+                    <block type=""run_script_by_name"" id=""d=x(+{E=MH+P}|7k~]D,"">
+                        <value name=""NAME"">
+                        <shadow type=""text"" id=""O3F,ir/FqRk;Aa#.V5_Q"">
+                            <field name=""TEXT""></field>
+                        </shadow>
+                        <block type=""text"" id=""BHQ{jzIo.x~jPttX1wAm"">
+                            <field name=""TEXT"">Jochen - Debug Demo 5 (Inner)</field>
+                        </block>
+                        </value>
+                        <value name=""ID"">
+                        <block type=""text"" id=""NIOq8r6=5JTvfun@vt;I"">
+                            <field name=""TEXT"">$$InnerId$$</field>
+                        </block>
+                        </value>
+                        <value name=""ARGS"">
+                        <block type=""lists_create_with"" id=""I?h%fZ*n}ps.14i5gB$r"">
+                            <mutation items=""1""></mutation>
+                            <value name=""ADD0"">
+                            <block type=""create_script_parameter"" id=""s{eY-IbF+DJ5C+ea|]^^"">
+                                <field name=""NAME"">Variable name</field>
+                                <field name=""VALUE"">Value</field>
+                                <value name=""NAME"">
+                                <block type=""text"" id=""F?.H8vJkh]1itx;z=8_i"">
+                                    <field name=""TEXT"">Hint</field>
+                                </block>
+                                </value>
+                                <value name=""VALUE"">
+                                <block type=""text"" id=""dkshGerj,}tmvw)LWNuw"">
+                                    <field name=""TEXT"">B</field>
+                                </block>
+                                </value>
+                            </block>
+                            </value>
+                        </block>
+                        </value>
+                        <value name=""BUILDONLY"">
+                        <shadow type=""logic_boolean"" id=""`J!OzG~53{50RqCpknFT"">
+                            <field name=""BOOL"">FALSE</field>
+                        </shadow>
+                        </value>
+                    </block>
+                    </value>
+                    <value name=""ADD2"">
+                    <block type=""run_script_by_name"" id=""b,Qgwaf%rV0|z$zRUL@P"">
+                        <value name=""NAME"">
+                        <shadow type=""text"" id=""O3F,ir/FqRk;Aa#.V5_Q"">
+                            <field name=""TEXT""></field>
+                        </shadow>
+                        <block type=""text"" id=""+;m)ukSt;PK%c8a=X!E`"">
+                            <field name=""TEXT"">Jochen - Debug Demo 5 (Inner)</field>
+                        </block>
+                        </value>
+                        <value name=""ID"">
+                        <block type=""text"" id=""`gd{G:^,PaWSmVHy2Tt%"">
+                            <field name=""TEXT"">$$InnerId$$</field>
+                        </block>
+                        </value>
+                        <value name=""ARGS"">
+                        <block type=""lists_create_with"" id=""YUf]9;oi=,:}qUUJQR:n"">
+                            <mutation items=""1""></mutation>
+                            <value name=""ADD0"">
+                            <block type=""create_script_parameter"" id=""4rsM*r^KA(rrD-$e4,~W"">
+                                <field name=""NAME"">Variable name</field>
+                                <field name=""VALUE"">Value</field>
+                                <value name=""NAME"">
+                                <block type=""text"" id=""(+lVw@ZnNS]=BO0bgaLH"">
+                                    <field name=""TEXT"">Hint</field>
+                                </block>
+                                </value>
+                                <value name=""VALUE"">
+                                <block type=""text"" id=""/uK?LjFvj`9bAj@kQVRa"">
+                                    <field name=""TEXT"">C</field>
+                                </block>
+                                </value>
+                            </block>
+                            </value>
+                        </block>
+                        </value>
+                        <value name=""BUILDONLY"">
+                        <shadow type=""logic_boolean"" id=""3Sf]hfku,TmWrqfbS}qr"">
+                            <field name=""BOOL"">FALSE</field>
+                        </shadow>
+                        </value>
+                    </block>
+                    </value>
+                </block>
+                </value>
+            </block>
+            </value>
+            <next>
+            <block type=""variables_set"" id=""oN]Q)P-|fWu2?kZJ%IE0"">
+                <field name=""VAR"" id=""Zmt}Hg1LuhcknI~,:o2$"">result</field>
+                <value name=""VALUE"">
+                <block type=""lists_split"" id=""~(tf[l*yUlbT/;(u~fze"">
+                    <mutation mode=""JOIN""></mutation>
+                    <field name=""MODE"">JOIN</field>
+                    <value name=""INPUT"">
+                    <block type=""variables_get"" id=""rUE32}]/L9JtVl%MpYcT"">
+                        <field name=""VAR"" id=""SG?L?f`u1D@r|U=pZf#4"">parallel</field>
+                    </block>
+                    </value>
+                    <value name=""DELIM"">
+                    <shadow type=""text"" id=""2`zo(7HqL^-^EC=`Nwl,"">
+                        <field name=""TEXT""> ++ </field>
+                    </shadow>
+                    </value>
+                </block>
+                </value>
+            </block>
+            </next>
+        </block>
+    </xml>".Replace("$$InnerId$$", innerId);
 }

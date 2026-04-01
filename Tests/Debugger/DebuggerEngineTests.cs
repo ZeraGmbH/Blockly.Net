@@ -1,15 +1,19 @@
+using BlocklyNet;
 using BlocklyNet.Scripting.Debugger;
 using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace BlocklyNetTests.Debugger;
 
 [TestFixture]
 public class DebuggerEngineTests : TestEnvironment
 {
-    private class DebuggerSink : ScriptDebugger, IScriptEngineNotifySink
+    private class DebuggerSink() : ScriptDebugger(new NullLogger<ScriptDebugger>()), IScriptEngineNotifySink
     {
         private readonly TaskCompletionSource _done = new();
 
@@ -311,5 +315,58 @@ public class DebuggerEngineTests : TestEnvironment
         var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
 
         Assert.That(result.Result, Is.EqualTo(-55));
+    }
+
+    [Test]
+    public async Task Can_Run_Parallel_Scripts_Async()
+    {
+        var innerId = AddScript("SCRIPTI", SampleScripts.DebugScript5Inner, new Parameter("Hint", "", true));
+        var outerId = AddScript("SCRIPTO", SampleScripts.DebugScript5Outer(innerId));
+
+        Debugger.Breakpoints.Add(innerId, "/:N_iDv3|JbFCX`Ac/+?");
+
+        HashSet<string> wait = ["\"A\"", "\"B\"", "\"C\""];
+
+        var hits = 0;
+
+        Debugger.OnBreak = (context) =>
+        {
+            if (wait.Count > 0)
+            {
+                hits++;
+
+                Assert.That(context.ScriptId, Is.EqualTo(innerId));
+                Assert.That(context.BlockId, Is.EqualTo("/:N_iDv3|JbFCX`Ac/+?"));
+
+                var var = context.GetVariables()[0].Variables.Single(v => v.Name == "Hint");
+
+                wait.Remove(var.Value ?? string.Empty);
+
+                if (wait.Count < 1)
+                {
+                    Debugger.Breakpoints.Remove(innerId, "/:N_iDv3|JbFCX`Ac/+?");
+                    Debugger.Continue(ScriptDebugContinueModes.LeaveNested);
+                }
+            }
+            else
+            {
+                Assert.That(context.ScriptId, Is.EqualTo(outerId));
+                Assert.That(context.BlockId, Is.EqualTo("oN]Q)P-|fWu2?kZJ%IE0"));
+
+                var var = context.GetVariables()[0].Variables.Single(v => v.Name == "parallel");
+                var value = JsonSerializer.Deserialize<JsonArray>(var.Value ?? "[]", JsonUtils.JsonSettings);
+
+                Assert.That(value, Has.Count.EqualTo(3));
+            }
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = outerId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(hits, Is.GreaterThanOrEqualTo(3).And.LessThanOrEqualTo(30));
+        Assert.That(result.Result, Is.EqualTo("A ** A ** A ** A ** A ** A ** A ** A ** A ** A ++ B ** B ** B ** B ** B ** B ** B ** B ** B ** B ++ C ** C ** C ** C ** C ** C ** C ** C ** C ** C"));
     }
 }
