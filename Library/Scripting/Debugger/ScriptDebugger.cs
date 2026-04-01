@@ -8,8 +8,15 @@ namespace BlocklyNet.Scripting.Debugger;
 /// <summary>
 /// Helper class to implement debuggers.
 /// </summary>
-public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDebugger, IDisposable
+public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 {
+    /// <summary>
+    /// Logging helper.
+    /// </summary>
+    protected readonly ILogger<ScriptDebugger> Logger;
+
+    internal ILogger<ScriptDebugger> InternalLogger => Logger;
+
     /// <summary>
     /// Synchronizer to allow for parallel script execution.
     /// </summary>
@@ -20,7 +27,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
     /// </summary>
     public IScriptBreakpoints Breakpoints => _breakpoints;
 
-    private readonly BreakpointList _breakpoints = new(logger);
+    private readonly BreakpointList _breakpoints;
 
     private class CurrentOperationMode(ILogger<ScriptDebugger> logger, bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null, IScriptSite? stopAtScript = null)
     {
@@ -69,7 +76,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
         }
     }
 
-    private CurrentOperationMode _operationMode = new(logger, false);
+    private CurrentOperationMode _operationMode;
 
     /// <summary>
     /// Current execution context.
@@ -89,6 +96,8 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
             _enabled = value;
 
             Restart();
+
+            SomethingChanged();
         }
     }
 
@@ -102,14 +111,26 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
     /// </summary>
     private TaskCompletionSource _stop = new();
 
+    /// <summary>
+    /// Initialize this debugger instance.
+    /// </summary>
+    /// <param name="logger">Logging helper.</param>
+    public ScriptDebugger(ILogger<ScriptDebugger> logger)
+    {
+        Logger = logger;
+
+        _breakpoints = new(this);
+        _operationMode = new(Logger, false);
+    }
+
     /// <inheritdoc/>
     public virtual void RunTo(string scriptId, string blockId)
     {
         var at = new ScriptBreakpoint(scriptId, blockId);
 
-        logger.LogTrace("Adding temporary breakpoint at {Breakpoint}", at);
+        Logger.LogTrace("Adding temporary breakpoint at {Breakpoint}", at);
 
-        _operationMode = new(logger, false, stopAtBlock: at);
+        _operationMode = new(Logger, false, stopAtBlock: at);
 
         Restart();
     }
@@ -122,46 +143,46 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
         switch (mode)
         {
             case ScriptDebugContinueModes.Normal:
-                logger.LogTrace("Continue regular execution of script");
+                Logger.LogTrace("Continue regular execution of script");
 
-                _operationMode = new(logger, false);
+                _operationMode = new(Logger, false);
 
                 break;
             case ScriptDebugContinueModes.StepInto:
-                logger.LogTrace("Execute the current block and stop immediatly after");
+                Logger.LogTrace("Execute the current block and stop immediatly after");
 
-                _operationMode = new(logger, true);
+                _operationMode = new(Logger, true);
 
                 break;
             case ScriptDebugContinueModes.StepOver:
-                logger.LogTrace("Step over the current block and stop on the next");
+                Logger.LogTrace("Step over the current block and stop on the next");
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
                 if (context.Block.Next == null) goto case ScriptDebugContinueModes.StepOut;
 
-                _operationMode = new(logger, false, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
+                _operationMode = new(Logger, false, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
 
                 break;
             case ScriptDebugContinueModes.StepOut:
-                logger.LogTrace("Execute the current prodecure and stop after the return");
+                Logger.LogTrace("Execute the current prodecure and stop after the return");
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
                 if (context.Context.Parent == null && context.Context.Engine.ParentSite != null) goto case ScriptDebugContinueModes.LeaveNested;
 
-                _operationMode = new(logger, false, stopAtParent: context.Context.Parent);
+                _operationMode = new(Logger, false, stopAtParent: context.Context.Parent);
 
                 break;
             case ScriptDebugContinueModes.LeaveNested:
-                logger.LogTrace("Execute the current script and stop after if finishes");
+                Logger.LogTrace("Execute the current script and stop after if finishes");
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
                 if (context.Context.Engine.ParentSite == null)
                     throw new InvalidOperationException("not a nested script");
 
-                _operationMode = new(logger, false, stopAtScript: context.Context.Engine.ParentSite);
+                _operationMode = new(Logger, false, stopAtScript: context.Context.Engine.ParentSite);
 
                 break;
             default:
@@ -186,7 +207,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
         /* Ignore all blocky internal warmup blocks. */
         if (block.Type == null)
         {
-            logger.LogTrace("Skipping hidden initializer block");
+            Logger.LogTrace("Skipping hidden initializer block");
 
             return default!;
         }
@@ -200,6 +221,8 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
             /* Simplify overloads by providing some execution context. */
             _context = new(script.Request.ScriptId, block, reason, context);
 
+            SomethingChanged();
+
             try
             {
                 return await handler(_context);
@@ -207,6 +230,8 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
             finally
             {
                 _context = null;
+
+                SomethingChanged();
             }
         }
     }
@@ -223,7 +248,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
 
                             if (regular || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
                             {
-                                if (!regular) logger.LogTrace("Stop at breakpoint {Breakpoint}", stoppedAt.Position);
+                                if (!regular) Logger.LogTrace("Stop at breakpoint {Breakpoint}", stoppedAt.Position);
 
                                 Continue(ScriptDebugContinueModes.Normal);
 
@@ -238,7 +263,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
                         {
                             if (_breakpoints.BreakOnEndOfScript)
                             {
-                                logger.LogTrace("Stop at end of script {Breakpoint}", stoppedAt.Position);
+                                Logger.LogTrace("Stop at end of script {Breakpoint}", stoppedAt.Position);
 
                                 await OnBreakAsync();
 
@@ -277,7 +302,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
         => _breakpoints.BreakOnExceptions
             ? RunAsync(block, context, ScriptDebuggerStopReason.Exception, (stoppedAt) =>
             {
-                logger.LogTrace("Stop at exception {Exception}", original.Message);
+                Logger.LogTrace("Stop at exception {Exception}", original.Message);
 
                 return OnExceptionDetectedAsync(original);
             })
@@ -288,7 +313,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
     /// </summary>
     protected virtual Task StopAsync()
     {
-        logger.LogTrace("Script execution paused");
+        Logger.LogTrace("Script execution paused");
 
         var newStopper = new TaskCompletionSource();
 
@@ -305,7 +330,7 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
     /// <param name="disposing">Set when restart is called during dispose.</param>
     protected virtual void Restart(bool disposing = false)
     {
-        if (!disposing) logger.LogTrace("Script execution resumed");
+        if (!disposing) Logger.LogTrace("Script execution resumed");
 
         var stop = _stop;
 
@@ -315,10 +340,17 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
     /// <inheritdoc/>
     public void Dispose()
     {
-        logger.LogTrace("Shutting down script debugger");
+        Logger.LogTrace("Shutting down script debugger");
 
         Restart(true);
 
         _sync.Dispose();
     }
+
+    /// <summary>
+    /// Report that something changes.
+    /// </summary>
+    protected virtual void OnReportChange() { }
+
+    internal void SomethingChanged() => OnReportChange();
 }
