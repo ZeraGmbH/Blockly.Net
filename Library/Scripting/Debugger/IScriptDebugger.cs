@@ -41,11 +41,6 @@ public interface IScriptDebugger
     IScriptBreakpoints Breakpoints { get; }
 
     /// <summary>
-    /// Retrieve all variables in current scope.
-    /// </summary>
-    List<ScriptDebugVariableScope>? GetVariables();
-
-    /// <summary>
     /// Current position in script - null while executing.
     /// </summary>
     IScriptPosition? CurrentPosition { get; }
@@ -61,7 +56,8 @@ public interface IScriptDebugger
     /// Prepare to run the script.
     /// </summary>
     /// <param name="mode">How to continue;</param>
-    void Continue(ScriptDebugContinueModes mode);
+    /// <param name="stoppedAt">For synchrounous operations the stop context.</param>
+    void Continue(ScriptDebugContinueModes mode, ScriptDebugContext? stoppedAt = null);
 
     /// <summary>
     /// Information on the current position in script - 

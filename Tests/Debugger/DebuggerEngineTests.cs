@@ -33,20 +33,20 @@ public class DebuggerEngineTests : TestEnvironment
         public Func<ScriptDebugContext, Exception, Exception?>? OnException;
 
 
-        protected override Task OnBreakAsync()
+        protected override Task OnBreakAsync(ScriptDebugContext stoppedAt)
         {
-            OnBreak?.Invoke(StoppedAt!);
+            OnBreak?.Invoke(stoppedAt);
 
-            return base.OnBreakAsync();
+            return base.OnBreakAsync(stoppedAt);
         }
 
-        protected override Task<Exception?> OnExceptionDetectedAsync(Exception original)
+        protected override Task<Exception?> OnExceptionDetectedAsync(Exception original, ScriptDebugContext stoppedAt)
         {
             var onException = OnException;
 
-            if (onException != null) return Task.FromResult(onException(StoppedAt!, original));
+            if (onException != null) return Task.FromResult(onException(stoppedAt, original));
 
-            return base.OnExceptionDetectedAsync(original);
+            return base.OnExceptionDetectedAsync(original, stoppedAt);
         }
     }
 
@@ -115,9 +115,9 @@ public class DebuggerEngineTests : TestEnvironment
 
         var hits = 0;
 
-        Debugger.OnBreak = (context) =>
+        Debugger.OnBreak = (stoppedAt) =>
         {
-            if (++hits != stopAt) Debugger.Continue(ScriptDebugContinueModes.StepInto);
+            if (++hits != stopAt) Debugger.Continue(ScriptDebugContinueModes.StepInto, stoppedAt);
         };
 
         var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript1);
@@ -173,7 +173,7 @@ public class DebuggerEngineTests : TestEnvironment
 
             Debugger.Breakpoints.Remove(scriptId, "X/i3:*Zxs6B(Y!IGPoEi");
 
-            var variables = Debugger.GetVariables();
+            var variables = context.GetVariables();
 
             Assert.That(variables, Has.Count.EqualTo(1));
 
@@ -213,13 +213,13 @@ public class DebuggerEngineTests : TestEnvironment
 
         string? next = null;
 
-        Debugger.OnBreak = (context) =>
+        Debugger.OnBreak = (stoppedAt) =>
         {
             if (next != null)
-                Assert.That(context.Block.Id, Is.EqualTo(nextBlockId));
-            else if (context.Block.Id == "~-@g:c_wcw/=l7I4Z$X9")
+                Assert.That(stoppedAt.Block.Id, Is.EqualTo(nextBlockId));
+            else if (stoppedAt.Block.Id == "~-@g:c_wcw/=l7I4Z$X9")
             {
-                Debugger.Continue(mode);
+                Debugger.Continue(mode, stoppedAt);
 
                 next = nextBlockId;
             }
@@ -265,11 +265,11 @@ public class DebuggerEngineTests : TestEnvironment
 
         Debugger.Breakpoints.Add(scriptId, "G5]l)A/yzjQbrq)Cr57t");
 
-        Debugger.OnBreak = Context =>
+        Debugger.OnBreak = stoppedAt =>
         {
-            if (Context.Position.BlockId == "G5]l)A/yzjQbrq)Cr57t")
+            if (stoppedAt.Position.BlockId == "G5]l)A/yzjQbrq)Cr57t")
             {
-                var variables = Context.GetVariables();
+                var variables = stoppedAt.GetVariables();
 
                 Assert.That(variables, Has.Count.EqualTo(3));
 
@@ -285,12 +285,12 @@ public class DebuggerEngineTests : TestEnvironment
 
                 Debugger.Breakpoints[scriptId, "G5]l)A/yzjQbrq)Cr57t"]!.Enabled = false;
 
-                Debugger.Continue(ScriptDebugContinueModes.StepOut);
+                Debugger.Continue(ScriptDebugContinueModes.StepOut, stoppedAt);
             }
-            else if (Context.Position.BlockId == ";g!0eq5)ITw{V(s*tSW/")
-                Debugger.Continue(ScriptDebugContinueModes.StepOut);
+            else if (stoppedAt.Position.BlockId == ";g!0eq5)ITw{V(s*tSW/")
+                Debugger.Continue(ScriptDebugContinueModes.StepOut, stoppedAt);
             else
-                Assert.That(Context.Position.BlockId, Is.EqualTo("sNfTZ[N@*YOpXCOZUZEc"));
+                Assert.That(stoppedAt.Position.BlockId, Is.EqualTo("sNfTZ[N@*YOpXCOZUZEc"));
         };
 
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
@@ -310,16 +310,16 @@ public class DebuggerEngineTests : TestEnvironment
 
         Debugger.Breakpoints.Add(innerId, "Z*dM$.4KJX*@?2L#Ll~^");
 
-        Debugger.OnBreak = context =>
+        Debugger.OnBreak = stoppedAt =>
         {
-            if (context.BlockId == "Z*dM$.4KJX*@?2L#Ll~^")
+            if (stoppedAt.BlockId == "Z*dM$.4KJX*@?2L#Ll~^")
             {
                 Debugger.Breakpoints[innerId, "Z*dM$.4KJX*@?2L#Ll~^"]!.Enabled = false;
 
-                Debugger.Continue(ScriptDebugContinueModes.LeaveNested);
+                Debugger.Continue(ScriptDebugContinueModes.LeaveNested, stoppedAt);
             }
             else
-                Assert.That(context.BlockId, Is.EqualTo("+%/-8RI^@6ZZo+~J#rV*"));
+                Assert.That(stoppedAt.BlockId, Is.EqualTo("+%/-8RI^@6ZZo+~J#rV*"));
         };
 
         var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = outerId }, "");
@@ -343,31 +343,31 @@ public class DebuggerEngineTests : TestEnvironment
 
         var hits = 0;
 
-        Debugger.OnBreak = (context) =>
+        Debugger.OnBreak = (stoppedAt) =>
         {
             if (wait.Count > 0)
             {
                 hits++;
 
-                Assert.That(context.ScriptId, Is.EqualTo(innerId));
-                Assert.That(context.BlockId, Is.EqualTo("/:N_iDv3|JbFCX`Ac/+?"));
+                Assert.That(stoppedAt.ScriptId, Is.EqualTo(innerId));
+                Assert.That(stoppedAt.BlockId, Is.EqualTo("/:N_iDv3|JbFCX`Ac/+?"));
 
-                var var = context.GetVariables()[0].Variables.Single(v => v.Name == "Hint");
+                var var = stoppedAt.GetVariables()[0].Variables.Single(v => v.Name == "Hint");
 
                 wait.Remove(var.Value ?? string.Empty);
 
                 if (wait.Count < 1)
                 {
                     Debugger.Breakpoints.Remove(innerId, "/:N_iDv3|JbFCX`Ac/+?");
-                    Debugger.Continue(ScriptDebugContinueModes.LeaveNested);
+                    Debugger.Continue(ScriptDebugContinueModes.LeaveNested, stoppedAt);
                 }
             }
             else
             {
-                Assert.That(context.ScriptId, Is.EqualTo(outerId));
-                Assert.That(context.BlockId, Is.EqualTo("oN]Q)P-|fWu2?kZJ%IE0"));
+                Assert.That(stoppedAt.ScriptId, Is.EqualTo(outerId));
+                Assert.That(stoppedAt.BlockId, Is.EqualTo("oN]Q)P-|fWu2?kZJ%IE0"));
 
-                var var = context.GetVariables()[0].Variables.Single(v => v.Name == "parallel");
+                var var = stoppedAt.GetVariables()[0].Variables.Single(v => v.Name == "parallel");
                 var value = JsonSerializer.Deserialize<JsonArray>(var.Value ?? "[]", JsonUtils.JsonSettings);
 
                 Assert.That(value, Has.Count.EqualTo(3));
