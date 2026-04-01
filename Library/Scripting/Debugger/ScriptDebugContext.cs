@@ -7,7 +7,7 @@ namespace BlocklyNet.Scripting.Debugger;
 /// <summary>
 /// Describes the current debug context.
 /// </summary>
-public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStopReason reason, Context context) : IScriptPosition
+public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStopReason reason, Context context, ScriptDebugger debugger) : IScriptPosition
 {
     /// <summary>
     /// Current position.
@@ -42,7 +42,7 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
     {
         List<ScriptDebugVariableScope> list = [];
 
-        list.AddRange(GetVariables(Context));
+        list.AddRange(GetVariables(Context, debugger));
 
         return list;
     }
@@ -51,8 +51,9 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
     /// Get variables of a context.
     /// </summary>
     /// <param name="context">Context to inspect.</param>
+    /// <param name="debugger">Corresponding script debugger.</param>
     /// <returns>List of variables.</returns>
-    private static List<ScriptDebugVariableScope> GetVariables(Context context)
+    private static List<ScriptDebugVariableScope> GetVariables(Context context, ScriptDebugger debugger)
     {
         List<ScriptDebugVariableScope> list = [];
 
@@ -61,6 +62,7 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
                 list.Add(new()
                 {
                     Context = current,
+                    Debugger = debugger,
                     Procedure = current is ProcedureContext procedure ? procedure.Name : null,
                     ScriptId = script.Request.ScriptId,
                     Variables = [
