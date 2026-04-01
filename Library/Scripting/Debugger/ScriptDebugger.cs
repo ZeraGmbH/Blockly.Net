@@ -1,4 +1,5 @@
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 
 namespace BlocklyNet.Scripting.Debugger;
@@ -51,7 +52,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
     private readonly BreakpointList _breakpoints = new();
 
-    private class CurrentOperationMode(bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null, string? stopAtScript = null)
+    private class CurrentOperationMode(bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null, IScriptSite? stopAtScript = null)
     {
         /// <summary>
         /// See if we should stop at the current context - can
@@ -62,7 +63,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
         public bool MustStop(ScriptDebugContext context)
         {
             /* Step into, step over or stop at. */
-            if (stopAtNextBlock || stopAtBlock == context.Position || stopAtScript == context.ScriptId)
+            if (stopAtNextBlock || stopAtBlock == context.Position || stopAtScript == context.Context.Engine)
                 return true;
 
             /* Step out. */
@@ -146,10 +147,10 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
             case ScriptDebugContinueModes.LeaveNested:
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
-                if (context.Context.Engine.ParentSite?.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId))
+                if (context.Context.Engine.ParentSite == null)
                     throw new InvalidOperationException("not a nested script");
 
-                _operationMode = new(false, stopAtScript: script.Request.ScriptId);
+                _operationMode = new(false, stopAtScript: context.Context.Engine.ParentSite);
 
                 break;
             default:
