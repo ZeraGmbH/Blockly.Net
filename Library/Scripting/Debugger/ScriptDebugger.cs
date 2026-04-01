@@ -48,7 +48,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
             }
 
             /* Stop at temporary position either through step over or run at. */
-            if (stopAtBlock == context.Position)
+            if (context.Position.Equals(stopAtBlock))
             {
                 logger.LogTrace("Stop on temporary breakpoint at {Breakpoint}", context.Position);
 
