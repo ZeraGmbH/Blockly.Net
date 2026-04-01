@@ -15,7 +15,7 @@ internal class ScriptBreakpoint(string scriptId, string blockId, string? descrip
     public string BlockId { get; } = blockId;
 
     /// <inheritdoc/>
-    public string? Description { get; } = description;
+    public string? Description { get; set; } = description;
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)
@@ -23,4 +23,7 @@ internal class ScriptBreakpoint(string scriptId, string blockId, string? descrip
 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(ScriptId, BlockId);
+
+    /// <inheritdoc/>
+    public override string ToString() => $"{(Enabled ? string.Empty : "-")}{BlockId}@{ScriptId}";
 }
