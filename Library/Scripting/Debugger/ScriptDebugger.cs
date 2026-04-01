@@ -215,22 +215,41 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
     public virtual Task InterceptAsync(Block block, Context context, ScriptDebuggerStopReason reason)
         => RunAsync(block, context, reason, async stoppedAt =>
             {
-                if (reason == ScriptDebuggerStopReason.Enter)
+                switch (reason)
                 {
-                    /* Volatile stop or active breakpoint hit. */
-                    var regular = _operationMode.MustStop(stoppedAt);
+                    case ScriptDebuggerStopReason.Enter:
+                        {
+                            var regular = _operationMode.MustStop(stoppedAt);
 
-                    if (regular || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
-                    {
-                        if (!regular) logger.LogTrace("Stop at breakpoint {Breakpoint}", stoppedAt.Position);
+                            if (regular || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
+                            {
+                                if (!regular) logger.LogTrace("Stop at breakpoint {Breakpoint}", stoppedAt.Position);
 
-                        Continue(ScriptDebugContinueModes.Normal);
+                                Continue(ScriptDebugContinueModes.Normal);
 
-                        await OnBreakAsync();
-                    }
+                                await OnBreakAsync();
+
+                                return true;
+                            }
+                        }
+
+                        break;
+                    case ScriptDebuggerStopReason.Leave:
+                        {
+                            if (_breakpoints.BreakOnEndOfScript)
+                            {
+                                logger.LogTrace("Stop at end of script {Breakpoint}", stoppedAt.Position);
+
+                                await OnBreakAsync();
+
+                                return true;
+                            }
+
+                            break;
+                        }
                 }
 
-                return true;
+                return false;
             });
 
     /// <summary>

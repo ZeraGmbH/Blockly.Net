@@ -383,4 +383,25 @@ public class DebuggerEngineTests : TestEnvironment
         Assert.That(hits, Is.GreaterThanOrEqualTo(3).And.LessThanOrEqualTo(30));
         Assert.That(result.Result, Is.EqualTo("A ** A ** A ** A ** A ** A ** A ** A ** A ** A ++ B ** B ** B ** B ** B ** B ** B ** B ** B ** B ++ C ** C ** C ** C ** C ** C ** C ** C ** C ** C"));
     }
+
+    [Test]
+    public async Task Can_Run_To_End_Of_Script_Async()
+    {
+        Debugger.Breakpoints.BreakOnEndOfScript = true;
+
+        Debugger.OnBreak = (context) =>
+        {
+            var var = context.GetVariables()[0].Variables.Single(v => v.Name == "result");
+
+            Assert.That(var.Value, Is.EqualTo("500500"));
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = AddScript("SCRIPT", SampleScripts.DebugScript1) }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(500500));
+    }
 }

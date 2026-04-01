@@ -42,21 +42,35 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
     {
         List<ScriptDebugVariableScope> list = [];
 
-        if (Context.Engine.CurrentScript is IGenericScript script && !string.IsNullOrEmpty(script.Request.ScriptId))
-            for (var context = Context; context != null; context = context.Parent)
+        list.AddRange(GetVariables(Context));
+
+        return list;
+    }
+
+    /// <summary>
+    /// Get variables of a context.
+    /// </summary>
+    /// <param name="context">Context to inspect.</param>
+    /// <returns>List of variables.</returns>
+    private static List<ScriptDebugVariableScope> GetVariables(Context context)
+    {
+        List<ScriptDebugVariableScope> list = [];
+
+        if (context.Engine.CurrentScript is IGenericScript script && !string.IsNullOrEmpty(script.Request.ScriptId))
+            for (var current = context; current != null; current = current.Parent)
                 list.Add(new()
                 {
-                    Context = context,
-                    Procedure = context is ProcedureContext procedure ? procedure.Name : null,
+                    Context = current,
+                    Procedure = current is ProcedureContext procedure ? procedure.Name : null,
                     ScriptId = script.Request.ScriptId,
                     Variables = [
-                        ..context
+                        ..current
                             .Variables
                             .Select(vi =>
                                 new ScriptDebugVariableInformation
                                 {
                                     Name = vi.Key,
-                                    Type = context.VariableTypes.TryGetValue(vi.Key, out var type) ? type : null,
+                                    Type = current.VariableTypes.TryGetValue(vi.Key, out var type) ? type : null,
                                     Value = vi.Value == null ? null : JsonSerializer.Serialize(vi.Value, JsonUtils.JsonSettings),
                                 })]
                 });

@@ -58,9 +58,6 @@ public abstract class Block
     /// <inheritdoc/>
     protected virtual async Task<object?> EvaluateAsync(Context context)
     {
-        /* Wait for debugger to allow execution - the current block has finished its work. */
-        await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Leave);
-
         /* Always check for cancel before proceeding with the execution of the next block in chain. */
         context.Cancellation.ThrowIfCancellationRequested();
 
@@ -81,8 +78,9 @@ public abstract class Block
     /// Start a brand new block execution chain.
     /// </summary>
     /// <param name="context">Current operation context.</param>
+    /// <param name="isScript">Set when we are executing the full script.</param>
     /// <returns>Result of the block if any.</returns>
-    public async Task<object?> EnterBlockAsync(Context context)
+    public async Task<object?> EnterBlockAsync(Context context, bool isScript = false)
     {
         /* Wait for debugger to allow execution - we enter a new chain of execution, e.g. calculating a value or control block. */
         await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Enter);
@@ -108,6 +106,9 @@ public abstract class Block
 
         /* Wait for debugger to allow execution - the current block as finished its work. */
         await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Finish);
+
+        /* Script is done. */
+        if (isScript) await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Leave);
 
         return result;
     }

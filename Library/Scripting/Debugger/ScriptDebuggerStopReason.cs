@@ -14,7 +14,7 @@ public enum ScriptDebuggerStopReason
     Enter = 0,
 
     /// <summary>
-    /// Block itself finished, next block will be started.
+    /// Script has finished.
     /// </summary>
     Leave = 1,
 
