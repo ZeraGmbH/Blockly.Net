@@ -47,6 +47,7 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
                 list.Add(new()
                 {
                     Context = context,
+                    Procedure = context is ProcedureContext procedure ? procedure.Name : null,
                     ScriptId = script.Request.ScriptId,
                     Variables = [
                         ..context
