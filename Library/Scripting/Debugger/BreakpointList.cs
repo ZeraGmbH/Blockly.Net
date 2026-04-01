@@ -5,7 +5,7 @@ namespace BlocklyNet.Scripting.Debugger;
 /// <summary>
 /// Management for the list of breakpoints. Implemention is thread-safe.
 /// </summary>
-internal class BreakpointList(ILogger<ScriptDebugger> logger) : IScriptBreakpoints
+internal class BreakpointList(ScriptDebugger debugger) : IScriptBreakpoints
 {
     /// <summary>
     /// Current list.
@@ -23,21 +23,50 @@ internal class BreakpointList(ILogger<ScriptDebugger> logger) : IScriptBreakpoin
     }
 
     /// <inheritdoc/>
-    public bool BreakOnExceptions { get; set; }
+    public bool BreakOnExceptions
+    {
+        get => _breakOnExceptions;
+        set
+        {
+            if (_breakOnExceptions == value) return;
 
-    public bool BreakOnEndOfScript { get; set; }
+            _breakOnExceptions = value;
+
+            debugger.SomethingChanged();
+        }
+    }
+
+    private bool _breakOnExceptions;
+
+    /// <inheritdoc/>
+    public bool BreakOnEndOfScript
+    {
+        get => _breakOnEndOfScript;
+        set
+        {
+            if (_breakOnEndOfScript == value) return;
+
+            _breakOnEndOfScript = value;
+
+            debugger.SomethingChanged();
+        }
+    }
+
+    private bool _breakOnEndOfScript;
 
     /// <inheritdoc/>
     public void Add(string scriptId, string blockId, string? description = null)
     {
-        var bp = new ScriptBreakpoint(scriptId, blockId, description);
+        var bp = new ScriptBreakpoint(scriptId, blockId, description, debugger);
 
         lock (_breakpoints)
         {
-            logger.LogTrace("{What} breakpoint {Breakpoint}", _breakpoints.ContainsKey(bp) ? "Updating" : "Adding", bp.ToString());
+            debugger.InternalLogger.LogTrace("{What} breakpoint {Breakpoint}", _breakpoints.ContainsKey(bp) ? "Updating" : "Adding", bp.ToString());
 
             _breakpoints[bp] = bp;
         }
+
+        debugger.SomethingChanged();
     }
 
     /// <inheritdoc/>
@@ -52,9 +81,12 @@ internal class BreakpointList(ILogger<ScriptDebugger> logger) : IScriptBreakpoin
     {
         var bp = new ScriptBreakpoint(scriptId, blockId);
 
-        logger.LogTrace("Removing breakpoint {Breakpoint}", bp.ToString());
+        debugger.InternalLogger.LogTrace("Removing breakpoint {Breakpoint}", bp.ToString());
 
         lock (_breakpoints)
-            _breakpoints.Remove(bp);
+            if (!_breakpoints.Remove(bp))
+                return;
+
+        debugger.SomethingChanged();
     }
 }
