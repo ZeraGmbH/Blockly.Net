@@ -103,7 +103,7 @@ public class SetProgress : Block
     protected override async Task<object?> EvaluateAsync(Context context)
     {
         var script = context.Engine.MainScript as IGenericScript;
-        var progress = await Values.EvaluateAsync<double>("PROGRESS", context);
+        var progress = await Values.EvaluateDoubleAsync("PROGRESS", context);
         var name = await Values.EvaluateAsync<string?>("NAME", context, false);
 
         context.Engine.ReportProgress(

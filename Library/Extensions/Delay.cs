@@ -50,7 +50,7 @@ public class Delay : Block
     /// <inheritdoc/>
     protected override async Task<object?> EvaluateAsync(Context context)
     {
-        var delay = (int)await Values.EvaluateAsync<double>("DELAY", context);
+        var delay = (int)await Values.EvaluateDoubleAsync("DELAY", context);
 
         if (delay > 0) await Task.Delay(delay, context.Cancellation);
 

@@ -50,26 +50,59 @@ public class Values : Entities<Value>
     /// <param name="context">Operation context.</param>
     /// <returns>Requested number.</returns>
     public async Task<double> EvaluateDoubleAsync(string name, Context context)
+        => (await EvaluateOptionalDoubleAsync(name, context)) ?? throw new ArgumentException($"value {name} not found");
+
+    /// <summary>
+    /// Get an optional number - may be auto-converted from some other type.
+    /// </summary>
+    /// <param name="name">Name of the parameter.</param>
+    /// <param name="context">Operation context.</param>
+    /// <returns>Requested number or null.</returns>
+    public async Task<double?> EvaluateOptionalDoubleAsync(string name, Context context)
     {
         /* Retrieve raw value. */
-        var raw = await EvaluateAsync(name, context) ?? throw new ArgumentException($"value {name} not found");
+        var raw = await EvaluateAsync(name, context, false);
 
-        /* Already a number. */
-        if (raw is double num) return num;
+        /* Make it a double number. */
+        return raw == null ? null : TryConvertToDouble(raw, context, out var num) ? num : (double)raw;
+    }
+
+    /// <summary>
+    /// Try to convert a given value to double precision floating point number.
+    /// </summary>
+    /// <param name="raw">Raw value - can be anything.</param>
+    /// <param name="context">Current operating context.</param>
+    /// <param name="value">Raw value as number.</param>
+    /// <returns>Set if the value contains the requested number.</returns>
+    public static bool TryConvertToDouble(object raw, Context context, out double value)
+    {
+        /* Already a number - extend as needed, left out long because conversion is not always lossless. */
+        if (raw is double doubleNum) { value = doubleNum; return true; }
+        if (raw is float floatNum) { value = floatNum; return true; }
+        if (raw is uint uintNum) { value = uintNum; return true; }
+        if (raw is int intNum) { value = intNum; return true; }
+        if (raw is ushort ushortNum) { value = ushortNum; return true; }
+        if (raw is short shortNum) { value = shortNum; return true; }
+        if (raw is byte byteNum) { value = byteNum; return true; }
+        if (raw is sbyte sByteNum) { value = sByteNum; return true; }
+
+        value = default;
 
         /* Check for converter. */
         var cvt = context.ServiceProvider.GetService<IDoubleExtractor>();
 
-        if (cvt == null) return (double)raw;
+        if (cvt == null) return false;
 
         /* Run converter - report cast error on mismatch. */
         try
         {
-            return cvt.GetNumber(raw);
+            value = cvt.GetNumber(raw);
+
+            return true;
         }
         catch (Exception)
         {
-            return (double)raw;
+            return false;
         }
     }
 

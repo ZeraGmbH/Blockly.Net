@@ -13,7 +13,7 @@ public class ListsRepeat : Block
   protected override async Task<object?> EvaluateAsync(Context context)
   {
     var item = await Values.EvaluateAsync<object>("ITEM", context);
-    var num = await Values.EvaluateAsync<double>("NUM", context);
+    var num = await Values.EvaluateDoubleAsync("NUM", context);
 
     var list = new List<object>();
 

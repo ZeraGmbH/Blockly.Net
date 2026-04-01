@@ -18,8 +18,8 @@ public class TextSubstring : Block
     {
       "FIRST" => 0,
       "LAST" => value.Length,
-      "FROM_START" => (int)await Values.EvaluateAsync<double>(at, context) - 1,
-      "FROM_END" => value.Length - ((int)await Values.EvaluateAsync<double>(at, context) - 1),
+      "FROM_START" => (int)await Values.EvaluateDoubleAsync(at, context) - 1,
+      "FROM_END" => value.Length - ((int)await Values.EvaluateDoubleAsync(at, context) - 1),
       _ => throw new ArgumentException($"unknown choice {where}")
     };
 

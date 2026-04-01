@@ -19,13 +19,9 @@ public class LogicCompare : Block
 
     if (a == null || b == null) return Compare(opValue, a == null, b == null);
 
-    var tryInt = TryConvertToDoubleValues(a, b); // int => blockly always uses double
+    var tryInt = TryConvertToDoubleValues(a, b, context);
     if (tryInt.canConvert)
       return Compare(opValue, tryInt.aValue, tryInt.bValue);
-
-    var tryDouble = TryConvertValues<double>(a, b);
-    if (tryDouble.canConvert)
-      return Compare(opValue, tryDouble.aValue, tryDouble.bValue);
 
     var tryString = TryConvertValues<string>(a, b);
     if (tryString.canConvert)
@@ -137,20 +133,11 @@ public class LogicCompare : Block
     return (true, aResult, bResult);
   }
 
-  private static (bool canConvert, double aValue, double bValue) TryConvertToDoubleValues(object a, object b)
+  private static (bool canConvert, double aValue, double bValue) TryConvertToDoubleValues(object a, object b, Context context)
   {
-    double aResult;
-    if (a?.GetType() == typeof(double) || a?.GetType() == typeof(int))
-      aResult = (double)Convert.ChangeType(a, typeof(double));
-    else
-      return (false, default, default);
+    if (Values.TryConvertToDouble(a, context, out var aResult) && Values.TryConvertToDouble(b, context, out var bResult))
+      return (true, aResult, bResult);
 
-    double bResult;
-    if (b?.GetType() == typeof(double) || b?.GetType() == typeof(int))
-      bResult = (double)Convert.ChangeType(b, typeof(double));
-    else
-      return (false, default, default);
-
-    return (true, aResult, bResult);
+    return (false, default, default);
   }
 }

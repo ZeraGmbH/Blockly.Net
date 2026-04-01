@@ -14,9 +14,9 @@ public class ControlsFor : Block
   {
     var variableName = Fields["VAR"];
 
-    var fromValue = await Values.EvaluateAsync<double>("FROM", context);
-    var toValue = await Values.EvaluateAsync<double>("TO", context);
-    var byValue = await Values.EvaluateAsync<double>("BY", context);
+    var fromValue = await Values.EvaluateDoubleAsync("FROM", context);
+    var toValue = await Values.EvaluateDoubleAsync("TO", context);
+    var byValue = await Values.EvaluateDoubleAsync("BY", context);
 
     var statement = Statements.TryGet("DO");
 
