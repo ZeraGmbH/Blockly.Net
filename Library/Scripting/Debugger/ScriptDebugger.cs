@@ -219,7 +219,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
         using (_sync.Wait())
         {
             /* Simplify overloads by providing some execution context. */
-            _context = new(script.Request.ScriptId, block, reason, context);
+            _context = new(script.Request.ScriptId, block, reason, context, this);
 
             SomethingChanged();
 

@@ -20,6 +20,12 @@ public class ScriptDebugVariableScope
     internal Context? Context { get; set; }
 
     /// <summary>
+    /// Debugger associated with this scope.
+    /// </summary>
+    [JsonIgnore]
+    internal ScriptDebugger? Debugger { get; set; }
+
+    /// <summary>
     /// Corresponding script.
     /// </summary>
     [NotNull, Required]
@@ -70,5 +76,6 @@ public class ScriptDebugVariableScope
             }
         }
 
+        Debugger?.SomethingChanged();
     }
 }
