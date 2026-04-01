@@ -138,16 +138,17 @@ public abstract class ScriptDebugger(ILogger<ScriptDebugger> logger) : IScriptDe
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
-                if (context.Block.Next == null)
-                    _operationMode = new(logger, false);
-                else
-                    _operationMode = new(logger, false, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
+                if (context.Block.Next == null) goto case ScriptDebugContinueModes.StepOut;
+
+                _operationMode = new(logger, false, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
 
                 break;
             case ScriptDebugContinueModes.StepOut:
                 logger.LogTrace("Execute the current prodecure and stop after the return");
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
+
+                if (context.Context.Parent == null && context.Context.Engine.ParentSite != null) goto case ScriptDebugContinueModes.LeaveNested;
 
                 _operationMode = new(logger, false, stopAtParent: context.Context.Parent);
 
