@@ -25,6 +25,8 @@ internal class BreakpointList(ILogger<ScriptDebugger> logger) : IScriptBreakpoin
     /// <inheritdoc/>
     public bool BreakOnExceptions { get; set; }
 
+    public bool BreakOnEndOfScript { get; set; }
+
     /// <inheritdoc/>
     public void Add(string scriptId, string blockId, string? description = null)
     {

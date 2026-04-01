@@ -36,4 +36,9 @@ public interface IScriptBreakpoints
     /// Set to break on each exception.
     /// </summary>
     bool BreakOnExceptions { get; set; }
+
+    /// <summary>
+    /// Set to break at the end of every script.
+    /// </summary>
+    bool BreakOnEndOfScript { get; set; }
 }

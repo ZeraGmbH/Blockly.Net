@@ -58,7 +58,7 @@ public class Workspace : IFragment
             /* Remember the result and report the last result afterwards. */
             context.Cancellation.ThrowIfCancellationRequested();
 
-            returnValue = await exec.EnterBlockAsync(context);
+            returnValue = await exec.EnterBlockAsync(context, true);
 
             /* Did this path. */
             break;
