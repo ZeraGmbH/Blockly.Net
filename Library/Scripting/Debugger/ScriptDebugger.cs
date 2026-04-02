@@ -167,18 +167,17 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
-                if (context.Context.Parent == null && context.Context.Engine.ParentSite != null) goto case ScriptDebugContinueModes.LeaveNested;
+                if (context.Context.Parent == null && context.Context.Engine.ParentSite != null) goto case ScriptDebugContinueModes.LeaveScript;
 
                 _operationMode = new(Logger, false, stopAtParent: context.Context.Parent);
 
                 break;
-            case ScriptDebugContinueModes.LeaveNested:
+            case ScriptDebugContinueModes.LeaveScript:
                 Logger.LogTrace("Execute the current script and stop after if finishes");
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
-                if (context.Context.Engine.ParentSite == null)
-                    throw new InvalidOperationException("not a nested script");
+                if (context.Context.Engine.ParentSite == null) goto case ScriptDebugContinueModes.Normal;
 
                 _operationMode = new(Logger, false, stopAtScript: context.Context.Engine.ParentSite);
 

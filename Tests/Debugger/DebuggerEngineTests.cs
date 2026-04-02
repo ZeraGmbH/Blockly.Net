@@ -316,7 +316,7 @@ public class DebuggerEngineTests : TestEnvironment
             {
                 Debugger.Breakpoints[innerId, "Z*dM$.4KJX*@?2L#Ll~^"]!.Enabled = false;
 
-                Debugger.Continue(ScriptDebugContinueModes.LeaveNested, stoppedAt);
+                Debugger.Continue(ScriptDebugContinueModes.LeaveScript, stoppedAt);
             }
             else
                 Assert.That(stoppedAt.BlockId, Is.EqualTo("+%/-8RI^@6ZZo+~J#rV*"));
@@ -359,7 +359,7 @@ public class DebuggerEngineTests : TestEnvironment
                 if (wait.Count < 1)
                 {
                     Debugger.Breakpoints.Remove(innerId, "/:N_iDv3|JbFCX`Ac/+?");
-                    Debugger.Continue(ScriptDebugContinueModes.LeaveNested, stoppedAt);
+                    Debugger.Continue(ScriptDebugContinueModes.LeaveScript, stoppedAt);
                 }
             }
             else
