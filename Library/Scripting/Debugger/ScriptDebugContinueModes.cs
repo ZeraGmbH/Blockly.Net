@@ -30,7 +30,7 @@ public enum ScriptDebugContinueModes
     StepOut = 3,
 
     /// <summary>
-    /// Leave a nested script.
+    /// Leave the current script.
     /// </summary>
-    LeaveNested = 4,
+    LeaveScript = 4,
 }
