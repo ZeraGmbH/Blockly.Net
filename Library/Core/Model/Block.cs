@@ -105,10 +105,10 @@ public abstract class Block
         }
 
         /* Wait for debugger to allow execution - the current block as finished its work. */
-        await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Finish);
+        await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Leave);
 
         /* Script is done. */
-        if (isScript) await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.Leave);
+        if (isScript) await context.Engine.SingleStepAsync(this, context, ScriptDebuggerStopReason.ScriptDone);
 
         return result;
     }

@@ -29,15 +29,41 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
     private readonly BreakpointList _breakpoints;
 
-    private class CurrentOperationMode(ILogger<ScriptDebugger> logger, bool stopAtNextBlock, Context? stopAtParent = null, IScriptBreakpoint? stopAtBlock = null, IScriptSite? stopAtScript = null)
+    private class CurrentOperationMode(
+        ILogger<ScriptDebugger> logger,
+        bool stopAtNextBlock = false,
+        Context stopAtParent = null!,
+        IScriptLocation stopAtBlock = null!,
+        IScriptSite stopAtScript = null!,
+        Context stepOverContext = null!,
+        IScriptLocation stepOverAtBlock = null!
+    )
     {
+        /// <summary>
+        /// See if we should stop after a block has been executed.
+        /// </summary>
+        /// <param name="context">Current execution context.</param>
+        /// <returns>Set if script should be paused in debugger.</returns>
+        public bool ShouldStopOnLeave(ScriptDebugContext context)
+        {
+            /* Check position. */
+            if (context.Context == stepOverContext && context.Position.Equals(stepOverAtBlock))
+            {
+                logger.LogTrace("Stop after step over {Breakpoint}", context.Position);
+
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// See if we should stop at the current context - can
         /// be either step into, step out, step over or stop at.
         /// </summary>
         /// <param name="context">Current execution context.</param>
         /// <returns>Set if we should stop execution.</returns>
-        public bool MustStop(ScriptDebugContext context)
+        public bool ShouldStopOnEnter(ScriptDebugContext context)
         {
             /* Single step mode. */
             if (stopAtNextBlock)
@@ -118,7 +144,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
         Logger = logger;
 
         _breakpoints = new(this);
-        _operationMode = new(Logger, false);
+        _operationMode = new(Logger);
     }
 
     /// <inheritdoc/>
@@ -128,7 +154,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
         Logger.LogTrace("Adding temporary breakpoint at {Breakpoint}", at);
 
-        _operationMode = new(Logger, false, stopAtBlock: at);
+        _operationMode = new(Logger, stopAtBlock: at);
 
         Restart();
     }
@@ -143,13 +169,13 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
             case ScriptDebugContinueModes.Normal:
                 Logger.LogTrace("Continue regular execution of script");
 
-                _operationMode = new(Logger, false);
+                _operationMode = new(Logger);
 
                 break;
             case ScriptDebugContinueModes.StepInto:
                 Logger.LogTrace("Execute the current block and stop immediatly after");
 
-                _operationMode = new(Logger, true);
+                _operationMode = new(Logger, stopAtNextBlock: true);
 
                 break;
             case ScriptDebugContinueModes.StepOver:
@@ -157,9 +183,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
-                if (context.Block.Next == null) goto case ScriptDebugContinueModes.StepOut;
-
-                _operationMode = new(Logger, false, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
+                _operationMode = new(Logger, stepOverContext: context.Context, stepOverAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Id));
 
                 break;
             case ScriptDebugContinueModes.StepOut:
@@ -169,7 +193,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                 if (context.Context.Parent == null && context.Context.Engine.ParentSite != null) goto case ScriptDebugContinueModes.LeaveScript;
 
-                _operationMode = new(Logger, false, stopAtParent: context.Context.Parent);
+                _operationMode = new(Logger, stopAtParent: context.Context.Parent!);
 
                 break;
             case ScriptDebugContinueModes.LeaveScript:
@@ -179,7 +203,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                 if (context.Context.Engine.ParentSite == null) goto case ScriptDebugContinueModes.Normal;
 
-                _operationMode = new(Logger, false, stopAtScript: context.Context.Engine.ParentSite);
+                _operationMode = new(Logger, stopAtScript: context.Context.Engine.ParentSite);
 
                 break;
             default:
@@ -225,7 +249,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
                 {
                     case ScriptDebuggerStopReason.Enter:
                         {
-                            var regular = _operationMode.MustStop(stoppedAt);
+                            var regular = _operationMode.ShouldStopOnEnter(stoppedAt);
 
                             if (regular || _breakpoints[stoppedAt.ScriptId, stoppedAt.BlockId]?.Enabled == true)
                             {
@@ -241,6 +265,19 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                         break;
                     case ScriptDebuggerStopReason.Leave:
+                        {
+                            if (_operationMode.ShouldStopOnLeave(stoppedAt))
+                            {
+                                Logger.LogTrace("Stepped over block");
+
+                                Continue(ScriptDebugContinueModes.StepInto);
+
+                                return true;
+                            }
+
+                            break;
+                        }
+                    case ScriptDebuggerStopReason.ScriptDone:
                         {
                             if (_breakpoints.BreakOnEndOfScript)
                             {

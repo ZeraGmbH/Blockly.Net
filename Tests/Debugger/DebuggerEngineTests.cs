@@ -404,4 +404,32 @@ public class DebuggerEngineTests : TestEnvironment
 
         Assert.That(result.Result, Is.EqualTo(500500));
     }
+
+    [Test]
+    public async Task Can_Step_Over_Procedure_Async()
+    {
+        var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript3);
+
+        Debugger.Breakpoints.Add(scriptId, "$%v6=0*|vNRKgbn(|(n;");
+
+        Debugger.OnBreak = (stoppedAt) =>
+        {
+            if (stoppedAt.Position.BlockId == "$%v6=0*|vNRKgbn(|(n;")
+            {
+                Debugger.Breakpoints.Remove(scriptId, "$%v6=0*|vNRKgbn(|(n;");
+
+                Debugger.Continue(ScriptDebugContinueModes.StepOver, stoppedAt);
+            }
+            else
+                Assert.That(stoppedAt.Position.BlockId, Is.EqualTo(";g!0eq5)ITw{V(s*tSW/"));
+        };
+
+        var jobId = await Engine.StartAsync(new StartGenericScript { Name = "Base for Debug Engine Tests", ScriptId = scriptId }, "");
+
+        await Debugger.DoneTask;
+
+        var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
+
+        Assert.That(result.Result, Is.EqualTo(1610));
+    }
 }
