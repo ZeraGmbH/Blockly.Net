@@ -14,14 +14,14 @@ public enum ScriptDebuggerStopReason
     Enter = 0,
 
     /// <summary>
-    /// Script has finished.
+    /// Block tree has finished.
     /// </summary>
     Leave = 1,
 
     /// <summary>
-    /// Block tree has finished.
+    /// Script has finished.
     /// </summary>
-    Finish = 2,
+    ScriptDone = 2,
 
     /// <summary>
     /// Detected an exception.
