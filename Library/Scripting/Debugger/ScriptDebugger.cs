@@ -183,7 +183,10 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
 
                 if (context == null) throw new InvalidOperationException("debugger not active");
 
-                _operationMode = new(Logger, stepOverContext: context.Context, stepOverAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Id));
+                if (context.Block.Next != null)
+                    _operationMode = new(Logger, stopAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Next.Id));
+                else
+                    _operationMode = new(Logger, stepOverContext: context.Context, stepOverAtBlock: new ScriptBreakpoint(context.ScriptId, context.Block.Id));
 
                 break;
             case ScriptDebugContinueModes.StepOut:

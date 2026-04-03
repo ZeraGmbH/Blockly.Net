@@ -405,18 +405,19 @@ public class DebuggerEngineTests : TestEnvironment
         Assert.That(result.Result, Is.EqualTo(500500));
     }
 
-    [Test]
-    public async Task Can_Step_Over_Procedure_Async()
+    [TestCase("$%v6=0*|vNRKgbn(|(n;")]
+    [TestCase("{U1[ES?Fxa;3EP2%Sk-F")]
+    public async Task Can_Step_Over_Async(string at)
     {
         var scriptId = AddScript("SCRIPT", SampleScripts.DebugScript3);
 
-        Debugger.Breakpoints.Add(scriptId, "$%v6=0*|vNRKgbn(|(n;");
+        Debugger.Breakpoints.Add(scriptId, at);
 
         Debugger.OnBreak = (stoppedAt) =>
         {
-            if (stoppedAt.Position.BlockId == "$%v6=0*|vNRKgbn(|(n;")
+            if (stoppedAt.Position.BlockId == at)
             {
-                Debugger.Breakpoints.Remove(scriptId, "$%v6=0*|vNRKgbn(|(n;");
+                Debugger.Breakpoints.Remove(scriptId, at);
 
                 Debugger.Continue(ScriptDebugContinueModes.StepOver, stoppedAt);
             }
