@@ -3,6 +3,7 @@ using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting;
 using BlocklyNet.Scripting.Definition;
+using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -117,9 +118,23 @@ public class RunScript : Block
 
     if (buildOnly == true) return config;
 
-    /* Run the script and report the result - in a new isolated environment. */
-    var result = await context.Engine.RunAsync<GenericResult>(config);
+    /* Install debugging context tree. */
+    IDebugScriptSite? debugSite = context.Engine as IDebugScriptSite;
 
-    return result.Result;
+    var oldContext = debugSite?.CallerContext;
+
+    debugSite?.CallerContext = context;
+
+    /* Run the script and report the result - in a new isolated environment. */
+    try
+    {
+      var result = await context.Engine.RunAsync<GenericResult>(config);
+
+      return result.Result;
+    }
+    finally
+    {
+      debugSite?.CallerContext = oldContext;
+    }
   }
 }

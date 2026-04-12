@@ -15,7 +15,7 @@ namespace BlocklyNet.Scripting.Engine;
 /// The script execution engine. There can be at most one active
 /// script at any time.
 /// </summary>
-public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogType>, IGroupManagerSite, IDisposable where TLogType : ScriptLoggingResult, new()
+public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogType>, IGroupManagerSite, IDebugScriptSite, IDisposable where TLogType : ScriptLoggingResult, new()
 {
     /// <summary>
     /// 
@@ -116,6 +116,9 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     public IScriptSite? ParentSite { get; } = null;
 
     private string _codeHash = null!;
+
+    /// <inheritdoc/>
+    public Context? CallerContext { get; set; }
 
     /// <summary>
     /// Get the current status of the group execution information.
