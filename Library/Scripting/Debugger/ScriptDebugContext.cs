@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BlocklyNet.Core.Model;
+using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 
 namespace BlocklyNet.Scripting.Debugger;
@@ -42,7 +43,14 @@ public class ScriptDebugContext(string scriptId, Block block, ScriptDebuggerStop
     {
         List<ScriptDebugVariableScope> list = [];
 
-        list.AddRange(GetVariables(Context, debugger));
+        // Full chain of nested scripts.
+        for (var context = Context; context != null;)
+        {
+            list.AddRange(GetVariables(context, debugger));
+
+            // See if this is a nested call.
+            context = context.Engine.ParentSite is IDebugScriptSite debugSite ? debugSite.CallerContext : null;
+        }
 
         return list;
     }

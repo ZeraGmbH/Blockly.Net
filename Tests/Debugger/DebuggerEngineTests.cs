@@ -316,6 +316,14 @@ public class DebuggerEngineTests : TestEnvironment
             {
                 Debugger.Breakpoints[innerId, "Z*dM$.4KJX*@?2L#Ll~^"]!.Enabled = false;
 
+                var variables = stoppedAt.GetVariables();
+
+                Assert.That(variables, Has.Count.EqualTo(2));
+                Assert.That(variables[0].ScriptId, Is.EqualTo(innerId));
+                Assert.That(variables[0].Variables, Has.Count.EqualTo(2));
+                Assert.That(variables[1].ScriptId, Is.EqualTo(outerId));
+                Assert.That(variables[1].Variables, Has.Count.EqualTo(1));
+
                 Debugger.Continue(ScriptDebugContinueModes.LeaveScript, stoppedAt);
             }
             else

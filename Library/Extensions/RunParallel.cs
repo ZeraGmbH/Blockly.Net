@@ -2,6 +2,7 @@ using System.Collections;
 using BlocklyNet.Core.Model;
 using BlocklyNet.Extensions.Builder;
 using BlocklyNet.Scripting;
+using BlocklyNet.Scripting.Engine;
 using BlocklyNet.Scripting.Generic;
 
 namespace BlocklyNet.Extensions;
@@ -70,20 +71,34 @@ public class RunParallel : Block
       var options = new StartScriptOptions { ShouldStopNow = () => leadingDone };
       var tasks = configs.Select(config => context.Engine.RunAsync<GenericResult>(config, options)).ToArray();
 
-      /* Wait for the leading task to finish. */
-      if (leading is double)
+      /* Install debugging context chain. */
+      IDebugScriptSite? debugSite = context.Engine as IDebugScriptSite;
+
+      var oldContext = debugSite?.CallerContext;
+
+      debugSite?.CallerContext = context;
+
+      try
       {
-        await tasks[((int)leading) - 1];
+        /* Wait for the leading task to finish. */
+        if (leading is double)
+        {
+          await tasks[((int)leading) - 1];
 
-        /* Let other tasks stop as soon as possible. */
-        leadingDone = true;
+          /* Let other tasks stop as soon as possible. */
+          leadingDone = true;
+        }
+
+        /* Wait for all other tasks to finish and get results */
+        var results = await Task.WhenAll(tasks);
+
+        /* Report combined results. */
+        return results.Select(r => r.Result).ToArray();
       }
-
-      /* Wait for all other tasks to finish and get results */
-      var results = await Task.WhenAll(tasks);
-
-      /* Report combined results. */
-      return results.Select(r => r.Result).ToArray();
+      finally
+      {
+        debugSite?.CallerContext = context;
+      }
     }
     finally
     {

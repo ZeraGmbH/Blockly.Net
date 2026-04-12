@@ -11,7 +11,7 @@ partial class ScriptEngine<TLogType>
     /// <summary>
     /// Helper class to manage nested script calls.
     /// </summary>
-    protected class ScriptSite : IScriptSite<TLogType>, IGroupManagerSite
+    protected class ScriptSite : IScriptSite<TLogType>, IGroupManagerSite, IDebugScriptSite
     {
         /// <summary>
         /// 
@@ -101,6 +101,9 @@ partial class ScriptEngine<TLogType>
 
         /// <inheritdoc/>
         IScript? IScriptSite.MainScript => MainScript;
+
+        /// <inheritdoc/>
+        public Context? CallerContext { get; set; }
 
         /// <inheritdoc/>
         public Task<object?> EvaluateAsync(string scriptAsXml, Dictionary<string, object?> presets)

@@ -144,3 +144,14 @@ public interface IScriptSite<TLogType> : IScriptSite where TLogType : ScriptLogg
     /// </summary>
     new IScript<TLogType>? MainScript { get; }
 }
+
+/// <summary>
+/// Support for debugging nested script calls.
+/// </summary>
+internal interface IDebugScriptSite
+{
+    /// <summary>
+    /// During a nested script call the context of the caller.
+    /// </summary>
+    public Context? CallerContext { get; set; }
+}
