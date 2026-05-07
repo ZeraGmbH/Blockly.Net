@@ -52,4 +52,9 @@ public class ScriptLoggingResult
     /// Information on finished execution groups.
     /// </summary>
     public ScriptGroupStatus? GroupsFinished { get; set; }
+
+    /// <summary>
+    /// Set for root scripts.
+    /// </summary>
+    public bool? IsRoot { get; set; }
 }
