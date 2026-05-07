@@ -161,6 +161,9 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
             if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not IScriptInstance<TLogType> script)
                 throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
+            /* This is an outer call. */
+            script.ResultForLogging.IsRoot = true;
+
             using (Lock.Wait())
             {
                 /* There can be only one active script. */

@@ -172,6 +172,9 @@ partial class ScriptEngine<TLogType>
                 if (Activator.CreateInstance(request.GetScriptType(), request, this, options) is not IScriptInstance<TLogType> script)
                     throw new ArgumentException("bad script for '{Name}' request.", request.Name);
 
+                /* This is an inner call. */
+                script.ResultForLogging.IsRoot = false;
+
                 /* Start the background execution of the script. */
                 Task.Factory.StartNew(() => RunScriptAsync(script), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Current).Touch();
             }
