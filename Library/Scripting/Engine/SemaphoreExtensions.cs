@@ -8,18 +8,13 @@ public static class SemaphoreExtensions
     /// <summary>
     /// Helper to wait on a semaphore to synchronize data flow.
     /// </summary>
-    private class Waiter : IDisposable
+    /// <param name="semaphore">Semaphore to use.</param>
+    private class Waiter(SemaphoreSlim semaphore) : IDisposable
     {
         /// <summary>
         /// Semaphore to wait on.
         /// </summary>
-        private Semaphore? _semaphore;
-
-        /// <summary>
-        /// Create wait in the semaphore.
-        /// </summary>
-        /// <param name="semaphore">Semaphore to use.</param>
-        public Waiter(Semaphore semaphore) => (_semaphore = semaphore)?.WaitOne();
+        private SemaphoreSlim? _semaphore = semaphore;
 
         /// <summary>
         /// Release semaphore once - although this should never happen
@@ -33,5 +28,10 @@ public static class SemaphoreExtensions
     /// </summary>
     /// <param name="semaphore">Semaphore to wait on.</param>
     /// <returns>Waiting helper instance.</returns>
-    public static IDisposable Wait(this Semaphore semaphore) => new Waiter(semaphore);
+    public static async Task<IDisposable> CreateWaiterAsync(this SemaphoreSlim semaphore)
+    {
+        await semaphore.WaitAsync();
+
+        return new Waiter(semaphore);
+    }
 }

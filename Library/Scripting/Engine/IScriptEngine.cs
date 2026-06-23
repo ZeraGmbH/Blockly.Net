@@ -27,7 +27,7 @@ public interface IScriptEngine
     /// Abort the currently running script.
     /// <param name="jobId"></param>
     /// </summary>
-    void Cancel(string jobId);
+    Task CancelAsync(string jobId);
 
     /// <summary>
     /// Get the script result and forget about the execution.
@@ -41,7 +41,7 @@ public interface IScriptEngine
     /// A client reports a requested value.
     /// </summary>
     /// <param name="value">Information on the request and the value.</param>
-    void SetUserInput(UserInputResponse? value);
+    Task SetUserInputAsync(UserInputResponse? value);
 
     /// <summary>
     /// Report the script parsing engine to use.
@@ -52,7 +52,7 @@ public interface IScriptEngine
     /// Send current status to a newly connected client to let it keep up.
     /// </summary>
     /// <param name="client">The new client.</param>
-    void Reconnect(IScriptEngineNotifySink client);
+    Task ReconnectAsync(IScriptEngineNotifySink client);
 
     /// <summary>
     /// Use the group manager to create flat result list.

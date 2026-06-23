@@ -127,12 +127,12 @@ partial class ScriptEngine<TLogType>
             => _engine.GetUserInputAsync<T>(key, type, delay, required);
 
         /// <inheritdoc/>
-        public void ReportProgress(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
+        public Task ReportProgressAsync(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
         {
             /* Remember and propagate. */
             _progress.Update(info, progress, name, addEstimation, noVisualisation);
 
-            _engine.ReportProgress(info, _depth);
+            return _engine.ReportProgressAsync(info, _depth);
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ partial class ScriptEngine<TLogType>
         /* Create execution context. */
         var site = CreateSite(parent, depth + 1, await groupManager.CreateNestedAsync((request as IStartGenericScript)?.ScriptId ?? string.Empty, request.Name));
 
-        using (Lock.Wait())
+        using (await Lock.CreateWaiterAsync())
         {
             /* Create a new progress entry for this child. */
             while (depth >= _allProgress.Count) _allProgress.Add([]);
@@ -292,7 +292,7 @@ partial class ScriptEngine<TLogType>
         }
         finally
         {
-            using (Lock.Wait())
+            using (await Lock.CreateWaiterAsync())
                 if (depth < _allProgress.Count)
                     _allProgress[depth].Remove(site);
         }

@@ -57,7 +57,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// <summary>
     /// Synchronize modifying the result.
     /// </summary>
-    protected readonly Semaphore Lock = new(1, 1);
+    protected readonly SemaphoreSlim Lock = new(1, 1);
 
     /// <summary>
     /// The active script.
@@ -164,7 +164,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
             /* This is an outer call. */
             script.ResultForLogging.IsRoot = true;
 
-            using (Lock.Wait())
+            using (await Lock.CreateWaiterAsync())
             {
                 /* There can be only one active script. */
                 if (_active != null)
@@ -216,7 +216,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
 
         try
         {
-            using (Lock.Wait())
+            using (await Lock.CreateWaiterAsync())
             {
                 /* There must be some active script. */
                 var script = (Script?)_active ?? throw new InvalidOperationException("no script to restart.");
@@ -266,9 +266,9 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     protected virtual Task OnPrepareStartAsync(bool restart) => Task.CompletedTask;
 
     /// <inheritdoc/>
-    public void Cancel(string jobId)
+    public async Task CancelAsync(string jobId)
     {
-        using (Lock.Wait())
+        using (await Lock.CreateWaiterAsync())
         {
             /* Silent leave if script is already cancelled. */
             if (_active == null) return;
@@ -283,7 +283,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
 
             /* Abort pending input. */
             if (_inputResponse != null && _inputRequest != null)
-                SetUserInput(new() { JobId = jobId, Key = _inputRequest.Key }, false);
+                await SetUserInputAsync(new() { JobId = jobId, Key = _inputRequest.Key }, false);
 
             /* Do custom cleanup. */
             OnCancel(jobId);
@@ -404,7 +404,7 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     /// <inheritdoc/>
     public async Task<object?> FinishScriptAndGetResultAsync(string jobId, bool keepActive = false)
     {
-        using (Lock.Wait())
+        using (await Lock.CreateWaiterAsync())
         {
             /* Can only get the result for the active script. */
             var script = _active;
@@ -467,9 +467,9 @@ public partial class ScriptEngine<TLogType> : IScriptEngine, IScriptSite<TLogTyp
     }
 
     /// <inheritdoc/>
-    public void Reconnect(IScriptEngineNotifySink client)
+    public async Task ReconnectAsync(IScriptEngineNotifySink client)
     {
-        using (Lock.Wait())
+        using (await Lock.CreateWaiterAsync())
         {
             /* Nothing to report. */
             if (_active == null) return;

@@ -96,7 +96,7 @@ public class RequestUserInput : Block
     }
 
     /* Simulate user input. */
-    context.Engine.Engine.SetUserInput(null);
+    await context.Engine.Engine.SetUserInputAsync(null);
 
     /* May want to throw an exception. */
     var message = await Values.EvaluateAsync<string?>("THROWMESSAGE", context, false);

@@ -106,7 +106,7 @@ public class UserInputTests : TestEnvironment
                 };
 
                 /* We may not do an immediate reply since this will run into a deadlock. */
-                ThreadPool.QueueUserWorkItem((_) => engine.SetUserInput(response));
+                ThreadPool.QueueUserWorkItem(async (_) => await engine.SetUserInputAsync(response));
             }
         };
 
@@ -155,7 +155,7 @@ public class UserInputTests : TestEnvironment
                 };
 
                 /* We may not do an immediate reply since this will run into a deadlock. */
-                ThreadPool.QueueUserWorkItem((_) => engine.SetUserInput(response));
+                ThreadPool.QueueUserWorkItem(async (_) => await engine.SetUserInputAsync(response));
             }
         };
 
@@ -166,14 +166,14 @@ public class UserInputTests : TestEnvironment
 
         /* Check the result. */
         var result = (GenericResult)(await Engine.FinishScriptAndGetResultAsync(jobId))!;
-        
+
         // Convert JsonElement to array if necessary
         var resultValue = result.Result;
         if (resultValue is JsonElement jsonElement)
         {
             resultValue = JsonSerializer.Deserialize<object[]>(jsonElement.GetRawText(), JsonUtils.JsonSettings);
         }
-        
+
         var list = ((IEnumerable)resultValue!).Cast<object?>().ToArray();
 
         Assert.That(list, Has.Length.EqualTo(3));

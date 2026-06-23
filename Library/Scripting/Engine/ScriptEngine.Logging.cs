@@ -15,7 +15,7 @@ partial class ScriptEngine<TLogType>
     /// <param name="final">Set if the script is now finished - unset for updates during the execution.</param>
     private async Task UpdateResultLogEntryAsync(IScript<TLogType> script, IScript<TLogType>? parent, bool final)
     {
-        using (Lock.Wait())
+        using (await Lock.CreateWaiterAsync())
             try
             {
                 /* For the outer script always add the current status of the exeuction groups. */

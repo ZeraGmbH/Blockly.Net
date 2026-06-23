@@ -20,7 +20,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     /// <summary>
     /// Synchronizer to allow for parallel script execution.
     /// </summary>
-    private readonly Semaphore _sync = new(1, 1);
+    private readonly SemaphoreSlim _sync = new(1, 1);
 
     /// <summary>
     /// All active breakpoints.
@@ -240,7 +240,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
         if (context.Engine.CurrentScript is not IGenericScript script || string.IsNullOrEmpty(script.Request.ScriptId)) return default!;
 
         /* In parallel mode a single break stops anything. */
-        using (_sync.Wait())
+        using (await _sync.CreateWaiterAsync())
             return await handler(new ScriptDebugContext(script.Request.ScriptId, block, reason, context, this));
     }
 

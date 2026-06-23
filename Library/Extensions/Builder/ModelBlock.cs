@@ -377,7 +377,9 @@ public class ModelBlock<T> : Block where T : class, new()
             if (blocklyData == null) continue;
 
             /* Too make sure that the data fits run it to a serialize/deserialze sequence - currently performance should not be a problem. */
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
             var dataAsJson = JsonSerializer.Serialize(blocklyData, JsonUtils.JsonSettings);
+#pragma warning restore VSTHRD103 // Call async methods when in an async method
             var typedData = JsonSerializer.Deserialize(dataAsJson, prop.Type, JsonUtils.JsonSettings);
 
             /* Store the adapted value in the model. */

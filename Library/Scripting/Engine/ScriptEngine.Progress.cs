@@ -15,16 +15,16 @@ partial class ScriptEngine<TLogType>
     private readonly ProgressManager _progress = new();
 
     /// <inheritdoc/>
-    public void ReportProgress(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
+    public Task ReportProgressAsync(object info, double? progress, string? name, bool? addEstimation, bool? noVisualisation)
     {
         _progress.Update(info, progress, name, addEstimation, noVisualisation);
 
-        ReportProgress(info, 0);
+        return ReportProgressAsync(info, 0);
     }
 
-    private void ReportProgress(object info, int depth)
+    private async Task ReportProgressAsync(object info, int depth)
     {
-        using (Lock.Wait())
+        using (await Lock.CreateWaiterAsync())
         {
             if (_active == null) return;
 

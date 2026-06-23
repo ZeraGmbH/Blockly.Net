@@ -28,13 +28,13 @@ partial class ScriptEngine<TLogType>
     private double? _inputDelay = null;
 
     /// <inheritdoc/>
-    public void SetUserInput(UserInputResponse? response) => SetUserInput(response, true);
+    public Task SetUserInputAsync(UserInputResponse? response) => SetUserInputAsync(response, true);
 
-    private void SetUserInput(UserInputResponse? response, bool mustLock)
+    private async Task SetUserInputAsync(UserInputResponse? response, bool mustLock)
     {
         TaskCompletionSource<UserInputResponse>? inputResponse;
 
-        using (mustLock ? Lock.Wait() : null)
+        using (mustLock ? await Lock.CreateWaiterAsync() : null)
         {
             /* The script requesting the input must still be the active one. */
             if (_active == null || (response != null && _active.JobId != response.JobId))
@@ -102,9 +102,11 @@ partial class ScriptEngine<TLogType>
     }
 
     /// <inheritdoc/>
-    public Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null, bool? required = null)
+    public async Task<T?> GetUserInputAsync<T>(string key, string? type = null, double? delay = null, bool? required = null)
     {
-        using (Lock.Wait())
+        Task<UserInputResponse> responseTask;
+
+        using (await Lock.CreateWaiterAsync())
         {
             /* We have no active script. */
             if (_active == null)
@@ -138,18 +140,14 @@ partial class ScriptEngine<TLogType>
                     .Touch();
             }
 
-            /* Report a promise on the result. */
-            Logger.LogTrace("Script {JobId} is requesting input for {Key}.", _active.JobId, key);
-
-            return _inputResponse
-                .Task
-                .ContinueWith(
-                    t => DecodeUserInput<T>(t.Result.Value, t.Result.ValueType, ServiceProvider),
-                    CancellationToken.None,
-                    TaskContinuationOptions.OnlyOnRanToCompletion,
-                    TaskScheduler.Current
-                );
+            responseTask = _inputResponse.Task;
         }
+
+        Logger.LogTrace("Script {JobId} is requesting input for {Key}.", _active.JobId, key);
+
+        var res = await responseTask;
+
+        return DecodeUserInput<T>(res.Value, res.ValueType, ServiceProvider);
     }
 
     private static object? UserInputValueFromJson(object? value, string? type, IServiceProvider services)

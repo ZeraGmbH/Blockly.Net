@@ -21,7 +21,12 @@ public class UserInputTests : TestEnvironment
         var task = new TaskCompletionSource<object?>();
         var engine = new Mock<IScriptEngine>();
 
-        engine.Setup(e => e.SetUserInput(null)).Callback(() => task.SetResult(null));
+        engine.Setup(e => e.SetUserInputAsync(null)).Returns(() =>
+        {
+            task.SetResult(null);
+
+            return Task.CompletedTask;
+        });
 
         site.SetupGet(s => s.Engine).Returns(engine.Object);
 

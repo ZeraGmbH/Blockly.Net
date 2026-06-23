@@ -106,7 +106,7 @@ public class SetProgress : Block
         var progress = await Values.EvaluateDoubleAsync("PROGRESS", context);
         var name = await Values.EvaluateAsync<string?>("NAME", context, false);
 
-        context.Engine.ReportProgress(
+        await context.Engine.ReportProgressAsync(
             new GenericProgress
             {
                 Payload = await Values.EvaluateAsync("PAYLOAD", context, false),
