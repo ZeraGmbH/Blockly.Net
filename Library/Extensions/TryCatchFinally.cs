@@ -64,10 +64,7 @@ public class TryCatchFinally : Block
                 /* Fetch the block to run. */
                 var report = Statements.TryGet("CATCH");
 
-                if (report != null)
-                    await report.EvaluateAsync(context);
-                else
-                    throw;
+                if (report != null) await report.EvaluateAsync(context);
             }
             finally
             {
