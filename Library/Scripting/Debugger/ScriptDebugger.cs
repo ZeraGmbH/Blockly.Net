@@ -335,7 +335,7 @@ public abstract class ScriptDebugger : IScriptDebugger, IDisposable
     {
         Logger.LogTrace("Script execution paused");
 
-        var newStopper = new TaskCompletionSource();
+        var newStopper = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var stop = Interlocked.Exchange(ref _stop, newStopper);
 
