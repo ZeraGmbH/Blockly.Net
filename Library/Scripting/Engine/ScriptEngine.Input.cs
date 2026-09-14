@@ -116,7 +116,7 @@ partial class ScriptEngine<TLogType>
             if (_inputResponse == null)
             {
                 /* Create a new response handler. */
-                _inputResponse = new TaskCompletionSource<UserInputResponse>();
+                _inputResponse = new TaskCompletionSource<UserInputResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
                 _inputDelay = delay;
                 _inputStarted = DateTime.UtcNow;
 
