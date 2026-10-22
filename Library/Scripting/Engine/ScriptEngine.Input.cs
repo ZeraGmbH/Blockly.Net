@@ -91,7 +91,7 @@ partial class ScriptEngine<TLogType>
                     values.Add(UserInputValueFromJson(array[i], typeNames[i], services));
 
                 /* Blind convert - hopefully caller knows what he is doing. */
-                return (T?)(object?)values.ToArray();
+                return (T?)(object?)values.ToList();
             }
         }
 
