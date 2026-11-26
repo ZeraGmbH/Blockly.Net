@@ -70,10 +70,10 @@ public class AbstractModelTests : TestEnvironment
         var master = models.Single(j => j!["type"]?.GetValue<string>() == "master")!;
         var args = (JsonArray)master["args0"]!;
 
-        Assert.That(args, Has.Count.EqualTo(5));
+        Assert.That(args, Has.Count.EqualTo(3));
 
-        Assert.That(args[2]!.ToJsonString(), Is.EqualTo(@"{""type"":""input_value"",""name"":""SingleValue"",""check"":[""va"",""vb""]}"));
-        Assert.That(args[4]!.ToJsonString(), Is.EqualTo(@"{""type"":""input_value"",""name"":""MultiValue"",""check"":""Array""}"));
+        Assert.That(args[1]!.ToJsonString(), Is.EqualTo(@"{""type"":""input_value"",""name"":""SingleValue"",""check"":[""va"",""vb""]}"));
+        Assert.That(args[2]!.ToJsonString(), Is.EqualTo(@"{""type"":""input_value"",""name"":""MultiValue"",""check"":""Array""}"));
     }
 }
 

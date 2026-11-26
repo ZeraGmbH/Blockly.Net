@@ -254,10 +254,9 @@ public class ModelAndEnumTests : TestEnvironment
         var modelBlock = @"{ 
             ""args0"":[
                 { ""type"":""input_dummy"" },
-                { ""type"":""field_label_serializable"", ""name"":""TheList"",""text"":""TheList""},
                 { ""type"":""input_value"",""name"":""TheList"",""check"":[""Array(list_and_dictionary_TheList)"", ""Array""]}
             ],
-            ""message0"":""Complex list with dictionary %1 %2 %3"",
+            ""message0"":""Complex list with dictionary %1 TheList %2"",
             ""output"":""list_and_dictionary"",
             ""tooltip"":""Complex list with dictionary"",
             ""type"":""list_and_dictionary""
@@ -272,14 +271,11 @@ public class ModelAndEnumTests : TestEnvironment
         var dictBlock = @"{
             ""args0"":[
                 {""type"":""input_dummy""},
-                {""type"":""field_label_serializable"",""name"":""One"",""text"":""One""},
                 {""type"":""input_value"",""name"":""One"",""check"":""Boolean""},
-                {""type"":""field_label_serializable"",""name"":""Two"",""text"":""Two""},
                 {""type"":""input_value"",""name"":""Two"",""check"":""Boolean""},
-                {""type"":""field_label_serializable"",""name"":""Three"",""text"":""Three""},
                 {""type"":""input_value"",""name"":""Three"",""check"":""Boolean""}
             ],
-            ""message0"":""Complex list with dictionary TheList %1 %2 %3 %4 %5 %6 %7"",
+            ""message0"":""Complex list with dictionary TheList %1 One %2 Two %3 Three %4"",
             ""output"":""list_and_dictionary_TheList"",
             ""tooltip"":""Complex list with dictionary TheList"",
             ""type"":""list_and_dictionary_TheList""
