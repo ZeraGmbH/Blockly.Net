@@ -86,7 +86,7 @@ public class UserInputTests : TestEnvironment
     }
 
     [Test]
-    public void UserInputWithAutoCloseAndException()
+    public async Task UserInputWithAutoCloseAndExceptionAsync()
     {
         var block = new RequestUserInput
         {
@@ -102,7 +102,7 @@ public class UserInputTests : TestEnvironment
 
         SetupGetUserInput<object?>(Site, 43, 1.0);
 
-        var except = Assert.ThrowsAsync<TimeoutException>(() => block.EnterBlockAsync(new Context(Site.Object)));
+        var except = await Assert.ThrowsAsync<TimeoutException>(() => block.EnterBlockAsync(new Context(Site.Object)));
 
         Assert.That(except.Message, Is.EqualTo("busted"));
     }

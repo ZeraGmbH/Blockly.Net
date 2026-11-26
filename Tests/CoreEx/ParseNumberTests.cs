@@ -22,10 +22,10 @@ public class ParseNumberTests : TestEnvironment
     [TestCase("")]
     [TestCase("xx")]
     [TestCase("15E")]
-    public void ParseBadNumber(string number)
+    public async Task ParseBadNumberAsync(string number)
     {
         var block = new ParseNumber { Values = { new() { Name = "NUMBER", Block = CreateStringBlock(number) } } };
 
-        Assert.ThrowsAsync<FormatException>(() => block.EnterBlockAsync(new Context(Site.Object)));
+        await Assert.ThrowsAsync<FormatException>(() => block.EnterBlockAsync(new Context(Site.Object)));
     }
 }
