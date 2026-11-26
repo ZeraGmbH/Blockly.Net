@@ -60,14 +60,14 @@ public class CancellationTests : TestEnvironment
     /// See if we can do a hard cancel of the endless loop.
     /// </summary>
     [Test]
-    public void Can_Cancel_A_Running_Script()
+    public async Task Can_Cancel_A_Running_Script_Async()
     {
         /* Prepare to terminate the loop after 0.5 seconds. */
         Cancel.CancelAfter(500);
 
         var script = Engine.Parser.Parse(EndLessLoop);
 
-        Assert.ThrowsAsync<OperationCanceledException>(async () => await script.RunAsync(Site.Object));
+        await Assert.ThrowsAsync<OperationCanceledException>(async () => await script.RunAsync(Site.Object));
     }
 
     /// <summary>

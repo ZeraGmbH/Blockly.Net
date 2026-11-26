@@ -57,7 +57,7 @@ public class GroupManagerTests
 
         await Manager.FinishAsync(new() { Type = GroupResultType.Succeeded });
 
-        Assert.ThrowsAsync<InvalidOperationException>(() => Manager.FinishAsync(new() { Type = GroupResultType.Failed }));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Manager.FinishAsync(new() { Type = GroupResultType.Failed }));
     }
 
     [Test]

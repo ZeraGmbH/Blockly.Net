@@ -84,7 +84,7 @@ public class ManualFinishTests : TestEnvironment
             Assert.That(result.Result, Is.EqualTo("READY"));
         }
 
-        Assert.ThrowsAsync<ArgumentException>(() => Engine.FinishScriptAndGetResultAsync(jobId));
+        await Assert.ThrowsAsync<ArgumentException>(() => Engine.FinishScriptAndGetResultAsync(jobId));
     }
 
     [Test]
