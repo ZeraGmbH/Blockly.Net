@@ -844,26 +844,16 @@
           "type": "input_dummy"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Type",
-          "text": "Type"
-        },
-        {
           "type": "input_value",
           "name": "Type",
           "check": "group_execution_result_type"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "Result",
-          "text": "Result"
         },
         {
           "type": "input_value",
           "name": "Result"
         }
       ],
-      "message0": "Result of a group execution %1 %2 %3 %4 %5",
+      "message0": "Result of a group execution %1 Type %2 Result %3",
       "output": "group_execution_result",
       "tooltip": "Result of a group execution",
       "type": "group_execution_result"
@@ -874,29 +864,14 @@
           "type": "input_dummy"
         },
         {
-          "type": "field_label_serializable",
-          "name": "IsScript",
-          "text": "IsScript"
-        },
-        {
           "type": "input_value",
           "name": "IsScript",
           "check": "Boolean"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Key",
-          "text": "Key"
-        },
-        {
           "type": "input_value",
           "name": "Key",
           "check": "String"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "Name",
-          "text": "Name"
         },
         {
           "type": "input_value",
@@ -904,19 +879,9 @@
           "check": "String"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Details",
-          "text": "Details"
-        },
-        {
           "type": "input_value",
           "name": "Details",
           "check": "String"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "Result",
-          "text": "Result"
         },
         {
           "type": "input_value",
@@ -924,7 +889,7 @@
           "check": "String"
         }
       ],
-      "message0": "Status of a group execution %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11",
+      "message0": "Status of a group execution %1 IsScript %2 Key %3 Name %4 Details %5 Result %6",
       "output": "group_execution_status",
       "tooltip": "Status of a group execution",
       "type": "group_execution_status"
@@ -935,19 +900,9 @@
           "type": "input_dummy"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Name",
-          "text": "Name"
-        },
-        {
           "type": "input_value",
           "name": "Name",
           "check": "String"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "LocalName",
-          "text": "LocalName"
         },
         {
           "type": "input_value",
@@ -955,19 +910,9 @@
           "check": "String"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Namespace",
-          "text": "Namespace"
-        },
-        {
           "type": "input_value",
           "name": "Namespace",
           "check": "String"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "Value",
-          "text": "Value"
         },
         {
           "type": "input_value",
@@ -975,7 +920,7 @@
           "check": "String"
         }
       ],
-      "message0": "XML DOM Attribute %1 %2 %3 %4 %5 %6 %7 %8 %9",
+      "message0": "XML DOM Attribute %1 Name %2 LocalName %3 Namespace %4 Value %5",
       "output": "xml_attribute",
       "tooltip": "XML DOM Attribute",
       "type": "xml_attribute"
@@ -986,11 +931,6 @@
           "type": "input_dummy"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Attributes",
-          "text": "Attributes"
-        },
-        {
           "type": "input_value",
           "name": "Attributes",
           "check": [
@@ -999,19 +939,9 @@
           ]
         },
         {
-          "type": "field_label_serializable",
-          "name": "Name",
-          "text": "Name"
-        },
-        {
           "type": "input_value",
           "name": "Name",
           "check": "String"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "LocalName",
-          "text": "LocalName"
         },
         {
           "type": "input_value",
@@ -1019,19 +949,9 @@
           "check": "String"
         },
         {
-          "type": "field_label_serializable",
-          "name": "Namespace",
-          "text": "Namespace"
-        },
-        {
           "type": "input_value",
           "name": "Namespace",
           "check": "String"
-        },
-        {
-          "type": "field_label_serializable",
-          "name": "Content",
-          "text": "Content"
         },
         {
           "type": "input_value",
@@ -1039,7 +959,7 @@
           "check": "String"
         }
       ],
-      "message0": "XML DOM Node %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11",
+      "message0": "XML DOM Node %1 Attributes %2 Name %3 LocalName %4 Namespace %5 Content %6",
       "output": "xml_node",
       "tooltip": "XML DOM Node",
       "type": "xml_node"

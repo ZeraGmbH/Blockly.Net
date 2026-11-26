@@ -237,16 +237,19 @@ public class ModelBlock<T> : Block where T : class, new()
     {
         var args = new JsonArray { new JsonObject { ["type"] = "input_dummy" } };
 
+        /* Build a message string from our arguments. */
+        var message = new StringBuilder(_name);
+
+        message.Append(" %1");
+
         /* Process all properties known as supported. */
         foreach (var prop in _props)
         {
             /* Always generate a label. */
-            args.Add(new JsonObject
-            {
-                ["type"] = "field_label_serializable",
-                ["name"] = prop.Name,
-                ["text"] = prop.Name
-            });
+            message.Append(' ');
+            message.Append(prop.Name);
+            message.Append(" %");
+            message.Append(args.Count + 1);
 
             /* For enumerations provide a static selection list. */
             var enumType = prop.Type.IsGenericType && prop.Type.GetGenericTypeDefinition() == typeof(Nullable<>)
@@ -307,15 +310,6 @@ public class ModelBlock<T> : Block where T : class, new()
                 input["check"] = knownType;
 
             args.Add(input);
-        }
-
-        /* Build a message string from our arguments. */
-        var message = new StringBuilder(_name);
-
-        for (var i = 0; i++ < args.Count;)
-        {
-            message.Append(" %");
-            message.Append(i);
         }
 
         /* Finish the block definition by putting it all together. */
