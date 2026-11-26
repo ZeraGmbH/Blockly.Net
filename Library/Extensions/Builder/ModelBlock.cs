@@ -149,7 +149,10 @@ public class ModelBlock<T> : Block where T : class, new()
         // Already known other model.
         if (models.Contains(type)) return true;
 
-        return modelFactory(type, $"{_key}_{propertyName}", _name, category);
+        if (modelFactory(type, $"{_key}_{propertyName}", _name, category)) return true;
+
+        // Check for polymorphism.
+        return type.GetCustomAttributes<JsonDerivedTypeAttribute>().Any();
     }
 
     /// <summary>
@@ -196,30 +199,30 @@ public class ModelBlock<T> : Block where T : class, new()
                     var valueType = typeof(T).GetGenericArguments()[1];
 
                     if (TestSupported(TestArray(valueType) ?? valueType, category, models, modelFactory, "Value"))
-                        _props = Enum
+                        _props = [.. Enum
                             .GetValues(keyType)
                             .Cast<object>()
                             .Select(key => new PropertyInformation(key.ToString()!, valueType, (obj, value) => ((IDictionary)obj)[key] = value))
-                            .ToArray();
+                        ];
                 }
             }
             /* Special handling of lists. */
             else if (typeof(T).GetGenericTypeDefinition() == typeof(List<>))
-                _props ??= typeof(T)
+                _props ??= [.. typeof(T)
                     .GetProperties()
                     .Where(p => p.Name != nameof(List<object>.Capacity))
                     .Where(p => (p.GetCustomAttribute<JsonIgnoreAttribute>() is not JsonIgnoreAttribute ign || ign.Condition != JsonIgnoreCondition.Always) && p.CanRead && p.CanWrite)
                     .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
                     .Select(p => new PropertyInformation(p))
-                    .ToArray();
+                ];
 
         /* Get all properties of supported types - including a generic list of supported types. */
-        _props ??= typeof(T)
-                .GetProperties()
-                .Where(p => (p.GetCustomAttribute<JsonIgnoreAttribute>() is not JsonIgnoreAttribute ign || ign.Condition != JsonIgnoreCondition.Always) && p.CanRead && p.CanWrite)
-                .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
-                .Select(p => new PropertyInformation(p))
-                .ToArray();
+        _props ??= [.. typeof(T)
+            .GetProperties()
+            .Where(p => (p.GetCustomAttribute<JsonIgnoreAttribute>() is not JsonIgnoreAttribute ign || ign.Condition != JsonIgnoreCondition.Always) && p.CanRead && p.CanWrite)
+            .Where(p => TestSupported(TestArray(p.PropertyType) ?? p.PropertyType, category, models, modelFactory, p.Name))
+            .Select(p => new PropertyInformation(p))
+        ];
 
         /* Generate the JSON descriptions of the model. */
         return Tuple.Create(CreateBlockDefinition(models), CreateToolboxEntry(models));
@@ -271,7 +274,9 @@ public class ModelBlock<T> : Block where T : class, new()
                 /* Type of each array element. */
                 var itemType = _supportedTypes.TryGetValue(elementType, out var elem)
                     ? elem.TypeName
-                    : models[elementType];
+                    : models.TryGetValue(elementType, out var knownModel)
+                    ? knownModel
+                    : null;
 
                 /* Type checkings end at the array level - no element type validation possible. */
                 args.Add(new JsonObject
@@ -285,9 +290,11 @@ public class ModelBlock<T> : Block where T : class, new()
             }
 
             /* According to the preparation we either have some wellknown type or another model. */
-            var knownType = _supportedTypes.TryGetValue(prop.Type, out var info)
-                ? info.TypeName
-                : models[prop.Type];
+            JsonNode knownType = _supportedTypes.TryGetValue(prop.Type, out var info)
+                ? JsonValue.Create(info.TypeName)
+                : models.TryGetValue(prop.Type, out var existing)
+                ? JsonValue.Create(existing)
+                : models.ResolvePolymorphism(prop.Type);
 
             /* Generate the related input. */
             var input = new JsonObject
@@ -296,7 +303,8 @@ public class ModelBlock<T> : Block where T : class, new()
                 ["name"] = prop.Name,
             };
 
-            if (!string.IsNullOrEmpty(knownType)) input["check"] = knownType;
+            if (knownType.GetValueKind() != JsonValueKind.String || !string.IsNullOrEmpty(knownType.GetValue<string>()))
+                input["check"] = knownType;
 
             args.Add(input);
         }
