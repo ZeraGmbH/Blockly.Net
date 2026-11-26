@@ -1,3 +1,8 @@
+using System.Reflection;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+
 namespace BlocklyNet.Extensions.Builder;
 
 /// <summary>
@@ -67,6 +72,43 @@ public class ModelCache
 
             return info.Name;
         }
+    }
+
+    /// <summary>
+    /// Report mapping if it exists.
+    /// </summary>
+    /// <param name="type">Type to check for.</param>
+    /// <param name="mapping">Configured mapping.</param>
+    /// <returns>Set if the type has a known mapping.</returns>
+    public bool TryGetValue(Type type, out string mapping)
+    {
+        if (!_mapping.ContainsKey(type))
+        {
+            mapping = null!;
+
+            return false;
+        }
+
+        mapping = this[type];
+
+        return true;
+    }
+
+    /// <summary>
+    /// See if this model represents some abstract base class
+    /// and therefore polymorphism.
+    /// </summary>
+    /// <param name="type">Type to inspect.</param>
+    /// <returns>List of types used to check.</returns>
+    public JsonArray ResolvePolymorphism(Type type)
+    {
+        var array = new JsonArray();
+
+        foreach (var derived in type.GetCustomAttributes<JsonDerivedTypeAttribute>())
+            if (TryGetValue(derived.DerivedType, out var alternative))
+                array.Add(JsonValue.Create(alternative));
+
+        return array.Count > 0 ? array : throw new ArgumentException($"unsupported type {type.FullName}");
     }
 
     /// <summary>
