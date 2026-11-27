@@ -1,5 +1,7 @@
 name: Publish to NuGet
 
+
+
 on:
   workflow_dispatch:
   push:
@@ -10,9 +12,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Login to NuGet via OIDC
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ZERA.publish
       - name: Verify
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
@@ -31,4 +40,4 @@ jobs:
         run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
       - name: Push
         run: |
-          dotnet nuget push Blockly.Net.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json
+          dotnet nuget push Blockly.Net.${VERSION}.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
