@@ -31,4 +31,4 @@ jobs:
         run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
       - name: Push
         run: |
-          dotnet nuget push Blockly.Net.${VERSION}.nupkg --api-key ${{secrets.NUGET_PUBLISH}} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push Blockly.Net.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json
